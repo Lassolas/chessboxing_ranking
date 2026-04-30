@@ -28,6 +28,33 @@
   .fair-mark { background: #fff; outline: 2px solid #000; outline-offset: -2px; }
   hr { border: none; border-top: 1px solid #eee; margin: 10px 0; }
   .small { color: #777; font-size: 12px; }
+  .picker-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 10px 0 12px;
+  }
+  .picker label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #444;
+  }
+  .picker select {
+    width: 100%;
+    min-height: 170px;
+    padding: 6px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    background: #fcfcfc;
+    font: 13px/1.35 ui-monospace, Menlo, Consolas, monospace;
+    box-sizing: border-box;
+  }
+  .picker select:focus {
+    outline: 2px solid rgba(30, 58, 138, 0.18);
+    border-color: #1e3a8a;
+  }
   #tooltip {
     position: absolute;
     pointer-events: none;
@@ -87,6 +114,8 @@
     #wrapper { flex-direction: column; gap: 12px; margin-top: 10px; }
     #grid-container { width: 100%; }
     #info { width: 100%; min-width: 0; box-sizing: border-box; padding: 12px 14px; }
+    .picker-grid { grid-template-columns: 1fr; }
+    .picker select { min-height: 132px; }
     .rating-block { padding: 8px 10px; }
     .rating-block.big { padding: 10px; }
     .rating-value.big { font-size: 16px; }
@@ -105,14 +134,15 @@
 
 <h1>Chessboxing skill evaluator</h1>
 <p class="intro">
-  Click anywhere on the grid to set <b>your</b> chess and boxing level.
-  Each cell then shows your probability of winning a chessboxing match against an opponent of that skill, on a red→yellow→green color scale.
-  The black-outlined band marks opponents that win against you <b>≈ 50 %</b> of the time — your fair-fight zone.
+  Choose <b>Fighter A</b>'s chess and boxing levels by scrolling the lists below.
+  Each cell then shows Fighter A's probability of winning a chessboxing match against an opponent of that skill, on a red→yellow→green color scale.
+  Touch and drag on the grid to inspect opponents on mobile; on desktop, press and drag to inspect.
+  The black-outlined band marks opponents that win against Fighter A <b>≈ 50 %</b> of the time — the fair-fight zone.
 </p>
 <p class="intro">
   Win probability model (fitted from simulation data, RMSE ≈ 0.026):
   <span class="formula">P(win) = σ( 2·tanh(Δchess / 3) + Δboxing )</span>
-  with <span class="formula">Δ = you − opponent</span>.
+  with <span class="formula">Δ = Fighter A − opponent</span>.
 </p>
 <p class="intro">
   <b>Chessboxing rating</b> (★) is an absolute rank: each cell's average win probability against every other cell, normalized to [0,1] across the grid and shown as 0–5 stars.
@@ -124,25 +154,35 @@
     <div id="tooltip"></div>
   </div>
   <div id="info">
-    <h3>You (click to set)</h3>
+    <h3>Fighter A</h3>
+    <div class="picker-grid">
+      <div class="picker">
+        <label for="fighterChessSelect">Chess level</label>
+        <select id="fighterChessSelect" size="8"></select>
+      </div>
+      <div class="picker">
+        <label for="fighterBoxSelect">Boxing level</label>
+        <select id="fighterBoxSelect" size="8"></select>
+      </div>
+    </div>
     <div class="kv"><span>Chess level</span><b id="myChess">—</b></div>
     <div class="kv"><span>Chess ELO</span><b id="myElo">—</b></div>
     <div class="kv"><span>Boxing level</span><b id="myBox">—</b></div>
     <div class="rating-block">
-      <div class="rating-label">Your chessboxing rating</div>
+      <div class="rating-label">Fighter A chessboxing rating</div>
       <svg class="stars-svg" id="myStars" width="180" height="36" viewBox="0 0 500 100"></svg>
       <div class="rating-value" id="myRating">—</div>
     </div>
 
     <hr>
 
-    <h3>Hovered opponent</h3>
+    <h3>Current opponent</h3>
     <div class="kv"><span>Chess level</span><b id="hChess">—</b></div>
     <div class="kv"><span>Chess ELO</span><b id="hElo">—</b></div>
     <div class="kv"><span>Boxing level</span><b id="hBox">—</b></div>
     <div class="kv"><span>Δchess</span><b id="hDc">—</b></div>
     <div class="kv"><span>Δboxing</span><b id="hDb">—</b></div>
-    <div class="kv"><span>Your win prob</span><b id="hP">—</b></div>
+    <div class="kv"><span>Fighter A win prob</span><b id="hP">—</b></div>
     <div class="rating-block big">
       <div class="rating-label">Their chessboxing rating</div>
       <svg class="stars-svg" id="oppStars" width="240" height="48" viewBox="0 0 500 100"></svg>
@@ -152,7 +192,7 @@
     <hr>
 
     <h3>Legend</h3>
-    <div><span class="swatch you-mark"></span>your selected level</div>
+    <div><span class="swatch you-mark"></span>Fighter A selected level</div>
     <div><span class="swatch fair-mark"></span>≈50 % zone (45–55 %)</div>
     <div class="legend-row">
       <span>0 %</span>
@@ -284,6 +324,24 @@ function miniStarsHTML(rating) {
 // ----- State -----
 let myChess = 3.0;
 let myBox   = 2.0;
+let activePointerId = null;
+
+const fighterChessSelect = document.getElementById('fighterChessSelect');
+const fighterBoxSelect = document.getElementById('fighterBoxSelect');
+
+function fillSelect(selectEl, levels, formatter) {
+  selectEl.innerHTML = levels
+    .map(level => `<option value="${level.toFixed(2)}">${formatter(level)}</option>`)
+    .join('');
+}
+
+function syncSelects() {
+  fighterChessSelect.value = myChess.toFixed(2);
+  fighterBoxSelect.value = myBox.toFixed(2);
+}
+
+fillSelect(fighterChessSelect, chessLevels, level => `${level.toFixed(1)}  (${eloOf(level)} ELO)`);
+fillSelect(fighterBoxSelect, boxLevels, level => level.toFixed(1));
 
 // ----- Drawing -----
 function draw() {
@@ -398,7 +456,7 @@ function draw() {
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   ctx.fillStyle = '#333';
-  ctx.fillText('Opponent skill grid — colors = your win probability', MARGIN.left, 12);
+  ctx.fillText('Opponent skill grid — colors = Fighter A win probability', MARGIN.left, 12);
 }
 
 // ----- Info panel -----
@@ -412,6 +470,7 @@ function updateMine() {
   document.getElementById('myRating').textContent =
     s.toFixed(2) + ' / 5    (rank ' + (rankOf(i,j)*100).toFixed(0) + ' %)';
   setStars(myStarsClip, s);
+  syncSelects();
 }
 function setHover(idx) {
   if (!idx) {
@@ -436,8 +495,6 @@ function setHover(idx) {
 
 // ----- Events (pointer for unified mouse + touch) -----
 const tooltip = document.getElementById('tooltip');
-const containerEl = document.getElementById('grid-container');
-
 function eventCoords(e) {
   const r = canvas.getBoundingClientRect();
   const cssX = e.clientX - r.left;
@@ -464,35 +521,64 @@ function showTooltip(idx, cssX, cssY) {
     `<span class="tt-stars">${miniStarsHTML(s)} <span style="opacity:0.85">${s.toFixed(2)} / 5</span></span>`;
 }
 
-function handlePointer(e, doSelect) {
+function handlePointer(e) {
   const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
   const idx = px2cell(canvasX, canvasY);
   setHover(idx);
   showTooltip(idx, cssX, cssY);
-  if (doSelect && idx) {
-    myChess = chessLevels[idx.i];
-    myBox   = boxLevels[idx.j];
-    updateMine();
-    draw();
-  }
 }
 
 canvas.addEventListener('pointerdown', e => {
   e.preventDefault();
+  activePointerId = e.pointerId;
   try { canvas.setPointerCapture(e.pointerId); } catch(_) {}
-  handlePointer(e, true);
+  handlePointer(e);
 });
 canvas.addEventListener('pointermove', e => {
-  // For touch, pointermove only fires while pressed. For mouse, e.buttons & 1 means dragging.
-  const pressed = e.pointerType === 'touch' || (e.buttons & 1);
-  handlePointer(e, pressed);
+  if (e.pointerId !== activePointerId) return;
+  handlePointer(e);
 });
-canvas.addEventListener('pointerup',     e => handlePointer(e, true));
-canvas.addEventListener('pointerleave',  () => { setHover(null); tooltip.style.display = 'none'; });
-canvas.addEventListener('pointercancel', () => { tooltip.style.display = 'none'; });
+canvas.addEventListener('pointerup', e => {
+  if (e.pointerId !== activePointerId) return;
+  activePointerId = null;
+  setHover(null);
+  tooltip.style.display = 'none';
+  try { canvas.releasePointerCapture(e.pointerId); } catch(_) {}
+});
+canvas.addEventListener('pointerleave', e => {
+  if (e.pointerId != null && e.pointerId !== activePointerId) return;
+  if (activePointerId === null) {
+    setHover(null);
+    tooltip.style.display = 'none';
+  }
+});
+canvas.addEventListener('pointercancel', e => {
+  if (e.pointerId !== activePointerId) return;
+  activePointerId = null;
+  setHover(null);
+  tooltip.style.display = 'none';
+});
 // Prevent the page from scrolling when interacting with the grid on touch
 canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 canvas.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
+
+function bindLevelSelect(selectEl, applyValue) {
+  const handleChange = e => {
+    applyValue(Number(e.target.value));
+    updateMine();
+    draw();
+  };
+  selectEl.addEventListener('input', handleChange);
+  selectEl.addEventListener('change', handleChange);
+}
+
+bindLevelSelect(fighterChessSelect, value => {
+  myChess = value;
+});
+
+bindLevelSelect(fighterBoxSelect, value => {
+  myBox = value;
+});
 
 // ----- Legend bar -----
 (function () {
