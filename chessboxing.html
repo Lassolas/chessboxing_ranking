@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chessboxing skill evaluator</title>
+<style>
+  html, body { -webkit-text-size-adjust: 100%; }
+  body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; margin: 24px; background: #fafafa; color: #222; }
+  h1 { margin: 0 0 6px; font-size: 26px; }
+  .intro { max-width: 760px; color: #555; line-height: 1.45; margin-bottom: 8px; }
+  .formula { background: #eef; padding: 4px 10px; border-radius: 5px; font-family: ui-monospace, Menlo, Consolas, monospace; display: inline-block; }
+  #wrapper { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; margin-top: 16px; }
+  #grid-container { position: relative; max-width: 100%; }
+  canvas#grid {
+    display: block; cursor: crosshair; background: #fff; border: 1px solid #ccc;
+    max-width: 100%; height: auto;
+    touch-action: none;
+    user-select: none; -webkit-user-select: none;
+  }
+  #info { min-width: 280px; padding: 14px 18px; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+  #info h3 { margin: 0 0 6px; font-size: 14px; color: #333; }
+  .kv { display: flex; justify-content: space-between; margin: 3px 0; }
+  .kv b { font-variant-numeric: tabular-nums; }
+  .legend-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; }
+  .swatch { display: inline-block; width: 14px; height: 14px; vertical-align: middle; margin-right: 4px; border: 1px solid #aaa; }
+  .you-mark { background: #1e3a8a; }
+  .fair-mark { background: #fff; outline: 2px solid #000; outline-offset: -2px; }
+  hr { border: none; border-top: 1px solid #eee; margin: 10px 0; }
+  .small { color: #777; font-size: 12px; }
+  #tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(20,20,20,0.94);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font: 12px/1.35 ui-monospace, Menlo, Consolas, monospace;
+    white-space: nowrap;
+    transform: translate(-50%, calc(-100% - 18px));
+    display: none;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    max-width: 90vw;
+  }
+  #tooltip .tt-stars { display: block; margin-top: 4px; }
+  .rating-block {
+    margin: 8px 0 4px;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, #fffaf0, #fff5e0);
+    border: 1px solid #f0d890;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .rating-block.big {
+    padding: 14px 12px 10px;
+    background: linear-gradient(180deg, #fffae0, #ffeeb0);
+    border-color: #e6b94a;
+    box-shadow: 0 2px 6px rgba(230, 185, 74, 0.35);
+  }
+  .rating-label {
+    font-size: 11px;
+    color: #8a6a20;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .rating-value {
+    font-size: 13px;
+    color: #5a430b;
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .rating-value.big {
+    font-size: 18px;
+    font-weight: 600;
+    color: #3a2a00;
+  }
+  .stars-svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+  @media (max-width: 720px) {
+    body { margin: 10px; }
+    h1 { font-size: 20px; }
+    .intro { font-size: 13px; line-height: 1.4; }
+    .formula { font-size: 12px; padding: 3px 6px; }
+    #wrapper { flex-direction: column; gap: 12px; margin-top: 10px; }
+    #grid-container { width: 100%; }
+    #info { width: 100%; min-width: 0; box-sizing: border-box; padding: 12px 14px; }
+    .rating-block { padding: 8px 10px; }
+    .rating-block.big { padding: 10px; }
+    .rating-value.big { font-size: 16px; }
+    #myStars { width: 160px; height: 32px; }
+    #oppStars { width: 220px; height: 44px; }
+    #tooltip { font-size: 11px; padding: 5px 8px; }
+  }
+  @media (max-width: 420px) {
+    body { margin: 6px; }
+    h1 { font-size: 18px; }
+    #info { padding: 10px 12px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Chessboxing skill evaluator</h1>
+<p class="intro">
+  Click anywhere on the grid to set <b>your</b> chess and boxing level.
+  Each cell then shows your probability of winning a chessboxing match against an opponent of that skill, on a red→yellow→green color scale.
+  The black-outlined band marks opponents that win against you <b>≈ 50 %</b> of the time — your fair-fight zone.
+</p>
+<p class="intro">
+  Win probability model (fitted from simulation data, RMSE ≈ 0.026):
+  <span class="formula">P(win) = σ( 2·tanh(Δchess / 3) + Δboxing )</span>
+  with <span class="formula">Δ = you − opponent</span>.
+</p>
+<p class="intro">
+  <b>Chessboxing rating</b> (★) is an absolute rank: each cell's average win probability against every other cell, normalized to [0,1] across the grid and shown as 0–5 stars.
+</p>
+
+<div id="wrapper">
+  <div id="grid-container">
+    <canvas id="grid"></canvas>
+    <div id="tooltip"></div>
+  </div>
+  <div id="info">
+    <h3>You (click to set)</h3>
+    <div class="kv"><span>Chess level</span><b id="myChess">—</b></div>
+    <div class="kv"><span>Chess ELO</span><b id="myElo">—</b></div>
+    <div class="kv"><span>Boxing level</span><b id="myBox">—</b></div>
+    <div class="rating-block">
+      <div class="rating-label">Your chessboxing rating</div>
+      <svg class="stars-svg" id="myStars" width="180" height="36" viewBox="0 0 500 100"></svg>
+      <div class="rating-value" id="myRating">—</div>
+    </div>
+
+    <hr>
+
+    <h3>Hovered opponent</h3>
+    <div class="kv"><span>Chess level</span><b id="hChess">—</b></div>
+    <div class="kv"><span>Chess ELO</span><b id="hElo">—</b></div>
+    <div class="kv"><span>Boxing level</span><b id="hBox">—</b></div>
+    <div class="kv"><span>Δchess</span><b id="hDc">—</b></div>
+    <div class="kv"><span>Δboxing</span><b id="hDb">—</b></div>
+    <div class="kv"><span>Your win prob</span><b id="hP">—</b></div>
+    <div class="rating-block big">
+      <div class="rating-label">Their chessboxing rating</div>
+      <svg class="stars-svg" id="oppStars" width="240" height="48" viewBox="0 0 500 100"></svg>
+      <div class="rating-value big" id="hRating">—</div>
+    </div>
+
+    <hr>
+
+    <h3>Legend</h3>
+    <div><span class="swatch you-mark"></span>your selected level</div>
+    <div><span class="swatch fair-mark"></span>≈50 % zone (45–55 %)</div>
+    <div class="legend-row">
+      <span>0 %</span>
+      <canvas id="legendBar" width="220" height="14" style="border:1px solid #aaa"></canvas>
+      <span>100 %</span>
+    </div>
+    <p class="small">Chess: 1 level ≈ 228 ELO (0 = 800, 7 = 2400). Boxing: ordinal 0–5 scale.</p>
+  </div>
+</div>
+
+<script>
+// ----- Configuration -----
+const CHESS_MIN = 0, CHESS_MAX = 7, CHESS_STEP = 0.2;
+const BOX_MIN   = 0, BOX_MAX   = 5, BOX_STEP   = 0.2;
+const CELL = 14;
+const MARGIN = { top: 36, right: 24, bottom: 60, left: 78 };
+
+function buildLevels(min, max, step) {
+  const out = [];
+  const n = Math.round((max - min) / step) + 1;
+  for (let k = 0; k < n; k++) out.push(+(min + k * step).toFixed(2));
+  return out;
+}
+const chessLevels = buildLevels(CHESS_MIN, CHESS_MAX, CHESS_STEP); // 36 values
+const boxLevels   = buildLevels(BOX_MIN,   BOX_MAX,   BOX_STEP);   // 26 values
+const NX = chessLevels.length;
+const NY = boxLevels.length;
+
+// ----- Canvas setup -----
+const canvas = document.getElementById('grid');
+canvas.width  = MARGIN.left + NX * CELL + MARGIN.right;
+canvas.height = MARGIN.top  + NY * CELL + MARGIN.bottom;
+const ctx = canvas.getContext('2d');
+
+// ----- Model -----
+const sigmoid = x => 1 / (1 + Math.exp(-x));
+function pWin(myC, myB, oppC, oppB) {
+  const dc = myC - oppC;
+  const db = myB - oppB;
+  return sigmoid(2 * Math.tanh(dc / 3) + db);
+}
+const eloOf = c => Math.round(800 + c * (1600 / 7));
+
+// ----- Color scale (diverging red → yellow → green) -----
+function color(p) {
+  const cLow  = [178, 34, 34];
+  const cMid  = [250, 230, 100];
+  const cHigh = [34, 145, 70];
+  let a, b, t;
+  if (p < 0.5) { a = cLow;  b = cMid;  t = p / 0.5; }
+  else         { a = cMid;  b = cHigh; t = (p - 0.5) / 0.5; }
+  const r = Math.round(a[0] + (b[0] - a[0]) * t);
+  const g = Math.round(a[1] + (b[1] - a[1]) * t);
+  const v = Math.round(a[2] + (b[2] - a[2]) * t);
+  return `rgb(${r},${g},${v})`;
+}
+
+// ----- Coordinate helpers (boxing 0 at bottom) -----
+function cell2px(i, j) {
+  return {
+    x: MARGIN.left + i * CELL,
+    y: MARGIN.top  + (NY - 1 - j) * CELL
+  };
+}
+function px2cell(px, py) {
+  const i = Math.floor((px - MARGIN.left) / CELL);
+  const jVis = Math.floor((py - MARGIN.top) / CELL);
+  const j = NY - 1 - jVis;
+  if (i < 0 || i >= NX || j < 0 || j >= NY) return null;
+  return { i, j };
+}
+
+// ----- Absolute rank: average win prob of each cell vs every other cell -----
+const avgP = new Float32Array(NX * NY);
+for (let j = 0; j < NY; j++) {
+  for (let i = 0; i < NX; i++) {
+    const c1 = chessLevels[i], b1 = boxLevels[j];
+    let sum = 0;
+    for (let j2 = 0; j2 < NY; j2++) {
+      const b2 = boxLevels[j2];
+      for (let i2 = 0; i2 < NX; i2++) {
+        sum += pWin(c1, b1, chessLevels[i2], b2);
+      }
+    }
+    avgP[j * NX + i] = sum / (NX * NY);
+  }
+}
+let minAvg = Infinity, maxAvg = -Infinity;
+for (let k = 0; k < avgP.length; k++) {
+  if (avgP[k] < minAvg) minAvg = avgP[k];
+  if (avgP[k] > maxAvg) maxAvg = avgP[k];
+}
+function rankOf(i, j) {
+  return (avgP[j * NX + i] - minAvg) / (maxAvg - minAvg); // [0,1]
+}
+function starsOf(i, j) { return rankOf(i, j) * 5; }
+
+// ----- Star rendering (SVG) -----
+const STAR_PATH = "M50 6 L62 38 L96 40 L70 60 L80 92 L50 74 L20 92 L30 60 L4 40 L38 38 Z";
+function buildStarSvg(svgEl) {
+  const idClip = 'cp_' + Math.random().toString(36).slice(2, 9);
+  let bg = '', fg = '';
+  for (let i = 0; i < 5; i++) {
+    bg += `<g transform="translate(${i*100},0)"><path d="${STAR_PATH}" fill="#e8e3d0" stroke="#c8b97c" stroke-width="2"/></g>`;
+    fg += `<g transform="translate(${i*100},0)"><path d="${STAR_PATH}" fill="#f5b800" stroke="#c98e0a" stroke-width="2"/></g>`;
+  }
+  svgEl.innerHTML = `
+    <defs>
+      <clipPath id="${idClip}"><rect x="0" y="0" width="0" height="100"/></clipPath>
+    </defs>
+    <g class="bg">${bg}</g>
+    <g class="fg" clip-path="url(#${idClip})">${fg}</g>`;
+  return svgEl.querySelector(`#${idClip} rect`);
+}
+const myStarsClip  = buildStarSvg(document.getElementById('myStars'));
+const oppStarsClip = buildStarSvg(document.getElementById('oppStars'));
+function setStars(rectEl, rating /* 0..5 */) {
+  rectEl.setAttribute('width', Math.max(0, Math.min(5, rating)) * 100);
+}
+// inline mini-stars for tooltip (HTML)
+function miniStarsHTML(rating) {
+  const pct = Math.max(0, Math.min(5, rating)) / 5 * 100;
+  return `<span style="position:relative;display:inline-block;letter-spacing:1px;font-size:14px;line-height:1">
+    <span style="color:#5c5040">★★★★★</span>
+    <span style="color:#ffd24a;position:absolute;top:0;left:0;width:${pct}%;overflow:hidden;white-space:nowrap">★★★★★</span>
+  </span>`;
+}
+
+// ----- State -----
+let myChess = 3.0;
+let myBox   = 2.0;
+
+// ----- Drawing -----
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // cells
+  for (let j = 0; j < NY; j++) {
+    for (let i = 0; i < NX; i++) {
+      const oc = chessLevels[i];
+      const ob = boxLevels[j];
+      const p = pWin(myChess, myBox, oc, ob);
+      const { x, y } = cell2px(i, j);
+      ctx.fillStyle = color(p);
+      ctx.fillRect(x, y, CELL, CELL);
+    }
+  }
+
+  // grid lines (light)
+  ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= NX; i++) {
+    const x = MARGIN.left + i * CELL + 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x, MARGIN.top);
+    ctx.lineTo(x, MARGIN.top + NY * CELL);
+    ctx.stroke();
+  }
+  for (let j = 0; j <= NY; j++) {
+    const y = MARGIN.top + j * CELL + 0.5;
+    ctx.beginPath();
+    ctx.moveTo(MARGIN.left, y);
+    ctx.lineTo(MARGIN.left + NX * CELL, y);
+    ctx.stroke();
+  }
+
+  // 50% band overlay
+  ctx.lineWidth = 1.6;
+  ctx.strokeStyle = '#000';
+  for (let j = 0; j < NY; j++) {
+    for (let i = 0; i < NX; i++) {
+      const p = pWin(myChess, myBox, chessLevels[i], boxLevels[j]);
+      if (p >= 0.45 && p <= 0.55) {
+        const { x, y } = cell2px(i, j);
+        ctx.strokeRect(x + 0.8, y + 0.8, CELL - 1.6, CELL - 1.6);
+      }
+    }
+  }
+
+  // selected cell
+  const myI = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
+  const myJ = Math.round((myBox   - BOX_MIN)   / BOX_STEP);
+  const sel = cell2px(myI, myJ);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#1e3a8a';
+  ctx.strokeRect(sel.x - 1.5, sel.y - 1.5, CELL + 3, CELL + 3);
+  ctx.fillStyle = '#1e3a8a';
+  ctx.fillRect(sel.x + CELL / 2 - 2, sel.y + CELL / 2 - 2, 4, 4);
+
+  // axis frame
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#666';
+  ctx.strokeRect(MARGIN.left + 0.5, MARGIN.top + 0.5, NX * CELL, NY * CELL);
+
+  // X axis (chess)
+  ctx.fillStyle = '#222';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (let v = CHESS_MIN; v <= CHESS_MAX; v += 1) {
+    const i = Math.round((v - CHESS_MIN) / CHESS_STEP);
+    const x = MARGIN.left + i * CELL + CELL / 2;
+    const yTop = MARGIN.top + NY * CELL;
+    ctx.beginPath();
+    ctx.moveTo(x, yTop);
+    ctx.lineTo(x, yTop + 4);
+    ctx.strokeStyle = '#444';
+    ctx.stroke();
+    ctx.fillText(v.toFixed(0), x, yTop + 6);
+    ctx.fillStyle = '#888';
+    ctx.fillText(eloOf(v), x, yTop + 22);
+    ctx.fillStyle = '#222';
+  }
+  ctx.font = 'bold 13px system-ui';
+  ctx.fillText('Chess level   (ELO)', MARGIN.left + NX * CELL / 2, MARGIN.top + NY * CELL + 42);
+
+  // Y axis (boxing)
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let v = BOX_MIN; v <= BOX_MAX; v += 1) {
+    const j = Math.round((v - BOX_MIN) / BOX_STEP);
+    const { y } = cell2px(0, j);
+    ctx.beginPath();
+    ctx.moveTo(MARGIN.left - 4, y + CELL / 2);
+    ctx.lineTo(MARGIN.left,     y + CELL / 2);
+    ctx.strokeStyle = '#444';
+    ctx.stroke();
+    ctx.fillText(v.toFixed(0), MARGIN.left - 7, y + CELL / 2);
+  }
+  ctx.save();
+  ctx.translate(20, MARGIN.top + NY * CELL / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 13px system-ui';
+  ctx.fillStyle = '#222';
+  ctx.fillText('Boxing level', 0, 0);
+  ctx.restore();
+
+  // title strip
+  ctx.font = 'bold 13px system-ui';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#333';
+  ctx.fillText('Opponent skill grid — colors = your win probability', MARGIN.left, 12);
+}
+
+// ----- Info panel -----
+function updateMine() {
+  const i = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
+  const j = Math.round((myBox   - BOX_MIN)   / BOX_STEP);
+  const s = starsOf(i, j);
+  document.getElementById('myChess').textContent = myChess.toFixed(1);
+  document.getElementById('myElo').textContent   = eloOf(myChess);
+  document.getElementById('myBox').textContent   = myBox.toFixed(1);
+  document.getElementById('myRating').textContent =
+    s.toFixed(2) + ' / 5    (rank ' + (rankOf(i,j)*100).toFixed(0) + ' %)';
+  setStars(myStarsClip, s);
+}
+function setHover(idx) {
+  if (!idx) {
+    ['hChess','hElo','hBox','hDc','hDb','hP','hRating'].forEach(id => document.getElementById(id).textContent = '—');
+    setStars(oppStarsClip, 0);
+    return;
+  }
+  const oc = chessLevels[idx.i];
+  const ob = boxLevels[idx.j];
+  const p  = pWin(myChess, myBox, oc, ob);
+  const s  = starsOf(idx.i, idx.j);
+  document.getElementById('hChess').textContent = oc.toFixed(1);
+  document.getElementById('hElo').textContent   = eloOf(oc);
+  document.getElementById('hBox').textContent   = ob.toFixed(1);
+  document.getElementById('hDc').textContent    = (myChess - oc).toFixed(1);
+  document.getElementById('hDb').textContent    = (myBox   - ob).toFixed(1);
+  document.getElementById('hP').textContent     = (p * 100).toFixed(1) + ' %';
+  document.getElementById('hRating').textContent =
+    s.toFixed(2) + ' / 5    (rank ' + (rankOf(idx.i, idx.j)*100).toFixed(0) + ' %)';
+  setStars(oppStarsClip, s);
+}
+
+// ----- Events (pointer for unified mouse + touch) -----
+const tooltip = document.getElementById('tooltip');
+const containerEl = document.getElementById('grid-container');
+
+function eventCoords(e) {
+  const r = canvas.getBoundingClientRect();
+  const cssX = e.clientX - r.left;
+  const cssY = e.clientY - r.top;
+  return {
+    cssX, cssY,
+    canvasX: cssX * (canvas.width  / r.width),
+    canvasY: cssY * (canvas.height / r.height),
+  };
+}
+
+function showTooltip(idx, cssX, cssY) {
+  if (!idx) { tooltip.style.display = 'none'; return; }
+  const oc = chessLevels[idx.i];
+  const ob = boxLevels[idx.j];
+  const p  = pWin(myChess, myBox, oc, ob);
+  const s  = starsOf(idx.i, idx.j);
+  tooltip.style.display = 'block';
+  // tooltip is positioned relative to grid-container; canvas is at (0,0) inside it
+  tooltip.style.left = cssX + 'px';
+  tooltip.style.top  = cssY + 'px';
+  tooltip.innerHTML =
+    `chess ${oc.toFixed(1)} (${eloOf(oc)})  box ${ob.toFixed(1)}  →  ${(p*100).toFixed(1)}%` +
+    `<span class="tt-stars">${miniStarsHTML(s)} <span style="opacity:0.85">${s.toFixed(2)} / 5</span></span>`;
+}
+
+function handlePointer(e, doSelect) {
+  const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
+  const idx = px2cell(canvasX, canvasY);
+  setHover(idx);
+  showTooltip(idx, cssX, cssY);
+  if (doSelect && idx) {
+    myChess = chessLevels[idx.i];
+    myBox   = boxLevels[idx.j];
+    updateMine();
+    draw();
+  }
+}
+
+canvas.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  try { canvas.setPointerCapture(e.pointerId); } catch(_) {}
+  handlePointer(e, true);
+});
+canvas.addEventListener('pointermove', e => {
+  // For touch, pointermove only fires while pressed. For mouse, e.buttons & 1 means dragging.
+  const pressed = e.pointerType === 'touch' || (e.buttons & 1);
+  handlePointer(e, pressed);
+});
+canvas.addEventListener('pointerup',     e => handlePointer(e, true));
+canvas.addEventListener('pointerleave',  () => { setHover(null); tooltip.style.display = 'none'; });
+canvas.addEventListener('pointercancel', () => { tooltip.style.display = 'none'; });
+// Prevent the page from scrolling when interacting with the grid on touch
+canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
+
+// ----- Legend bar -----
+(function () {
+  const lc = document.getElementById('legendBar');
+  const lctx = lc.getContext('2d');
+  for (let x = 0; x < lc.width; x++) {
+    lctx.fillStyle = color(x / (lc.width - 1));
+    lctx.fillRect(x, 0, 1, lc.height);
+  }
+})();
+
+updateMine();
+draw();
+</script>
+
+</body>
+</html>
