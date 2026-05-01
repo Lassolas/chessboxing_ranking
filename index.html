@@ -24,7 +24,7 @@
   --font-body:      system-ui, -apple-system, sans-serif;
   --font-mono:      ui-monospace, Menlo, Consolas, monospace;
   --radius-card:    12px;
-  --radius-btn:     8px;
+  --item-h:         52px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -42,7 +42,7 @@ body {
 /* ── HEADER ── */
 #site-header {
   text-align: center;
-  padding: 40px 20px 28px;
+  padding: 36px 20px 24px;
   background-image: url('assets/hero-banner.png');
   background-size: cover;
   background-position: center 40%;
@@ -53,14 +53,14 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10,10,15,0.55) 0%, rgba(10,10,15,0.78) 100%);
+  background: linear-gradient(180deg, rgba(10,10,15,0.52) 0%, rgba(10,10,15,0.76) 100%);
   pointer-events: none;
 }
 #site-header > * { position: relative; z-index: 1; }
 
 .site-title {
   font-family: var(--font-display);
-  font-size: clamp(26px, 8vw, 52px);
+  font-size: clamp(24px, 7vw, 50px);
   font-weight: 700;
   letter-spacing: 0.14em;
   color: var(--gold-bright);
@@ -71,36 +71,36 @@ body {
   gap: 14px;
 }
 .site-title img {
-  width: clamp(28px, 5vw, 44px);
-  height: clamp(28px, 5vw, 44px);
+  width: clamp(26px, 5vw, 42px);
+  height: clamp(26px, 5vw, 42px);
   object-fit: contain;
   filter: drop-shadow(0 0 6px rgba(245,200,66,0.5));
 }
 .site-tagline {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin: 10px 0 0;
+  margin: 8px 0 0;
 }
 
 /* ── MAIN LAYOUT ── */
-#main { max-width: 1100px; margin: 0 auto; padding: 0 0 100px; }
+#main { max-width: 1100px; margin: 0 auto; padding-bottom: 80px; }
 
-/* ── SECTION HEADINGS ── */
+/* ── SECTION HEADING ── */
 .section-title {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gold-bright);
   border-bottom: 1px solid var(--gold-dim);
-  padding: 22px 16px 10px;
+  padding: 18px 16px 9px;
   margin: 0;
 }
 .section-hint {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
   font-family: var(--font-body);
   font-weight: 400;
@@ -109,118 +109,307 @@ body {
   margin-left: 8px;
 }
 
-/* ── FIGHTER SETUP ── */
-#fighter-setup { padding: 0 0 8px; }
-
-.carousels-row {
+/* ── DRUMS ROW ── */
+.drums-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;
   border-bottom: 1px solid var(--border);
 }
 
-.carousel-block {
-  position: relative;
-  padding: 14px 0 10px;
-  border-right: 1px solid var(--border);
+.drum-section {
+  padding: 10px 0 0;
 }
-.carousel-block:last-child { border-right: none; }
+.drum-section:first-child { border-right: 1px solid var(--border); }
 
-.carousel-label {
+.drum-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
+  gap: 6px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-secondary);
-  padding: 0 16px 8px;
+  padding: 0 12px 6px;
 }
-.carousel-label img { width: 18px; height: 18px; object-fit: contain; opacity: 0.8; }
+.drum-label img { width: 14px; height: 14px; object-fit: contain; opacity: 0.75; }
 
-.carousel {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  gap: 8px;
-  padding: 4px 40% 10px;
-  scrollbar-width: none;
-  cursor: grab;
+/* The clip wrapper hides overflow and provides gradient masks */
+.drum-clip {
+  position: relative;
+  height: calc(var(--item-h) * 3); /* show 3 items */
+  overflow: hidden;
 }
-.carousel:active { cursor: grabbing; }
-.carousel::-webkit-scrollbar { display: none; }
 
-.carousel-item {
-  flex: 0 0 130px;
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
-  background: var(--bg-panel-alt);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-btn);
-  padding: 12px 10px 10px;
-  text-align: center;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.carousel-item:hover { border-color: var(--gold-dim); }
-.carousel-item.active {
-  border-color: var(--gold-bright);
-  box-shadow: 0 0 0 2px var(--gold-glow), 0 4px 18px rgba(245,200,66,0.15);
-  transform: scale(1.05);
-}
-.carousel-item__name { font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-.carousel-item.active .carousel-item__name { color: var(--gold-bright); }
-.carousel-item__sub { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.3; }
-
-.carousel-block::before,
-.carousel-block::after {
+/* Center-slot highlight */
+.drum-clip::before {
   content: '';
   position: absolute;
-  top: 50px; bottom: 14px;
-  width: 40px;
-  z-index: 2;
+  left: 6px; right: 6px;
+  top: var(--item-h); /* one item down = center slot */
+  height: var(--item-h);
+  background: rgba(245, 200, 66, 0.07);
+  border-top: 1px solid rgba(245, 200, 66, 0.22);
+  border-bottom: 1px solid rgba(245, 200, 66, 0.22);
+  border-radius: 6px;
   pointer-events: none;
+  z-index: 2;
 }
-.carousel-block::before { left: 0; background: linear-gradient(to right, var(--bg-deep), transparent); }
-.carousel-block::after  { right: 0; background: linear-gradient(to left,  var(--bg-deep), transparent); }
+
+/* Top/bottom fade */
+.drum-clip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, var(--bg-deep) 0%, transparent 28%),
+    linear-gradient(to top,    var(--bg-deep) 0%, transparent 28%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.drum {
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  cursor: ns-resize;
+  overscroll-behavior: contain;
+}
+.drum::-webkit-scrollbar { display: none; }
+
+.drum-spacer { height: var(--item-h); flex-shrink: 0; }
+
+.drum-item {
+  height: var(--item-h);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 8px;
+  cursor: pointer;
+  opacity: 0.35;
+  transition: opacity 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+  text-align: center;
+}
+.drum-item.active { opacity: 1; }
+
+.drum-item__name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.drum-item.active .drum-item__name { color: var(--gold-bright); }
+
+.drum-item__sub {
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+.drum-item.active .drum-item__sub { color: var(--gold-mid); }
 
 /* ── FIGHTER CARD ── */
 .fighter-card {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 12px 16px;
-  padding: 14px 20px;
-  background: var(--bg-panel);
+  gap: 10px 14px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border);
-  transition: box-shadow 0.3s;
+  background: var(--bg-panel);
 }
 @keyframes pulse-gold {
   0%   { box-shadow: inset 0 0 0 0 rgba(245,200,66,0); }
-  40%  { box-shadow: inset 0 0 0 2px rgba(245,200,66,0.5); }
+  40%  { box-shadow: inset 0 0 0 2px rgba(245,200,66,0.45); }
   100% { box-shadow: inset 0 0 0 0 rgba(245,200,66,0); }
 }
 .fighter-card.pulse { animation: pulse-gold 0.5s ease; }
 
 .fighter-card__label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--gold-dim);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
-.fighter-card__levels { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.5; }
-.fighter-card__levels .sub { color: var(--text-secondary); font-weight: 400; font-size: 11px; display: block; }
+.fighter-card__chess {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.fighter-card__chess-sub {
+  font-size: 11px;
+  color: var(--gold-mid);
+  font-family: var(--font-mono);
+  margin-top: 1px;
+}
+.fighter-card__box {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
 
 .fighter-card__right { text-align: right; }
-.fighter-card__rank { font-size: 11px; color: var(--text-secondary); margin-top: 4px; font-family: var(--font-mono); }
+.fighter-card__rank {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  font-family: var(--font-mono);
+}
 
-/* ── EXPLORE GRID ── */
+/* ── FIGHT CARD ── */
+#fight-card {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-panel);
+  border-top: 2px solid var(--gold-mid);
+  border-radius: 16px 16px 0 0;
+  padding: 0 0 env(safe-area-inset-bottom, 12px);
+  z-index: 200;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+  box-shadow: 0 -8px 48px rgba(0,0,0,0.7);
+  max-height: 75vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#fight-card.visible { transform: translateY(0); }
+
+.fc-handle {
+  width: 32px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 10px auto 0;
+}
+.fc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 0;
+}
+.fc-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.fc-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  border-radius: 4px;
+}
+.fc-close:hover { color: var(--text-primary); }
+
+.fc-fighters {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 8px;
+}
+
+.fc-fighter { display: flex; flex-direction: column; gap: 2px; }
+.fc-fighter--a  { text-align: left; }
+.fc-fighter--opp { text-align: right; }
+
+.fc-corner {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.fc-fighter--a .fc-corner { color: var(--gold-dim); }
+
+.fc-chess-level { font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+.fc-chess-elo   { font-size: 11px; color: var(--gold-mid); font-family: var(--font-mono); }
+.fc-box-level   { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.fc-stars-row   { margin-top: 4px; }
+
+.fc-outcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  background: var(--bg-panel-alt);
+  border: 2px solid var(--gold-mid);
+  transition: border-color 0.3s;
+  flex-shrink: 0;
+}
+.fc-outcome__prob {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--gold-bright);
+  line-height: 1;
+  transition: color 0.3s;
+}
+.fc-outcome__label {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.fc-divider {
+  width: calc(100% - 32px);
+  height: 28px;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+  opacity: 0.5;
+}
+
+.fc-bars {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fc-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.fc-bar-row span { flex: 0 0 82px; text-align: right; }
+.fc-bar {
+  flex: 1;
+  height: 5px;
+  background: var(--bg-panel-alt);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.fc-bar__fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  border-radius: 3px;
+  background: var(--gold-bright);
+  transition: width 0.4s ease;
+}
+
+/* ── GRID ── */
 #explore-section { padding-bottom: 16px; }
 
 #grid-wrap {
@@ -271,210 +460,78 @@ canvas#grid {
   font-size: 12px;
   color: var(--text-secondary);
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
   padding: 0 4px;
 }
 .legend-row canvas { flex: 1; border-radius: 3px; border: 1px solid var(--border); }
 
 .legend-markers {
   display: flex;
-  gap: 18px;
-  font-size: 12px;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  font-size: 11px;
   color: var(--text-secondary);
   padding: 0 4px;
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
 }
 .swatch {
   display: inline-block;
   width: 12px; height: 12px;
   border-radius: 2px;
   vertical-align: middle;
-  margin-right: 5px;
-  border: 1px solid rgba(255,255,255,0.15);
+  margin-right: 4px;
 }
 .you-mark { background: #f5c842; }
-.fair-mark { background: transparent; outline: 2px solid rgba(255,255,255,0.65); outline-offset: -1px; }
-
-/* ── FIGHT CARD ── */
-#fight-card {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--bg-panel);
-  border-top: 2px solid var(--gold-mid);
-  border-radius: 18px 18px 0 0;
-  padding: 0 0 env(safe-area-inset-bottom, 16px);
-  z-index: 200;
-  transform: translateY(100%);
-  transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
-  box-shadow: 0 -8px 48px rgba(0,0,0,0.7);
-  max-height: 80vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+.iso-line {
+  display: inline-block;
+  width: 20px; height: 2px;
+  background: rgba(245,200,66,0.85);
+  vertical-align: middle;
+  margin-right: 4px;
+  border-radius: 1px;
 }
-#fight-card.visible { transform: translateY(0); }
-
-.fc-handle {
-  width: 36px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 10px auto 0;
-}
-
-.fc-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 18px 0;
-}
-.fc-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gold-dim);
-}
-.fc-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px 8px;
-  line-height: 1;
-  border-radius: 4px;
-  transition: color 0.15s;
-}
-.fc-close:hover { color: var(--text-primary); }
-
-.fc-fighters {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 18px 10px;
-}
-
-.fc-fighter { display: flex; flex-direction: column; gap: 3px; }
-.fc-fighter--a  { text-align: left; }
-.fc-fighter--opp { text-align: right; }
-
-.fc-corner {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.fc-fighter--a .fc-corner { color: var(--gold-dim); }
-
-.fc-chess-level { font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-.fc-box-level   { font-size: 12px; color: var(--text-secondary); }
-.fc-stars-row   { margin-top: 4px; }
-
-.fc-outcome {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 72px; height: 72px;
-  border-radius: 50%;
-  background: var(--bg-panel-alt);
-  border: 2px solid var(--gold-mid);
-  transition: border-color 0.3s;
-  flex-shrink: 0;
-}
-.fc-outcome__prob {
-  font-size: 17px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  color: var(--gold-bright);
-  line-height: 1;
-  transition: color 0.3s;
-}
-.fc-outcome__label {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
-  margin-top: 3px;
-}
-
-.fc-divider {
-  width: calc(100% - 36px);
-  height: 32px;
-  display: block;
-  margin: 0 auto;
-  object-fit: contain;
-  opacity: 0.55;
-}
-
-.fc-bars {
-  padding: 0 18px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.fc-bar-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-.fc-bar-row span { flex: 0 0 90px; text-align: right; }
-.fc-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--bg-panel-alt);
-  border-radius: 3px;
-  overflow: hidden;
-  position: relative;
-}
-.fc-bar__fill {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  border-radius: 3px;
-  background: var(--gold-bright);
-  transition: width 0.4s ease;
+.iso-band {
+  display: inline-block;
+  width: 20px; height: 2px;
+  background: rgba(245,200,66,0.38);
+  vertical-align: middle;
+  margin-right: 4px;
+  border-radius: 1px;
+  background: repeating-linear-gradient(90deg, rgba(245,200,66,0.45) 0px, rgba(245,200,66,0.45) 4px, transparent 4px, transparent 7px);
 }
 
 /* ── DESKTOP ── */
 @media (min-width: 760px) {
   #main {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 300px 1fr;
     align-items: start;
     padding-bottom: 40px;
   }
-  .section-title { padding: 22px 20px 10px; }
+  .section-title { padding: 18px 16px 9px; }
 
   #fighter-setup {
     grid-column: 1;
-    grid-row: 1 / 3;
+    grid-row: 1;
     border-right: 1px solid var(--border);
     position: sticky;
     top: 0;
     max-height: 100vh;
     overflow-y: auto;
   }
+  #explore-section { grid-column: 2; }
 
-  #explore-section { grid-column: 2; grid-row: 1; }
-
-  .carousels-row { grid-template-columns: 1fr; }
-  .carousel-block { border-right: none; border-bottom: 1px solid var(--border); }
-  .carousel-block:last-of-type { border-bottom: none; }
-  .carousel { padding: 4px 35% 10px; }
-
-  /* fight card inline on desktop */
+  /* fight card: inline in sidebar on desktop */
   #fight-card {
     position: static;
     transform: none !important;
-    border-radius: var(--radius-card);
+    border-radius: 10px;
     border: 1px solid var(--gold-mid);
+    border-top: 1px solid var(--gold-mid);
     box-shadow: none;
     max-height: none;
-    margin: 12px 16px 16px;
+    margin: 10px 12px 12px;
     padding-bottom: 0;
     opacity: 0;
     visibility: hidden;
@@ -484,9 +541,9 @@ canvas#grid {
   .fc-handle { display: none; }
 }
 
-@media (max-width: 420px) {
-  .carousel-item { flex: 0 0 110px; }
-  .site-title { letter-spacing: 0.08em; }
+@media (max-width: 380px) {
+  .drum-item__name { font-size: 11px; }
+  .drum-item__sub  { font-size: 9px; }
 }
 </style>
 </head>
@@ -503,38 +560,46 @@ canvas#grid {
 
 <div id="main">
 
+  <!-- ── FIGHTER SETUP ── -->
   <section id="fighter-setup">
     <h2 class="section-title">Your Profile</h2>
 
-    <div class="carousels-row">
-      <div class="carousel-block">
-        <div class="carousel-label">
+    <div class="drums-row">
+      <!-- Chess drum -->
+      <div class="drum-section">
+        <div class="drum-label">
           <img src="assets/icon-chess.png" alt="">Chess
         </div>
-        <div class="carousel" id="chess-carousel" role="listbox" aria-label="Chess level" tabindex="0"></div>
+        <div class="drum-clip">
+          <div class="drum" id="chess-drum" role="listbox" aria-label="Chess level" tabindex="0"></div>
+        </div>
       </div>
-      <div class="carousel-block">
-        <div class="carousel-label">
+      <!-- Boxing drum -->
+      <div class="drum-section">
+        <div class="drum-label">
           <img src="assets/icon-boxing.png" alt="">Boxing
         </div>
-        <div class="carousel" id="boxing-carousel" role="listbox" aria-label="Boxing level" tabindex="0"></div>
+        <div class="drum-clip">
+          <div class="drum" id="boxing-drum" role="listbox" aria-label="Boxing level" tabindex="0"></div>
+        </div>
       </div>
     </div>
 
+    <!-- Fighter summary card -->
     <div class="fighter-card" id="my-fighter-card">
       <div>
         <div class="fighter-card__label">Your Corner</div>
-        <div class="fighter-card__levels">
-          <span id="myChessLabel">—</span>
-          <span class="sub" id="myBoxLabel">—</span>
-        </div>
+        <div class="fighter-card__chess" id="myChessLabel">—</div>
+        <div class="fighter-card__chess-sub" id="myElo">—</div>
+        <div class="fighter-card__box" id="myBoxLabel">—</div>
       </div>
       <div class="fighter-card__right">
-        <svg class="stars-svg" id="myStars" width="120" height="24" viewBox="0 0 500 100"></svg>
+        <svg class="stars-svg" id="myStars" width="110" height="22" viewBox="0 0 500 100"></svg>
         <div class="fighter-card__rank" id="myRating">—</div>
       </div>
     </div>
 
+    <!-- Fight card: fixed bottom sheet on mobile, inline here on desktop -->
     <div id="fight-card">
       <div class="fc-handle"></div>
       <div class="fc-header">
@@ -545,6 +610,7 @@ canvas#grid {
         <div class="fc-fighter fc-fighter--a">
           <div class="fc-corner">Your Corner</div>
           <div class="fc-chess-level" id="fc-my-chess">—</div>
+          <div class="fc-chess-elo"   id="fc-my-elo">—</div>
           <div class="fc-box-level"   id="fc-my-box">—</div>
         </div>
         <div class="fc-outcome" id="fc-outcome">
@@ -554,9 +620,10 @@ canvas#grid {
         <div class="fc-fighter fc-fighter--opp">
           <div class="fc-corner">Opponent</div>
           <div class="fc-chess-level" id="hChess">—</div>
+          <div class="fc-chess-elo"   id="hElo">—</div>
           <div class="fc-box-level"   id="hBox">—</div>
           <div class="fc-stars-row">
-            <svg class="stars-svg" id="oppStars" width="100" height="20" viewBox="0 0 500 100"></svg>
+            <svg class="stars-svg" id="oppStars" width="95" height="19" viewBox="0 0 500 100"></svg>
           </div>
         </div>
       </div>
@@ -574,6 +641,7 @@ canvas#grid {
     </div>
   </section>
 
+  <!-- ── EXPLORE GRID ── -->
   <section id="explore-section">
     <h2 class="section-title">Explore Matchups <span class="section-hint">tap a cell to see that fight</span></h2>
     <div id="grid-wrap">
@@ -588,19 +656,22 @@ canvas#grid {
       </div>
       <div class="legend-markers">
         <span><span class="swatch you-mark"></span>Your level</span>
-        <span><span class="swatch fair-mark"></span>Even fight zone (45–55 %)</span>
+        <span><span class="iso-line"></span>50 % line (even fight)</span>
+        <span><span class="iso-band"></span>45–55 % band</span>
       </div>
     </div>
   </section>
 
-</div>
+</div><!-- #main -->
 
 <script>
 // ── CONFIG ──
 const CHESS_MIN = 0, CHESS_MAX = 7, CHESS_STEP = 0.2;
 const BOX_MIN   = 0, BOX_MAX   = 5, BOX_STEP   = 0.2;
-const CELL = 14;
-const MARGIN = { top: 36, right: 24, bottom: 60, left: 78 };
+const CELL   = 14;
+const ITEM_H = 52; // must match CSS --item-h
+
+const MARGIN = { top: 40, right: 24, bottom: 68, left: 88 };
 
 const CHESS_NAMED = [
   { value: 0, short: 'Total Beginner', sub: '800 ELO'  },
@@ -613,12 +684,12 @@ const CHESS_NAMED = [
   { value: 7, short: 'Elite / GM',     sub: '2400 ELO' },
 ];
 const BOXING_NAMED = [
-  { value: 0, short: 'Novice',       sub: 'Never sparred'       },
-  { value: 1, short: 'Beginner',     sub: 'Gym < 1 year'        },
-  { value: 2, short: 'Amateur',      sub: '1–3 years training'  },
-  { value: 3, short: 'Regional',     sub: 'First amateur bouts' },
-  { value: 4, short: 'Semi-Pro',     sub: '10+ fights'          },
-  { value: 5, short: 'Professional', sub: '40+ fights or pro'   },
+  { value: 0, short: 'Novice',        sub: 'Never sparred'       },
+  { value: 1, short: 'Beginner',      sub: 'Gym < 1 year'        },
+  { value: 2, short: 'Amateur',       sub: '1–3 yrs training'    },
+  { value: 3, short: 'Regional',      sub: 'First amateur bouts' },
+  { value: 4, short: 'Semi-Pro',      sub: '10+ fights'          },
+  { value: 5, short: 'Professional',  sub: '40+ fights or pro'   },
 ];
 
 function buildLevels(min, max, step) {
@@ -645,7 +716,7 @@ function pWin(myC, myB, oppC, oppB) {
 }
 const eloOf = c => Math.round(800 + c * (1600 / 7));
 
-// ── COLOR SCALE (deep purple → electric blue → gold) ──
+// ── COLOR SCALE: deep purple → electric blue → gold ──
 function color(p) {
   const cLow  = [26,  10,  46];
   const cMid  = [30,  55, 153];
@@ -714,17 +785,54 @@ function miniStarsHTML(rating) {
 let myChess = 3.0;
 let myBox   = 2.0;
 
-// ── NAMED LEVEL HELPERS ──
 function closestNamed(arr, v) {
   let best = arr[0], bd = Infinity;
   for (const n of arr) { const d = Math.abs(n.value - v); if (d < bd) { bd = d; best = n; } }
   return best;
 }
 
+// ── ISOLINE: returns canvas points where pWin crosses threshold ──
+function getIsoline(threshold) {
+  const pts = [];
+  for (let i = 0; i < NX; i++) {
+    for (let j = 0; j < NY - 1; j++) {
+      const p1 = pWin(myChess, myBox, chessLevels[i], boxLevels[j]);
+      const p2 = pWin(myChess, myBox, chessLevels[i], boxLevels[j + 1]);
+      if ((p1 - threshold) * (p2 - threshold) <= 0) {
+        const t = Math.abs(p2 - p1) < 1e-9 ? 0.5 : (threshold - p1) / (p2 - p1);
+        // Canvas y: interpolated between center of cell j and center of cell j+1
+        const yJ  = MARGIN.top + (NY - 1 - j)     * CELL + CELL / 2;
+        const yJ1 = MARGIN.top + (NY - 1 - j - 1) * CELL + CELL / 2;
+        pts.push({
+          x: MARGIN.left + i * CELL + CELL / 2,
+          y: yJ + t * (yJ1 - yJ),
+        });
+        break;
+      }
+    }
+  }
+  return pts;
+}
+
+function strokeLine(pts, col, width, dash) {
+  if (pts.length < 2) return;
+  ctx.save();
+  ctx.strokeStyle = col;
+  ctx.lineWidth = width;
+  ctx.setLineDash(dash || []);
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let k = 1; k < pts.length; k++) ctx.lineTo(pts[k].x, pts[k].y);
+  ctx.stroke();
+  ctx.restore();
+}
+
 // ── DRAW ──
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // heatmap cells
   for (let j = 0; j < NY; j++) {
     for (let i = 0; i < NX; i++) {
       const { x, y } = cell2px(i, j);
@@ -733,7 +841,8 @@ function draw() {
     }
   }
 
-  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  // subtle grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
   ctx.lineWidth = 1;
   for (let i = 0; i <= NX; i++) {
     const x = MARGIN.left + i * CELL + 0.5;
@@ -744,67 +853,86 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(MARGIN.left, y); ctx.lineTo(MARGIN.left + NX * CELL, y); ctx.stroke();
   }
 
-  // 50 % band
-  ctx.lineWidth = 1.6; ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+  // ── FAIR FIGHT ZONE: soft fill on 45-55% cells ──
+  ctx.fillStyle = 'rgba(255,245,180,0.06)';
   for (let j = 0; j < NY; j++) {
     for (let i = 0; i < NX; i++) {
       const p = pWin(myChess, myBox, chessLevels[i], boxLevels[j]);
       if (p >= 0.45 && p <= 0.55) {
         const { x, y } = cell2px(i, j);
-        ctx.strokeRect(x + 0.8, y + 0.8, CELL - 1.6, CELL - 1.6);
+        ctx.fillRect(x, y, CELL, CELL);
       }
     }
   }
 
-  // selected cell
+  // ── ISOLINES: 45% and 55% dashed, 50% solid ──
+  strokeLine(getIsoline(0.45), 'rgba(245,200,66,0.38)', 1, [3, 4]);
+  strokeLine(getIsoline(0.55), 'rgba(245,200,66,0.38)', 1, [3, 4]);
+  strokeLine(getIsoline(0.50), 'rgba(245,200,66,0.88)', 2);
+
+  // ── SELECTED CELL: gold diamond marker ──
   const myI = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
   const myJ = Math.round((myBox   - BOX_MIN)   / BOX_STEP);
   const sel = cell2px(myI, myJ);
-  ctx.lineWidth = 3; ctx.strokeStyle = '#f5c842';
-  ctx.strokeRect(sel.x - 1.5, sel.y - 1.5, CELL + 3, CELL + 3);
-  ctx.fillStyle = '#f5c842';
-  ctx.fillRect(sel.x + CELL/2 - 2, sel.y + CELL/2 - 2, 4, 4);
+  const cx = sel.x + CELL / 2, cy = sel.y + CELL / 2;
+  const ds = CELL / 2 + 3; // diamond half-size (extends slightly beyond cell)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - ds);
+  ctx.lineTo(cx + ds, cy);
+  ctx.lineTo(cx, cy + ds);
+  ctx.lineTo(cx - ds, cy);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(245,200,66,0.92)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.restore();
 
   // axis frame
   ctx.lineWidth = 1; ctx.strokeStyle = '#3a3a4a';
   ctx.strokeRect(MARGIN.left + 0.5, MARGIN.top + 0.5, NX * CELL, NY * CELL);
 
-  // X axis labels (use first word of chess name)
-  ctx.font = '11px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  // ── X AXIS (chess) ──
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   for (let v = CHESS_MIN; v <= CHESS_MAX; v++) {
     const i = Math.round((v - CHESS_MIN) / CHESS_STEP);
     const x = MARGIN.left + i * CELL + CELL / 2;
     const yTop = MARGIN.top + NY * CELL;
-    ctx.beginPath(); ctx.moveTo(x, yTop); ctx.lineTo(x, yTop + 4); ctx.strokeStyle = '#5a5a6a'; ctx.stroke();
-    ctx.fillStyle = '#c0b890';
-    ctx.fillText(CHESS_NAMED[v] ? CHESS_NAMED[v].short.split(' ')[0] : v, x, yTop + 6);
-    ctx.fillStyle = '#6a6a80';
-    ctx.fillText(eloOf(v), x, yTop + 20);
+    ctx.beginPath(); ctx.moveTo(x, yTop); ctx.lineTo(x, yTop + 5);
+    ctx.strokeStyle = '#5a5a6a'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.font = '11px system-ui'; ctx.fillStyle = '#c8b880';
+    ctx.fillText(CHESS_NAMED[v] ? CHESS_NAMED[v].short.split(' ')[0] : v, x, yTop + 7);
+    ctx.font = '10px ' + getComputedStyle(document.body).getPropertyValue('--font-mono');
+    ctx.fillStyle = '#7a6a40';
+    ctx.fillText(eloOf(v), x, yTop + 21);
   }
-  ctx.font = 'bold 12px system-ui'; ctx.fillStyle = '#9090a8';
-  ctx.fillText('Chess level  (ELO)', MARGIN.left + NX * CELL / 2, MARGIN.top + NY * CELL + 38);
+  ctx.font = 'bold 11px system-ui'; ctx.fillStyle = '#8888a0';
+  ctx.fillText('Chess level  (ELO)', MARGIN.left + NX * CELL / 2, MARGIN.top + NY * CELL + 40);
 
-  // Y axis labels
+  // ── Y AXIS (boxing) ──
   ctx.font = '11px system-ui'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
   for (let v = BOX_MIN; v <= BOX_MAX; v++) {
     const j = Math.round((v - BOX_MIN) / BOX_STEP);
     const { y } = cell2px(0, j);
-    ctx.beginPath(); ctx.moveTo(MARGIN.left - 4, y + CELL/2); ctx.lineTo(MARGIN.left, y + CELL/2);
-    ctx.strokeStyle = '#5a5a6a'; ctx.stroke();
-    ctx.fillStyle = '#c0b890';
-    ctx.fillText(BOXING_NAMED[v] ? BOXING_NAMED[v].short : v, MARGIN.left - 7, y + CELL/2);
+    ctx.beginPath(); ctx.moveTo(MARGIN.left - 5, y + CELL/2); ctx.lineTo(MARGIN.left, y + CELL/2);
+    ctx.strokeStyle = '#5a5a6a'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#c8b880';
+    ctx.fillText(BOXING_NAMED[v] ? BOXING_NAMED[v].short : v, MARGIN.left - 8, y + CELL/2);
   }
   ctx.save();
   ctx.translate(16, MARGIN.top + NY * CELL / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.font = 'bold 12px system-ui'; ctx.fillStyle = '#9090a8';
+  ctx.font = 'bold 11px system-ui'; ctx.fillStyle = '#8888a0';
   ctx.fillText('Boxing level', 0, 0);
   ctx.restore();
 
-  ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-  ctx.fillStyle = '#9090a8';
-  ctx.fillText('Opponent skill grid — color = your win probability', MARGIN.left, 10);
+  // title strip
+  ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillStyle = '#6a6a80';
+  ctx.fillText('Opponent grid — color = your win probability', MARGIN.left, 12);
 }
 
 // ── UPDATE FIGHTER CARD ──
@@ -813,12 +941,19 @@ function updateMine() {
   const j = Math.round((myBox   - BOX_MIN)   / BOX_STEP);
   const cn = closestNamed(CHESS_NAMED, myChess);
   const bn = closestNamed(BOXING_NAMED, myBox);
-  document.getElementById('myChessLabel').textContent = cn.short + ' · ' + cn.sub;
+  document.getElementById('myChessLabel').textContent = cn.short;
+  document.getElementById('myElo').textContent        = cn.sub;
   document.getElementById('myBoxLabel').textContent   = bn.short + ' · ' + bn.sub;
-  document.getElementById('myRating').textContent = 'Top ' + Math.max(1, Math.round((1 - rankOf(i,j)) * 100)) + '%';
+  document.getElementById('myRating').textContent     = 'Top ' + Math.max(1, Math.round((1 - rankOf(i,j)) * 100)) + '%';
   setStars(myStarsClip, starsOf(i, j));
+
+  // keep fight card my-corner in sync
   document.getElementById('fc-my-chess').textContent = cn.short;
+  document.getElementById('fc-my-elo').textContent   = cn.sub;
   document.getElementById('fc-my-box').textContent   = bn.short;
+
+  // refresh fight card if open
+  if (currentOppIdx && fightCard.classList.contains('visible')) showFightCard(currentOppIdx);
 }
 
 // ── OUTCOME ──
@@ -837,16 +972,19 @@ function outcomeColor(p) {
 
 // ── FIGHT CARD ──
 const fightCard = document.getElementById('fight-card');
+let currentOppIdx = null;
 
 function showFightCard(idx) {
   if (!idx) return;
+  currentOppIdx = idx;
   const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
-  const p  = pWin(myChess, myBox, oc, ob);
-  const cn = closestNamed(CHESS_NAMED, oc);
-  const bn = closestNamed(BOXING_NAMED, ob);
+  const p   = pWin(myChess, myBox, oc, ob);
+  const cn  = closestNamed(CHESS_NAMED, oc);
+  const bn  = closestNamed(BOXING_NAMED, ob);
   const col = outcomeColor(p);
 
   document.getElementById('hChess').textContent = cn.short;
+  document.getElementById('hElo').textContent   = cn.sub;
   document.getElementById('hBox').textContent   = bn.short;
   document.getElementById('hP').textContent     = Math.round(p * 100) + '%';
   document.getElementById('hP').style.color     = col;
@@ -862,7 +1000,10 @@ function showFightCard(idx) {
   fightCard.classList.add('visible');
 }
 
-function dismissFightCard() { fightCard.classList.remove('visible'); }
+function dismissFightCard() {
+  fightCard.classList.remove('visible');
+  currentOppIdx = null;
+}
 
 document.getElementById('fc-close-btn').addEventListener('click', dismissFightCard);
 
@@ -884,10 +1025,10 @@ const tooltip = document.getElementById('tooltip');
 
 function showTooltip(idx, cssX, cssY) {
   if (!idx) { tooltip.style.display = 'none'; return; }
-  const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
-  const p  = pWin(myChess, myBox, oc, ob);
-  const cn = closestNamed(CHESS_NAMED, oc);
-  const bn = closestNamed(BOXING_NAMED, ob);
+  const oc  = chessLevels[idx.i], ob = boxLevels[idx.j];
+  const p   = pWin(myChess, myBox, oc, ob);
+  const cn  = closestNamed(CHESS_NAMED, oc);
+  const bn  = closestNamed(BOXING_NAMED, ob);
   tooltip.style.display = 'block';
   tooltip.style.left = cssX + 'px';
   tooltip.style.top  = cssY + 'px';
@@ -901,116 +1042,120 @@ function eventCoords(e) {
   const r = canvas.getBoundingClientRect();
   const cssX = e.clientX - r.left, cssY = e.clientY - r.top;
   return { cssX, cssY,
-    canvasX: cssX * (canvas.width  / r.width),
+    canvasX: cssX * (canvas.width / r.width),
     canvasY: cssY * (canvas.height / r.height) };
 }
 
-let pointerDownTime = 0, pointerDownX = 0, pointerDownY = 0, isDragging = false;
+let pdTime = 0, pdX = 0, pdY = 0, dragging = false;
 
 canvas.addEventListener('pointerdown', e => {
   e.preventDefault();
   try { canvas.setPointerCapture(e.pointerId); } catch(_) {}
-  pointerDownTime = Date.now();
-  pointerDownX = e.clientX; pointerDownY = e.clientY;
-  isDragging = false;
+  pdTime = Date.now(); pdX = e.clientX; pdY = e.clientY; dragging = false;
   const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
   showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
 });
-
 canvas.addEventListener('pointermove', e => {
-  const dx = e.clientX - pointerDownX, dy = e.clientY - pointerDownY;
-  if (Math.sqrt(dx*dx + dy*dy) > 6) isDragging = true;
+  const dx = e.clientX - pdX, dy = e.clientY - pdY;
+  if (Math.sqrt(dx*dx + dy*dy) > 6) dragging = true;
   const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
   showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
 });
-
 canvas.addEventListener('pointerup', e => {
   const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
   const idx = px2cell(canvasX, canvasY);
-  if (!isDragging && Date.now() - pointerDownTime < 400 && idx) {
+  if (!dragging && Date.now() - pdTime < 400 && idx) {
     tooltip.style.display = 'none';
     showFightCard(idx);
   } else {
     tooltip.style.display = 'none';
   }
 });
-
 canvas.addEventListener('pointerleave',  () => { tooltip.style.display = 'none'; });
 canvas.addEventListener('pointercancel', () => { tooltip.style.display = 'none'; });
 canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 canvas.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
-
 canvas.addEventListener('mousemove', e => {
   if (e.buttons !== 0) return;
   const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
   showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
 });
 
-// ── CAROUSEL ──
-function buildCarousel(containerEl, namedLevels, initialValue, onSelect) {
+// ── DRUM PICKER ──
+function buildDrum(containerEl, namedLevels, initialValue, onSelect) {
   let activeValue = Math.round(initialValue);
+  let scrollTimer = null;
 
-  namedLevels.forEach(item => {
+  // top spacer
+  const topSpacer = document.createElement('div');
+  topSpacer.className = 'drum-spacer';
+  containerEl.appendChild(topSpacer);
+
+  namedLevels.forEach((item, idx) => {
     const el = document.createElement('div');
-    el.className = 'carousel-item' + (item.value === activeValue ? ' active' : '');
+    el.className = 'drum-item' + (item.value === activeValue ? ' active' : '');
     el.dataset.value = item.value;
+    el.dataset.idx   = idx;
     el.setAttribute('role', 'option');
     el.setAttribute('aria-selected', String(item.value === activeValue));
-    el.innerHTML = `<div class="carousel-item__name">${item.short}</div><div class="carousel-item__sub">${item.sub}</div>`;
-    el.addEventListener('click', () => scrollToValue(item.value));
+    el.innerHTML = `<div class="drum-item__name">${item.short}</div><div class="drum-item__sub">${item.sub}</div>`;
+    el.addEventListener('click', () => scrollToIdx(idx));
     containerEl.appendChild(el);
   });
 
-  function getItems() { return [...containerEl.querySelectorAll('.carousel-item')]; }
+  // bottom spacer
+  const botSpacer = document.createElement('div');
+  botSpacer.className = 'drum-spacer';
+  containerEl.appendChild(botSpacer);
 
   function setActive(val) {
     activeValue = val;
-    getItems().forEach(el => {
+    [...containerEl.querySelectorAll('.drum-item')].forEach(el => {
       const match = Number(el.dataset.value) === val;
       el.classList.toggle('active', match);
       el.setAttribute('aria-selected', String(match));
     });
   }
 
-  function scrollToValue(val, smooth = true) {
-    const el = containerEl.querySelector(`[data-value="${val}"]`);
-    if (!el) return;
-    el.scrollIntoView({ behavior: smooth ? 'smooth' : 'instant', inline: 'center', block: 'nearest' });
+  function scrollToIdx(idx, smooth = true) {
+    const target = idx * ITEM_H;
+    if (smooth) {
+      containerEl.scrollTo({ top: target, behavior: 'smooth' });
+    } else {
+      containerEl.scrollTop = target;
+    }
+    const val = namedLevels[idx].value;
     setActive(val);
     onSelect(val);
   }
 
-  let scrollTimer = null;
+  // after scroll settles, snap to nearest integer index
   containerEl.addEventListener('scroll', () => {
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
-      const center = containerEl.getBoundingClientRect().left + containerEl.offsetWidth / 2;
-      let closest = null, closestDist = Infinity;
-      getItems().forEach(el => {
-        const r = el.getBoundingClientRect();
-        const d = Math.abs(r.left + r.width / 2 - center);
-        if (d < closestDist) { closestDist = d; closest = el; }
-      });
-      if (closest) {
-        const val = Number(closest.dataset.value);
-        if (val !== activeValue) { setActive(val); onSelect(val); }
+      const raw = containerEl.scrollTop / ITEM_H;
+      const idx = Math.max(0, Math.min(namedLevels.length - 1, Math.round(raw)));
+      const val = namedLevels[idx].value;
+      // snap if not already aligned
+      if (Math.abs(raw - idx) > 0.03) {
+        containerEl.scrollTo({ top: idx * ITEM_H, behavior: 'smooth' });
       }
-    }, 80);
+      if (val !== activeValue) { setActive(val); onSelect(val); }
+    }, 100);
   }, { passive: true });
 
-  containerEl.addEventListener('wheel', e => {
-    e.preventDefault();
-    containerEl.scrollLeft += e.deltaY || e.deltaX;
-  }, { passive: false });
-
+  // keyboard
   containerEl.addEventListener('keydown', e => {
-    const vals = namedLevels.map(x => x.value);
-    const idx = vals.indexOf(activeValue);
-    if (e.key === 'ArrowRight' && idx < vals.length - 1) { e.preventDefault(); scrollToValue(vals[idx + 1]); }
-    if (e.key === 'ArrowLeft'  && idx > 0)               { e.preventDefault(); scrollToValue(vals[idx - 1]); }
+    const cur = namedLevels.findIndex(x => x.value === activeValue);
+    if (e.key === 'ArrowDown' && cur < namedLevels.length - 1) { e.preventDefault(); scrollToIdx(cur + 1); }
+    if (e.key === 'ArrowUp'   && cur > 0)                      { e.preventDefault(); scrollToIdx(cur - 1); }
   });
 
-  setTimeout(() => scrollToValue(activeValue, false), 0);
+  // init position (delayed to ensure layout is complete)
+  setTimeout(() => {
+    const initIdx = namedLevels.findIndex(x => x.value === activeValue);
+    if (initIdx >= 0) containerEl.scrollTop = initIdx * ITEM_H;
+  }, 60);
 }
 
 function pulseCard() {
@@ -1021,13 +1166,13 @@ function pulseCard() {
   setTimeout(() => card.classList.remove('pulse'), 500);
 }
 
-buildCarousel(
-  document.getElementById('chess-carousel'),
+buildDrum(
+  document.getElementById('chess-drum'),
   CHESS_NAMED, myChess,
   val => { myChess = val; updateMine(); draw(); pulseCard(); }
 );
-buildCarousel(
-  document.getElementById('boxing-carousel'),
+buildDrum(
+  document.getElementById('boxing-drum'),
   BOXING_NAMED, myBox,
   val => { myBox = val; updateMine(); draw(); pulseCard(); }
 );
