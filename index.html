@@ -392,7 +392,14 @@ body {
   font-size: 11px;
   color: var(--text-secondary);
 }
-.fc-bar-row span { flex: 0 0 82px; text-align: right; }
+.fc-bar-row > span:not(.fc-diff) { flex: 0 0 52px; text-align: right; }
+.fc-diff {
+  flex: 0 0 68px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-align: right;
+  white-space: nowrap;
+}
 .fc-bar {
   flex: 1;
   height: 5px;
@@ -630,12 +637,14 @@ canvas#grid {
       <img src="assets/divider.png" class="fc-divider" alt="">
       <div class="fc-bars">
         <div class="fc-bar-row">
-          <span>Chess edge</span>
+          <span>Chess</span>
           <div class="fc-bar"><div class="fc-bar__fill" id="fc-chess-bar" style="width:50%"></div></div>
+          <span class="fc-diff" id="fc-chess-diff">—</span>
         </div>
         <div class="fc-bar-row">
-          <span>Boxing edge</span>
+          <span>Boxing</span>
           <div class="fc-bar"><div class="fc-bar__fill" id="fc-box-bar" style="width:50%"></div></div>
+          <span class="fc-diff" id="fc-box-diff">—</span>
         </div>
       </div>
     </div>
@@ -655,9 +664,11 @@ canvas#grid {
         <span>You win</span>
       </div>
       <div class="legend-markers">
-        <span><span class="swatch you-mark"></span>Your level</span>
-        <span><span class="iso-line"></span>50 % line (even fight)</span>
-        <span><span class="iso-band"></span>45–55 % band</span>
+        <span><span class="swatch you-mark"></span>You</span>
+        <span><span class="iso-line"></span>50 % (even)</span>
+        <span><span class="iso-band"></span>45–55 %</span>
+        <span style="opacity:0.65"><span class="iso-band"></span>25/75 %</span>
+        <span style="opacity:0.45"><span class="iso-band"></span>10/90 %</span>
       </div>
     </div>
   </section>
@@ -691,6 +702,24 @@ const BOXING_NAMED = [
   { value: 4, short: 'Semi-Pro',      sub: '10+ fights'          },
   { value: 5, short: 'Professional',  sub: '40+ fights or pro'   },
 ];
+
+// Drum-picker levels at 0.5-step granularity (intermediate items show ELO / level number)
+const _eloOf = c => Math.round(800 + c * (1600 / 7));
+const CHESS_DRUM_LEVELS = [];
+for (let v = 0; v <= 7; v += 0.5) {
+  const named = CHESS_NAMED.find(n => n.value === v);
+  CHESS_DRUM_LEVELS.push({ value: v, short: named ? named.short : (_eloOf(v) + ' ELO'), sub: named ? named.sub : '' });
+}
+const BOXING_DRUM_LEVELS = [];
+for (let v = 0; v <= 5; v += 0.5) {
+  const named = BOXING_NAMED.find(n => n.value === v);
+  BOXING_DRUM_LEVELS.push({ value: v, short: named ? named.short : v.toFixed(1), sub: named ? named.sub : '' });
+}
+
+function boxLabel(v) {
+  const named = BOXING_NAMED.find(n => n.value === v);
+  return named ? named.short + ' · ' + named.sub : closestNamed(BOXING_NAMED, v).short + ' · Lv ' + v.toFixed(1);
+}
 
 function buildLevels(min, max, step) {
   const out = [];
@@ -853,6 +882,19 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(MARGIN.left, y); ctx.lineTo(MARGIN.left + NX * CELL, y); ctx.stroke();
   }
 
+  // Midpoint axis reference lines (chess mid = 3.5, boxing mid = 2.5)
+  {
+    const xMid = MARGIN.left + NX * CELL / 2;
+    const yMid = MARGIN.top  + NY * CELL / 2;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath(); ctx.moveTo(xMid, MARGIN.top); ctx.lineTo(xMid, MARGIN.top + NY * CELL); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(MARGIN.left, yMid); ctx.lineTo(MARGIN.left + NX * CELL, yMid); ctx.stroke();
+    ctx.restore();
+  }
+
   // ── FAIR FIGHT ZONE: soft fill on 45-55% cells ──
   ctx.fillStyle = 'rgba(255,245,180,0.06)';
   for (let j = 0; j < NY; j++) {
@@ -865,9 +907,13 @@ function draw() {
     }
   }
 
-  // ── ISOLINES: 45% and 55% dashed, 50% solid ──
+  // ── ISOLINES: outer contours faint → denser near 50% → solid at 50% ──
+  strokeLine(getIsoline(0.10), 'rgba(245,200,66,0.16)', 1, [2, 7]);
+  strokeLine(getIsoline(0.25), 'rgba(245,200,66,0.24)', 1, [3, 5]);
   strokeLine(getIsoline(0.45), 'rgba(245,200,66,0.38)', 1, [3, 4]);
   strokeLine(getIsoline(0.55), 'rgba(245,200,66,0.38)', 1, [3, 4]);
+  strokeLine(getIsoline(0.75), 'rgba(245,200,66,0.24)', 1, [3, 5]);
+  strokeLine(getIsoline(0.90), 'rgba(245,200,66,0.16)', 1, [2, 7]);
   strokeLine(getIsoline(0.50), 'rgba(245,200,66,0.88)', 2);
 
   // ── SELECTED CELL: gold diamond marker ──
@@ -940,17 +986,16 @@ function updateMine() {
   const i = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
   const j = Math.round((myBox   - BOX_MIN)   / BOX_STEP);
   const cn = closestNamed(CHESS_NAMED, myChess);
-  const bn = closestNamed(BOXING_NAMED, myBox);
   document.getElementById('myChessLabel').textContent = cn.short;
-  document.getElementById('myElo').textContent        = cn.sub;
-  document.getElementById('myBoxLabel').textContent   = bn.short + ' · ' + bn.sub;
+  document.getElementById('myElo').textContent        = 'ELO ' + eloOf(myChess);
+  document.getElementById('myBoxLabel').textContent   = boxLabel(myBox);
   document.getElementById('myRating').textContent     = 'Top ' + Math.max(1, Math.round((1 - rankOf(i,j)) * 100)) + '%';
   setStars(myStarsClip, starsOf(i, j));
 
   // keep fight card my-corner in sync
   document.getElementById('fc-my-chess').textContent = cn.short;
-  document.getElementById('fc-my-elo').textContent   = cn.sub;
-  document.getElementById('fc-my-box').textContent   = bn.short;
+  document.getElementById('fc-my-elo').textContent   = 'ELO ' + eloOf(myChess);
+  document.getElementById('fc-my-box').textContent   = boxLabel(myBox);
 
   // refresh fight card if open
   if (currentOppIdx && fightCard.classList.contains('visible')) showFightCard(currentOppIdx);
@@ -980,12 +1025,11 @@ function showFightCard(idx) {
   const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
   const p   = pWin(myChess, myBox, oc, ob);
   const cn  = closestNamed(CHESS_NAMED, oc);
-  const bn  = closestNamed(BOXING_NAMED, ob);
   const col = outcomeColor(p);
 
   document.getElementById('hChess').textContent = cn.short;
-  document.getElementById('hElo').textContent   = cn.sub;
-  document.getElementById('hBox').textContent   = bn.short;
+  document.getElementById('hElo').textContent   = 'ELO ' + eloOf(oc);
+  document.getElementById('hBox').textContent   = boxLabel(ob);
   document.getElementById('hP').textContent     = Math.round(p * 100) + '%';
   document.getElementById('hP').style.color     = col;
   document.getElementById('fc-outcome-label').textContent = outcomeLabel(p);
@@ -995,6 +1039,16 @@ function showFightCard(idx) {
   const boxBar   = 50 + (myBox   - ob) / (BOX_MAX   - BOX_MIN)   * 50;
   document.getElementById('fc-chess-bar').style.width = Math.max(2, Math.min(98, chessBar)) + '%';
   document.getElementById('fc-box-bar').style.width   = Math.max(2, Math.min(98, boxBar))   + '%';
+
+  const eloDiff = eloOf(myChess) - eloOf(oc);
+  const boxDiff = +(myBox - ob).toFixed(1);
+  const signStr = v => v > 0 ? '+' : '';
+  const diffCol = v => v > 0 ? '#39d353' : v < 0 ? '#e03c3c' : '#9090a8';
+  const cdEl = document.getElementById('fc-chess-diff');
+  if (cdEl) { cdEl.textContent = signStr(eloDiff) + eloDiff + ' ELO'; cdEl.style.color = diffCol(eloDiff); }
+  const bdEl = document.getElementById('fc-box-diff');
+  if (bdEl) { bdEl.textContent = signStr(boxDiff) + boxDiff + ' lvl'; bdEl.style.color = diffCol(boxDiff); }
+
   setStars(oppStarsClip, starsOf(idx.i, idx.j));
 
   fightCard.classList.add('visible');
@@ -1083,7 +1137,9 @@ canvas.addEventListener('mousemove', e => {
 
 // ── DRUM PICKER ──
 function buildDrum(containerEl, namedLevels, initialValue, onSelect) {
-  let activeValue = Math.round(initialValue);
+  let activeValue = namedLevels.reduce((best, item) =>
+    Math.abs(item.value - initialValue) < Math.abs(best - initialValue) ? item.value : best,
+    namedLevels[0].value);
   let scrollTimer = null;
 
   // top spacer
@@ -1168,12 +1224,12 @@ function pulseCard() {
 
 buildDrum(
   document.getElementById('chess-drum'),
-  CHESS_NAMED, myChess,
+  CHESS_DRUM_LEVELS, myChess,
   val => { myChess = val; updateMine(); draw(); pulseCard(); }
 );
 buildDrum(
   document.getElementById('boxing-drum'),
-  BOXING_NAMED, myBox,
+  BOXING_DRUM_LEVELS, myBox,
   val => { myBox = val; updateMine(); draw(); pulseCard(); }
 );
 
