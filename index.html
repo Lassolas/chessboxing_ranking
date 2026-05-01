@@ -493,7 +493,7 @@ canvas#grid {
 .iso-line {
   display: inline-block;
   width: 20px; height: 2px;
-  background: rgba(245,200,66,0.85);
+  background: linear-gradient(90deg, #ffd9d0 0%, #fff3dc 52%, #b9f3d7 100%);
   vertical-align: middle;
   margin-right: 4px;
   border-radius: 1px;
@@ -501,11 +501,16 @@ canvas#grid {
 .iso-band {
   display: inline-block;
   width: 20px; height: 2px;
-  background: rgba(245,200,66,0.38);
   vertical-align: middle;
   margin-right: 4px;
   border-radius: 1px;
-  background: repeating-linear-gradient(90deg, rgba(245,200,66,0.45) 0px, rgba(245,200,66,0.45) 4px, transparent 4px, transparent 7px);
+  background: repeating-linear-gradient(90deg, rgba(255,166,122,0.9) 0px, rgba(255,166,122,0.9) 4px, transparent 4px, transparent 7px);
+}
+.iso-band--balanced {
+  background: repeating-linear-gradient(90deg, rgba(255,120,120,0.92) 0px, rgba(255,120,120,0.92) 4px, transparent 4px, transparent 7px);
+}
+.iso-band--outer {
+  background: repeating-linear-gradient(90deg, rgba(101,220,173,0.88) 0px, rgba(101,220,173,0.88) 4px, transparent 4px, transparent 7px);
 }
 
 /* ── DESKTOP ── */
@@ -666,9 +671,9 @@ canvas#grid {
       <div class="legend-markers">
         <span><span class="swatch you-mark"></span>You</span>
         <span><span class="iso-line"></span>50 % (even)</span>
-        <span><span class="iso-band"></span>45–55 %</span>
-        <span style="opacity:0.65"><span class="iso-band"></span>25/75 %</span>
-        <span style="opacity:0.45"><span class="iso-band"></span>10/90 %</span>
+        <span><span class="iso-band iso-band--balanced"></span>45–55 %</span>
+        <span><span class="iso-band"></span>25/75 %</span>
+        <span><span class="iso-band iso-band--outer"></span>10/90 %</span>
       </div>
     </div>
   </section>
@@ -705,11 +710,22 @@ const BOXING_NAMED = [
 
 // Drum-picker levels at 0.2-step granularity (intermediate items show ELO / level number)
 const _eloOf = c => Math.round(800 + c * (1600 / 7));
+function chessCategory(v) {
+  for (let i = CHESS_NAMED.length - 1; i >= 0; i--) {
+    if (v >= CHESS_NAMED[i].value) return CHESS_NAMED[i];
+  }
+  return CHESS_NAMED[0];
+}
 const CHESS_DRUM_LEVELS = [];
 for (let k = 0; k <= Math.round((CHESS_MAX - CHESS_MIN) / CHESS_STEP); k++) {
   const v = +(CHESS_MIN + k * CHESS_STEP).toFixed(1);
   const named = CHESS_NAMED.find(n => n.value === v);
-  CHESS_DRUM_LEVELS.push({ value: v, short: named ? named.short : (_eloOf(v) + ' ELO'), sub: named ? named.sub : '' });
+  const category = chessCategory(v);
+  CHESS_DRUM_LEVELS.push({
+    value: v,
+    short: named ? named.short : category.short,
+    sub: named ? named.sub : (_eloOf(v) + ' ELO'),
+  });
 }
 const BOXING_DRUM_LEVELS = [];
 for (let k = 0; k <= Math.round((BOX_MAX - BOX_MIN) / BOX_STEP); k++) {
@@ -859,11 +875,6 @@ function strokeLine(pts, col, width, dash) {
   ctx.restore();
 }
 
-function strokeLineContrast(pts, col, width, dash, outline = 'rgba(7,8,16,0.62)') {
-  strokeLine(pts, outline, width + 2, dash);
-  strokeLine(pts, col, width, dash);
-}
-
 // ── DRAW ──
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -914,14 +925,14 @@ function draw() {
     }
   }
 
-  // ── ISOLINES: outlined to stay readable across the full heatmap ──
-  strokeLineContrast(getIsoline(0.10), 'rgba(245,200,66,0.56)', 1.5, [3, 5]);
-  strokeLineContrast(getIsoline(0.25), 'rgba(245,200,66,0.72)', 1.5, [4, 4]);
-  strokeLineContrast(getIsoline(0.45), 'rgba(245,200,66,0.86)', 1.5, [4, 3]);
-  strokeLineContrast(getIsoline(0.55), 'rgba(245,200,66,0.86)', 1.5, [4, 3]);
-  strokeLineContrast(getIsoline(0.75), 'rgba(245,200,66,0.72)', 1.5, [4, 4]);
-  strokeLineContrast(getIsoline(0.90), 'rgba(245,200,66,0.56)', 1.5, [3, 5]);
-  strokeLineContrast(getIsoline(0.50), 'rgba(245,200,66,1)', 2.5);
+  // ── ISOLINES: probability-tinted palette that shifts from warm danger to cool success ──
+  strokeLine(getIsoline(0.10), 'rgba(255,214,204,0.80)', 1, [3, 5]);
+  strokeLine(getIsoline(0.25), 'rgba(255,166,122,0.88)', 1, [4, 4]);
+  strokeLine(getIsoline(0.45), 'rgba(255,116,116,0.92)', 1, [4, 3]);
+  strokeLine(getIsoline(0.55), 'rgba(155,235,198,0.92)', 1, [4, 3]);
+  strokeLine(getIsoline(0.75), 'rgba(92,214,162,0.90)', 1, [4, 4]);
+  strokeLine(getIsoline(0.90), 'rgba(208,255,233,0.82)', 1, [3, 5]);
+  strokeLine(getIsoline(0.50), 'rgba(255,243,220,0.96)', 2, [8, 4]);
 
   // ── SELECTED CELL: gold diamond marker ──
   const myI = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
@@ -992,7 +1003,7 @@ function draw() {
 function updateMine() {
   const i = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
   const j = Math.round((myBox   - BOX_MIN)   / BOX_STEP);
-  const cn = closestNamed(CHESS_NAMED, myChess);
+  const cn = chessCategory(myChess);
   document.getElementById('myChessLabel').textContent = cn.short;
   document.getElementById('myElo').textContent        = 'ELO ' + eloOf(myChess);
   document.getElementById('myBoxLabel').textContent   = boxLabel(myBox);
@@ -1031,7 +1042,7 @@ function showFightCard(idx) {
   currentOppIdx = idx;
   const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
   const p   = pWin(myChess, myBox, oc, ob);
-  const cn  = closestNamed(CHESS_NAMED, oc);
+  const cn  = chessCategory(oc);
   const col = outcomeColor(p);
 
   document.getElementById('hChess').textContent = cn.short;
@@ -1088,7 +1099,7 @@ function showTooltip(idx, cssX, cssY) {
   if (!idx) { tooltip.style.display = 'none'; return; }
   const oc  = chessLevels[idx.i], ob = boxLevels[idx.j];
   const p   = pWin(myChess, myBox, oc, ob);
-  const cn  = closestNamed(CHESS_NAMED, oc);
+  const cn  = chessCategory(oc);
   const bn  = closestNamed(BOXING_NAMED, ob);
   tooltip.style.display = 'block';
   tooltip.style.left = cssX + 'px';
