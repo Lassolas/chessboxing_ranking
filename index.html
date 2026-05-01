@@ -659,9 +659,9 @@ canvas#grid {
         <div id="tooltip"></div>
       </div>
       <div class="legend-row">
-        <span>You lose</span>
+        <span>0%</span>
         <canvas id="legendBar" width="220" height="10"></canvas>
-        <span>You win</span>
+        <span>100%</span>
       </div>
       <div class="legend-markers">
         <span><span class="swatch you-mark"></span>You</span>
@@ -703,15 +703,17 @@ const BOXING_NAMED = [
   { value: 5, short: 'Professional',  sub: '40+ fights or pro'   },
 ];
 
-// Drum-picker levels at 0.5-step granularity (intermediate items show ELO / level number)
+// Drum-picker levels at 0.2-step granularity (intermediate items show ELO / level number)
 const _eloOf = c => Math.round(800 + c * (1600 / 7));
 const CHESS_DRUM_LEVELS = [];
-for (let v = 0; v <= 7; v += 0.5) {
+for (let k = 0; k <= Math.round((CHESS_MAX - CHESS_MIN) / CHESS_STEP); k++) {
+  const v = +(CHESS_MIN + k * CHESS_STEP).toFixed(1);
   const named = CHESS_NAMED.find(n => n.value === v);
   CHESS_DRUM_LEVELS.push({ value: v, short: named ? named.short : (_eloOf(v) + ' ELO'), sub: named ? named.sub : '' });
 }
 const BOXING_DRUM_LEVELS = [];
-for (let v = 0; v <= 5; v += 0.5) {
+for (let k = 0; k <= Math.round((BOX_MAX - BOX_MIN) / BOX_STEP); k++) {
+  const v = +(BOX_MIN + k * BOX_STEP).toFixed(1);
   const named = BOXING_NAMED.find(n => n.value === v);
   BOXING_DRUM_LEVELS.push({ value: v, short: named ? named.short : v.toFixed(1), sub: named ? named.sub : '' });
 }
@@ -857,6 +859,11 @@ function strokeLine(pts, col, width, dash) {
   ctx.restore();
 }
 
+function strokeLineContrast(pts, col, width, dash, outline = 'rgba(7,8,16,0.62)') {
+  strokeLine(pts, outline, width + 2, dash);
+  strokeLine(pts, col, width, dash);
+}
+
 // ── DRAW ──
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -907,14 +914,14 @@ function draw() {
     }
   }
 
-  // ── ISOLINES: outer contours faint → denser near 50% → solid at 50% ──
-  strokeLine(getIsoline(0.10), 'rgba(245,200,66,0.16)', 1, [2, 7]);
-  strokeLine(getIsoline(0.25), 'rgba(245,200,66,0.24)', 1, [3, 5]);
-  strokeLine(getIsoline(0.45), 'rgba(245,200,66,0.38)', 1, [3, 4]);
-  strokeLine(getIsoline(0.55), 'rgba(245,200,66,0.38)', 1, [3, 4]);
-  strokeLine(getIsoline(0.75), 'rgba(245,200,66,0.24)', 1, [3, 5]);
-  strokeLine(getIsoline(0.90), 'rgba(245,200,66,0.16)', 1, [2, 7]);
-  strokeLine(getIsoline(0.50), 'rgba(245,200,66,0.88)', 2);
+  // ── ISOLINES: outlined to stay readable across the full heatmap ──
+  strokeLineContrast(getIsoline(0.10), 'rgba(245,200,66,0.56)', 1.5, [3, 5]);
+  strokeLineContrast(getIsoline(0.25), 'rgba(245,200,66,0.72)', 1.5, [4, 4]);
+  strokeLineContrast(getIsoline(0.45), 'rgba(245,200,66,0.86)', 1.5, [4, 3]);
+  strokeLineContrast(getIsoline(0.55), 'rgba(245,200,66,0.86)', 1.5, [4, 3]);
+  strokeLineContrast(getIsoline(0.75), 'rgba(245,200,66,0.72)', 1.5, [4, 4]);
+  strokeLineContrast(getIsoline(0.90), 'rgba(245,200,66,0.56)', 1.5, [3, 5]);
+  strokeLineContrast(getIsoline(0.50), 'rgba(245,200,66,1)', 2.5);
 
   // ── SELECTED CELL: gold diamond marker ──
   const myI = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
