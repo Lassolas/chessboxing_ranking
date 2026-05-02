@@ -24,7 +24,7 @@
   --font-body:      system-ui, -apple-system, sans-serif;
   --font-mono:      ui-monospace, Menlo, Consolas, monospace;
   --radius-card:    12px;
-  --item-h:         52px;
+  --item-h:         58px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -85,12 +85,12 @@ body {
 }
 
 /* ── MAIN LAYOUT ── */
-#main { max-width: 1100px; margin: 0 auto; padding-bottom: 80px; }
+#main { max-width: 1240px; margin: 0 auto; padding-bottom: 96px; }
 
 /* ── SECTION HEADING ── */
 .section-title {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -100,7 +100,7 @@ body {
   margin: 0;
 }
 .section-hint {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
   font-family: var(--font-body);
   font-weight: 400;
@@ -125,14 +125,14 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-secondary);
   padding: 0 12px 6px;
 }
-.drum-label img { width: 14px; height: 14px; object-fit: contain; opacity: 0.75; }
+.drum-label img { width: 16px; height: 16px; object-fit: contain; opacity: 0.75; }
 
 /* The clip wrapper hides overflow and provides gradient masks */
 .drum-clip {
@@ -201,7 +201,7 @@ body {
 .drum-item.active { opacity: 1; }
 
 .drum-item__name {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
@@ -209,7 +209,7 @@ body {
 .drum-item.active .drum-item__name { color: var(--gold-bright); }
 
 .drum-item__sub {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-secondary);
   line-height: 1.2;
 }
@@ -220,8 +220,8 @@ body {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 10px 14px;
-  padding: 12px 16px;
+  gap: 12px 16px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-panel);
 }
@@ -233,7 +233,7 @@ body {
 .fighter-card.pulse { animation: pulse-gold 0.5s ease; }
 
 .fighter-card__label {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -241,26 +241,32 @@ body {
   margin-bottom: 3px;
 }
 .fighter-card__chess {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
 }
 .fighter-card__chess-sub {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--gold-mid);
   font-family: var(--font-mono);
   margin-top: 1px;
 }
 .fighter-card__box {
-  font-size: 12px;
-  color: var(--text-secondary);
+  font-size: 17px;
+  color: var(--text-primary);
   margin-top: 3px;
+}
+.fighter-card__box-sub {
+  font-size: 12px;
+  color: var(--gold-mid);
+  font-family: var(--font-mono);
+  margin-left: 6px;
 }
 
 .fighter-card__right { text-align: right; }
 .fighter-card__rank {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
   margin-top: 4px;
   font-family: var(--font-mono);
@@ -297,7 +303,7 @@ body {
   padding: 8px 16px 0;
 }
 .fc-title {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -328,7 +334,7 @@ body {
 .fc-fighter--opp { text-align: right; }
 
 .fc-corner {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -337,10 +343,10 @@ body {
 }
 .fc-fighter--a .fc-corner { color: var(--gold-dim); }
 
-.fc-chess-level { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+.fc-chess-level { font-size: 17px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
 .fc-chess-elo   { font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); }
-.fc-box-level   { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
-.fc-box-sub     { font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); margin-left: 5px; }
+.fc-box-level   { font-size: 17px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
+.fc-box-sub     { font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); margin-left: 6px; }
 .fc-stars-row   { margin-top: 4px; }
 
 .fc-outcome {
@@ -364,7 +370,7 @@ body {
   transition: color 0.3s;
 }
 .fc-outcome__label {
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-secondary);
@@ -390,24 +396,35 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
 }
-.fc-bar-row > span:not(.fc-diff) { flex: 0 0 52px; text-align: right; }
+.fc-bar-row > span:not(.fc-diff) { flex: 0 0 58px; text-align: right; }
 .fc-diff {
-  flex: 0 0 68px;
-  font-size: 10px;
+  flex: 0 0 78px;
+  font-size: 11px;
   font-family: var(--font-mono);
   text-align: right;
   white-space: nowrap;
 }
 .fc-bar {
   flex: 1;
-  height: 5px;
+  height: 8px;
   background: var(--bg-panel-alt);
   border-radius: 3px;
   overflow: hidden;
   position: relative;
+}
+.fc-bar::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: rgba(255,255,255,0.5);
+  transform: translateX(-0.5px);
+  z-index: 2;
 }
 .fc-bar__fill {
   position: absolute;
@@ -424,7 +441,7 @@ body {
   margin-top: 2px;
 }
 .fc-rounds-title {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -440,12 +457,12 @@ body {
   text-transform: none;
   display: flex;
   gap: 8px;
-  font-size: 9px;
+  font-size: 10px;
 }
 .fc-round-row {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 4px;
   margin-bottom: 5px;
 }
 .fc-round-icon {
@@ -455,17 +472,21 @@ body {
   object-fit: contain;
   opacity: 0.6;
 }
+.fc-round-icon-spacer {
+  flex: 0 0 11px;
+  width: 11px;
+}
 .fc-round-label {
-  flex: 0 0 28px;
-  font-size: 9px;
+  flex: 0 0 52px;
+  font-size: 10px;
   font-family: var(--font-mono);
-  text-align: right;
+  text-align: left;
   font-weight: 700;
   color: var(--text-muted);
 }
 .fc-round-bar {
   flex: 1;
-  height: 5px;
+  height: 6px;
   background: var(--bg-panel-alt);
   border-radius: 3px;
   overflow: hidden;
@@ -484,8 +505,8 @@ body {
   transition: left 0.4s ease, width 0.4s ease;
 }
 .fc-round-detail {
-  flex: 0 0 56px;
-  font-size: 9px;
+  flex: 0 0 62px;
+  font-size: 10px;
   font-family: var(--font-mono);
   text-align: right;
   white-space: nowrap;
@@ -502,7 +523,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px 12px 0;
+  padding: 16px 16px 0;
   gap: 10px;
 }
 
@@ -529,7 +550,7 @@ canvas#grid {
   padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid var(--border);
-  font: 12px/1.35 var(--font-mono);
+  font: 13px/1.4 var(--font-mono);
   white-space: nowrap;
   transform: translate(-50%, calc(-100% - 14px));
   display: none;
@@ -538,17 +559,17 @@ canvas#grid {
   max-width: 90vw;
 }
 #tooltip .tt-stars { display: inline-block; margin-left: 5px; vertical-align: middle; }
-#tooltip .tt-elo   { color: #c9922a; font-size: 10px; margin-left: 5px; }
-#tooltip .tt-sub   { color: #9090a8; font-size: 10px; }
+#tooltip .tt-elo   { color: #c9922a; font-size: 11px; margin-left: 6px; }
+#tooltip .tt-sub   { color: #9090a8; font-size: 11px; }
 
 .legend-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
   width: 100%;
-  max-width: 540px;
+  max-width: 700px;
   padding: 0 4px;
 }
 .legend-row canvas { flex: 1; border-radius: 3px; border: 1px solid var(--border); }
@@ -557,11 +578,11 @@ canvas#grid {
   display: flex;
   flex-wrap: wrap;
   gap: 12px 20px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
   padding: 0 4px;
   width: 100%;
-  max-width: 540px;
+  max-width: 700px;
 }
 .swatch {
   display: inline-block;
@@ -588,11 +609,11 @@ canvas#grid {
   background: rgba(255,255,255,0.82);
 }
 .iso-band--balanced {
-  height: 2px;
-  background: rgba(255,255,255,0.68);
+  height: 5px;
+  background: rgba(255,255,255,0.8);
 }
 .iso-band--outer {
-  height: 1px;
+  height: 2px;
   background: rgba(255,255,255,0.5);
 }
 
@@ -600,11 +621,11 @@ canvas#grid {
 @media (min-width: 760px) {
   #main {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: 340px 1fr;
     align-items: start;
     padding-bottom: 40px;
   }
-  .section-title { padding: 18px 16px 9px; }
+  .section-title { padding: 20px 18px 10px; }
 
   #fighter-setup {
     grid-column: 1;
@@ -637,8 +658,8 @@ canvas#grid {
 }
 
 @media (max-width: 380px) {
-  .drum-item__name { font-size: 11px; }
-  .drum-item__sub  { font-size: 9px; }
+  .drum-item__name { font-size: 12px; }
+  .drum-item__sub  { font-size: 10px; }
 }
 </style>
 </head>
@@ -777,10 +798,10 @@ canvas#grid {
 // ── CONFIG ──
 const CHESS_MIN = 0, CHESS_MAX = 7, CHESS_STEP = 0.2;
 const BOX_MIN   = 0, BOX_MAX   = 5, BOX_STEP   = 0.2;
-const CELL   = 14;
-const ITEM_H = 52; // must match CSS --item-h
+const CELL   = 16;
+const ITEM_H = 58; // must match CSS --item-h
 
-const MARGIN = { top: 40, right: 24, bottom: 68, left: 88 };
+const MARGIN = { top: 42, right: 28, bottom: 78, left: 108 };
 
 const CHESS_NAMED = [
   { value: 0, short: 'Total Beginner', sub: '800 ELO'  },
@@ -830,6 +851,19 @@ for (let k = 0; k <= Math.round((BOX_MAX - BOX_MIN) / BOX_STEP); k++) {
 function boxLabel(v) {
   const named = BOXING_NAMED.find(n => n.value === v);
   return named ? named.short + ' · ' + named.sub : closestNamed(BOXING_NAMED, v).short + ' · Lv ' + v.toFixed(1);
+}
+
+function boxCategory(v) {
+  const named = BOXING_NAMED.find(n => n.value === v);
+  return named ? named.short : closestNamed(BOXING_NAMED, v).short;
+}
+
+function boxMeta(v) {
+  return 'Lv ' + v.toFixed(1);
+}
+
+function boxLabelHTML(v, levelClass = 'fighter-card__box', metaClass = 'fighter-card__box-sub') {
+  return `<b class="${levelClass}">${boxCategory(v)}</b><span class="${metaClass}">${boxMeta(v)}</span>`;
 }
 
 function buildLevels(min, max, step) {
@@ -921,6 +955,15 @@ function miniStarsHTML(rating) {
   </span>`;
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 // ── STATE ──
 let myChess = 3.0;
 let myBox   = 2.0;
@@ -993,19 +1036,6 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(MARGIN.left, y); ctx.lineTo(MARGIN.left + NX * CELL, y); ctx.stroke();
   }
 
-  // Midpoint axis reference lines (chess mid = 3.5, boxing mid = 2.5)
-  {
-    const xMid = MARGIN.left + NX * CELL / 2;
-    const yMid = MARGIN.top  + NY * CELL / 2;
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255,255,255,0.14)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 6]);
-    ctx.beginPath(); ctx.moveTo(xMid, MARGIN.top); ctx.lineTo(xMid, MARGIN.top + NY * CELL); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(MARGIN.left, yMid); ctx.lineTo(MARGIN.left + NX * CELL, yMid); ctx.stroke();
-    ctx.restore();
-  }
-
   // ── FAIR FIGHT ZONE: soft fill on 45-55% cells ──
   ctx.fillStyle = 'rgba(255,245,180,0.06)';
   for (let j = 0; j < NY; j++) {
@@ -1020,10 +1050,10 @@ function draw() {
 
   // ── ISOLINES: strong gold center line, lighter white secondary contours ──
   strokeLine(getIsoline(0.10), 'rgba(255,255,255,0.34)', 1.1, [2, 2]);
-  strokeLine(getIsoline(0.25), 'rgba(255,255,255,0.48)', 1.5, [4, 2]);
-  strokeLine(getIsoline(0.45), 'rgba(255,255,255,0.72)', 2, [6, 2]);
-  strokeLine(getIsoline(0.55), 'rgba(255,255,255,0.72)', 2, [6, 2]);
-  strokeLine(getIsoline(0.75), 'rgba(255,255,255,0.48)', 1.5, [4, 2]);
+  strokeLine(getIsoline(0.25), 'rgba(255,255,255,0.48)', 1.6, [4, 2]);
+  strokeLine(getIsoline(0.45), 'rgba(255,255,255,0.76)', 2.8, [7, 2]);
+  strokeLine(getIsoline(0.55), 'rgba(255,255,255,0.76)', 2.8, [7, 2]);
+  strokeLine(getIsoline(0.75), 'rgba(255,255,255,0.48)', 1.6, [4, 2]);
   strokeLine(getIsoline(0.90), 'rgba(255,255,255,0.34)', 1.1, [2, 2]);
   strokeLine(getIsoline(0.50), 'rgba(245,200,66,0.98)', 3.5);
 
@@ -1069,17 +1099,17 @@ function draw() {
     const yTop = MARGIN.top + NY * CELL;
     ctx.beginPath(); ctx.moveTo(x, yTop); ctx.lineTo(x, yTop + 5);
     ctx.strokeStyle = '#5a5a6a'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.font = '11px system-ui'; ctx.fillStyle = '#c8b880';
+    ctx.font = '12px system-ui'; ctx.fillStyle = '#c8b880';
     ctx.fillText(CHESS_NAMED[v] ? CHESS_NAMED[v].short.split(' ')[0] : v, x, yTop + 7);
-    ctx.font = '10px ' + getComputedStyle(document.body).getPropertyValue('--font-mono');
+    ctx.font = '11px ' + getComputedStyle(document.body).getPropertyValue('--font-mono');
     ctx.fillStyle = '#7a6a40';
     ctx.fillText(eloOf(v), x, yTop + 21);
   }
-  ctx.font = 'bold 11px system-ui'; ctx.fillStyle = '#8888a0';
-  ctx.fillText('Chess level  (ELO)', MARGIN.left + NX * CELL / 2, MARGIN.top + NY * CELL + 40);
+  ctx.font = 'bold 12px system-ui'; ctx.fillStyle = '#8888a0';
+  ctx.fillText('Chess level  (ELO)', MARGIN.left + NX * CELL / 2, MARGIN.top + NY * CELL + 46);
 
   // ── Y AXIS (boxing) ──
-  ctx.font = '11px system-ui'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  ctx.font = '12px system-ui'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
   for (let v = BOX_MIN; v <= BOX_MAX; v++) {
     const j = Math.round((v - BOX_MIN) / BOX_STEP);
     const { y } = cell2px(0, j);
@@ -1092,12 +1122,12 @@ function draw() {
   ctx.translate(16, MARGIN.top + NY * CELL / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.font = 'bold 11px system-ui'; ctx.fillStyle = '#8888a0';
+  ctx.font = 'bold 12px system-ui'; ctx.fillStyle = '#8888a0';
   ctx.fillText('Boxing level', 0, 0);
   ctx.restore();
 
   // title strip
-  ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
   ctx.fillStyle = '#6a6a80';
   ctx.fillText('Opponent grid — color = your win probability', MARGIN.left, 12);
 }
@@ -1109,14 +1139,14 @@ function updateMine() {
   const cn = chessCategory(myChess);
   document.getElementById('myChessLabel').textContent = cn.short;
   document.getElementById('myElo').textContent        = 'ELO ' + eloOf(myChess);
-  document.getElementById('myBoxLabel').textContent   = boxLabel(myBox);
+  document.getElementById('myBoxLabel').innerHTML     = boxLabelHTML(myBox);
   document.getElementById('myRating').textContent     = 'Top ' + Math.max(1, Math.round((1 - rankOf(i,j)) * 100)) + '%';
   setStars(myStarsClip, starsOf(i, j));
 
   // keep fight card my-corner in sync
   document.getElementById('fc-my-chess').textContent = cn.short;
   document.getElementById('fc-my-elo').textContent   = 'ELO ' + eloOf(myChess);
-  document.getElementById('fc-my-box').textContent   = boxLabel(myBox);
+  document.getElementById('fc-my-box').innerHTML     = boxLabelHTML(myBox, 'fc-box-level', 'fc-box-sub');
 
   // refresh fight card if open
   if (currentOppIdx && fightCard.classList.contains('visible')) showFightCard(currentOppIdx);
@@ -1176,10 +1206,14 @@ function renderRoundChart(dChess, dBox) {
     const wB = Math.round(pB * 100);
     const row = document.createElement('div');
     row.className = 'fc-round-row';
+    const showIcon = r !== 8;
     const icon = type === 'chess' ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
-    const label = r === 8 ? 'Dec' : `R${r}`;
+    const label = r === 8 ? 'Decision' : `R${r}`;
+    const iconMarkup = showIcon
+      ? `<img class="fc-round-icon" src="${icon}" alt="">`
+      : `<span class="fc-round-icon-spacer" aria-hidden="true"></span>`;
     row.innerHTML =
-      `<img class="fc-round-icon" src="${icon}" alt="">` +
+      iconMarkup +
       `<span class="fc-round-label">${label}</span>` +
       `<div class="fc-round-bar">` +
         `<div class="fc-round-fill-a" style="width:${wA}%"></div>` +
@@ -1208,7 +1242,7 @@ function showFightCard(idx) {
 
   document.getElementById('hChess').textContent = cn.short;
   document.getElementById('hElo').textContent   = 'ELO ' + eloOf(oc);
-  document.getElementById('hBox').textContent   = boxLabel(ob);
+  document.getElementById('hBox').innerHTML     = boxLabelHTML(ob, 'fc-box-level', 'fc-box-sub');
   document.getElementById('hP').textContent     = Math.round(p * 100) + '%';
   document.getElementById('hP').style.color     = col;
   document.getElementById('fc-outcome-label').textContent = outcomeLabel(p);
@@ -1264,13 +1298,12 @@ function showTooltip(idx, cssX, cssY) {
   const oc  = chessLevels[idx.i], ob = boxLevels[idx.j];
   const p   = pWin(myChess, myBox, oc, ob);
   const cn  = chessCategory(oc);
-  const bn  = closestNamed(BOXING_NAMED, ob);
   tooltip.style.display = 'block';
   tooltip.style.left = cssX + 'px';
   tooltip.style.top  = cssY + 'px';
   tooltip.innerHTML =
-    `<b>${cn.short}</b><span class="tt-elo">ELO ${eloOf(oc)}</span><br>` +
-    `<b>lv. ${ob.toFixed(1)}</b><br>` +
+    `<b>${escapeHtml(cn.short)}</b><span class="tt-elo">ELO ${eloOf(oc)}</span><br>` +
+    `<b>${escapeHtml(boxCategory(ob))}</b><span class="tt-elo">${escapeHtml(boxMeta(ob))}</span><br>` +
     `<b style="color:${outcomeColor(p)}">${Math.round(p*100)}%</b>` +
     `<span class="tt-stars">${miniStarsHTML(starsOf(idx.i, idx.j))}</span>`;
 }
