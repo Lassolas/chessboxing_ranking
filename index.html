@@ -99,7 +99,11 @@ body {
 }
 
 /* ── MAIN LAYOUT ── */
-#main { max-width: 1240px; margin: 0 auto; padding-bottom: 96px; }
+#main { max-width: 1240px; margin: 0 auto; padding-bottom: 96px; display: flex; flex-direction: column; }
+#sidebar { display: contents; }
+#fighter-setup { order: 1; }
+#explore-section { order: 2; }
+#opponent-setup { order: 3; }
 
 /* ── SECTION HEADING ── */
 .section-title {
@@ -289,28 +293,24 @@ body {
 }
 
 /* ── FIGHT CARD ── */
-#fight-card {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
+#opponent-setup {
+  display: none;
   background: var(--bg-panel);
   border-top: 2px solid var(--gold-mid);
   border-radius: 16px 16px 0 0;
-  padding: 0 0 env(safe-area-inset-bottom, 12px);
-  z-index: 200;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  box-shadow: 0 -8px 48px rgba(0,0,0,0.7);
-  max-height: 75vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: env(safe-area-inset-bottom, 12px);
+  margin-top: 16px;
 }
-#fight-card.visible { transform: translateY(0); }
+#opponent-setup.visible {
+  display: block;
+}
+
+#fight-card {
+  padding: 0;
+}
 
 .fc-handle {
-  width: 32px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 10px auto 0;
+  display: none;
 }
 .fc-header {
   display: flex;
@@ -762,9 +762,8 @@ input[type=range].stoppage-slider {
     align-items: start;
     padding-bottom: 40px;
   }
-  .section-title { padding: 20px 18px 10px; }
-
-  #fighter-setup {
+  #sidebar {
+    display: block;
     grid-column: 1;
     grid-row: 1;
     border-right: 1px solid var(--border);
@@ -773,26 +772,30 @@ input[type=range].stoppage-slider {
     max-height: 100vh;
     overflow-y: auto;
   }
+  .section-title { padding: 20px 18px 10px; }
+
+  #fighter-setup {
+    border-right: none;
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+  #opponent-setup {
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+    border-radius: 0;
+    background: transparent;
+  }
   #explore-section { grid-column: 2; }
 
   /* fight card: inline in sidebar on desktop */
   #fight-card {
-    position: sticky;
-    bottom: 12px;
-    z-index: 100;
-    transform: none !important;
     border-radius: 10px;
     border: 1px solid var(--gold-mid);
     box-shadow: 0 12px 32px rgba(0,0,0,0.8);
-    max-height: calc(100vh - 24px);
     margin: 10px 12px 12px;
-    padding-bottom: 0;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s, visibility 0.2s;
+    background: var(--bg-panel);
   }
-  #fight-card.visible { opacity: 1; visibility: visible; }
-  .fc-handle { display: none; }
 }
 
 @media (max-width: 380px) {
@@ -817,7 +820,7 @@ input[type=range].stoppage-slider {
 </header>
 
 <div id="main">
-
+  <div id="sidebar">
   <!-- ── FIGHTER SETUP ── -->
   <section id="fighter-setup">
     <h2 class="section-title" data-i18n="your_profile">Your Profile</h2>
@@ -856,8 +859,32 @@ input[type=range].stoppage-slider {
         <div class="fighter-card__rank" id="myRating">—</div>
       </div>
     </div>
+  </section>
 
-    <!-- Fight card: fixed bottom sheet on mobile, inline here on desktop -->
+  <!-- ── OPPONENT SETUP ── -->
+  <section id="opponent-setup">
+    <div class="drums-row">
+      <!-- Opponent Chess drum -->
+      <div class="drum-section">
+        <div class="drum-label">
+          <img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span>
+        </div>
+        <div class="drum-clip">
+          <div class="drum" id="opp-chess-drum" role="listbox" aria-label="Opponent Chess level" tabindex="0"></div>
+        </div>
+      </div>
+      <!-- Opponent Boxing drum -->
+      <div class="drum-section">
+        <div class="drum-label">
+          <img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span>
+        </div>
+        <div class="drum-clip">
+          <div class="drum" id="opp-boxing-drum" role="listbox" aria-label="Opponent Boxing level" tabindex="0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fight card: inline now -->
     <div id="fight-card">
       <div class="fc-handle"></div>
       <div class="fc-header">
@@ -935,6 +962,7 @@ input[type=range].stoppage-slider {
       </div>
     </div>
   </section>
+  </div><!-- #sidebar -->
 
   <!-- ── EXPLORE GRID ── -->
   <section id="explore-section">
@@ -1582,11 +1610,18 @@ function renderRoundChart(dChess, dBox) {
 const fightCard = document.getElementById('fight-card');
 let currentOppIdx = null;
 
-function showFightCard(idx) {
+function showFightCard(idx, updateDrums = true) {
   if (!idx) return;
   currentOppIdx = idx;
   const t = i18n[currentLang];
   const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
+
+  if (updateDrums && typeof oppChessDrumObj !== 'undefined') {
+    oppChess = oc;
+    oppBox = ob;
+    oppChessDrumObj.setValue(oc);
+    oppBoxDrumObj.setValue(ob);
+  }
   const p   = pWin(myChess, myBox, oc, ob);
   const cn  = chessCategory(oc);
   const col = outcomeColor(p);
@@ -1648,30 +1683,17 @@ function showFightCard(idx) {
   setStars(oppStarsClip, starsOf(idx.i, idx.j));
   renderRoundChart(myChess - oc, myBox - ob);
 
-  fightCard.classList.add('visible');
+  document.getElementById('opponent-setup').classList.add('visible');
   draw();
 }
 
 function dismissFightCard() {
-  fightCard.classList.remove('visible');
+  document.getElementById('opponent-setup').classList.remove('visible');
   currentOppIdx = null;
   draw();
 }
 
 document.getElementById('fc-close-btn').addEventListener('click', dismissFightCard);
-
-let fcTouchStartY = 0;
-fightCard.addEventListener('touchstart', e => { fcTouchStartY = e.touches[0].clientY; }, { passive: true });
-fightCard.addEventListener('touchend', e => {
-  if (e.changedTouches[0].clientY - fcTouchStartY > 60) dismissFightCard();
-}, { passive: true });
-
-document.addEventListener('pointerdown', e => {
-  if (window.innerWidth < 760 && fightCard.classList.contains('visible')
-      && !fightCard.contains(e.target) && e.target !== canvas) {
-    dismissFightCard();
-  }
-});
 
 // ── TOOLTIP ──
 const tooltip = document.getElementById('tooltip');
@@ -1827,6 +1849,17 @@ function buildDrum(containerEl, namedLevels, initialValue, onSelect) {
     const initIdx = namedLevels.findIndex(x => x.value === activeValue);
     if (initIdx >= 0) containerEl.scrollTop = initIdx * ITEM_H;
   }, 60);
+
+  return {
+    setValue: (val) => {
+      if (val === activeValue) return;
+      const idx = namedLevels.findIndex(x => x.value === val);
+      if (idx >= 0) {
+        setActive(val);
+        containerEl.scrollTo({ top: idx * ITEM_H, behavior: 'smooth' });
+      }
+    }
+  };
 }
 
 function pulseCard() {
@@ -1846,6 +1879,30 @@ buildDrum(
   document.getElementById('boxing-drum'),
   getBoxingDrumLevels(), myBox,
   val => { myBox = val; updateMine(); draw(); pulseCard(); }
+);
+
+let oppChess = 4.0;
+let oppBox   = 2.0;
+
+const oppChessDrumObj = buildDrum(
+  document.getElementById('opp-chess-drum'),
+  getChessDrumLevels(), oppChess,
+  val => {
+    oppChess = val;
+    const i = Math.round((oppChess - CHESS_MIN) / CHESS_STEP);
+    const j = Math.round((oppBox - BOX_MIN) / BOX_STEP);
+    showFightCard({ i, j }, false);
+  }
+);
+const oppBoxDrumObj = buildDrum(
+  document.getElementById('opp-boxing-drum'),
+  getBoxingDrumLevels(), oppBox,
+  val => {
+    oppBox = val;
+    const i = Math.round((oppChess - CHESS_MIN) / CHESS_STEP);
+    const j = Math.round((oppBox - BOX_MIN) / BOX_STEP);
+    showFightCard({ i, j }, false);
+  }
 );
 
 // ── LEGEND BAR ──
@@ -1878,13 +1935,13 @@ function setLang(lang) {
   document.getElementById('stoppage-val').textContent = stoppageLimit === 0 ? t.off : stoppageLimit.toFixed(1) + ' ' + t.rnds_short;
 
   const cLevels = getChessDrumLevels();
-  document.querySelectorAll('#chess-drum .drum-item').forEach(el => {
+  document.querySelectorAll('#chess-drum .drum-item, #opp-chess-drum .drum-item').forEach(el => {
     const idx = el.dataset.idx;
     el.querySelector('.drum-item__name').textContent = cLevels[idx].short;
     el.querySelector('.drum-item__sub').textContent  = cLevels[idx].sub;
   });
   const bLevels = getBoxingDrumLevels();
-  document.querySelectorAll('#boxing-drum .drum-item').forEach(el => {
+  document.querySelectorAll('#boxing-drum .drum-item, #opp-boxing-drum .drum-item').forEach(el => {
     const idx = el.dataset.idx;
     el.querySelector('.drum-item__name').textContent = bLevels[idx].short;
     el.querySelector('.drum-item__sub').textContent  = bLevels[idx].sub;
