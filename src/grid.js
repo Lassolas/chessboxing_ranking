@@ -103,10 +103,15 @@ export function draw(canvas, ctx, myChess, myBox, stoppageLimit, currentOppIdx) 
   if (stoppageLimit > 0) {
     for (let j = 0; j < NY; j++) {
       for (let i = 0; i < NX; i++) {
-        const { expectedRounds } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
+        const { expectedRounds, chessWin, boxWin } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
         if (expectedRounds < stoppageLimit) {
           const { x, y } = cell2px(i, j);
-          ctx.fillStyle = 'rgba(224, 60, 60, 0.4)';
+          const winProb = chessWin + boxWin;
+          if (winProb < 0.5) {
+            ctx.fillStyle = 'rgba(224, 60, 60, 0.4)'; // Danger zone (red)
+          } else {
+            ctx.fillStyle = 'rgba(57, 211, 83, 0.4)'; // Domination zone (green)
+          }
           ctx.fillRect(x, y, CELL, CELL);
         }
       }
