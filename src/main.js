@@ -44,7 +44,9 @@ function updateMine() {
   document.getElementById('fc-my-elo').textContent   = 'ELO ' + eloOf(myChess);
   document.getElementById('fc-my-box').innerHTML     = fightCardBoxHTML(myBox);
 
-  if (currentOppIdx && fightCard.classList.contains('visible')) showFightCard(currentOppIdx);
+  if (currentOppIdx && document.getElementById('opponent-setup').classList.contains('visible')) {
+    showFightCard(currentOppIdx, false);
+  }
 }
 
 function showFightCard(idx, updateDrums = true) {
