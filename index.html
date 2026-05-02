@@ -1253,7 +1253,7 @@ function showTooltip(idx, cssX, cssY) {
   tooltip.style.top  = cssY + 'px';
   tooltip.innerHTML =
     `<b>${cn.short}</b><span class="tt-elo">ELO ${eloOf(oc)}</span><br>` +
-    `<span class="tt-sub">${bn.short}</span><br>` +
+    `<b>lv. ${ob.toFixed(1)}</b><br>` +
     `<b style="color:${outcomeColor(p)}">${Math.round(p*100)}%</b>` +
     `<span class="tt-stars">${miniStarsHTML(starsOf(idx.i, idx.j))}</span>`;
 }
