@@ -453,29 +453,27 @@ body {
   font-family: var(--font-mono);
   text-align: right;
   font-weight: 700;
+  color: var(--text-muted);
 }
 .fc-round-bar {
   flex: 1;
-  height: 4px;
+  height: 5px;
   background: var(--bg-panel-alt);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
   position: relative;
 }
-.fc-round-fill {
+.fc-round-fill-a {
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  border-radius: 2px;
+  background: var(--gold-mid);
   transition: width 0.4s ease;
 }
-.fc-round-fill--chess { background: var(--gold-mid); }
-.fc-round-fill--box   { background: var(--even-blue); }
-.fc-round-pct {
-  flex: 0 0 32px;
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--text-secondary);
-  text-align: right;
+.fc-round-fill-b {
+  position: absolute;
+  top: 0; bottom: 0;
+  background: var(--even-blue);
+  transition: left 0.4s ease, width 0.4s ease;
 }
 
 /* ── GRID ── */
@@ -720,8 +718,8 @@ canvas#grid {
         <div class="fc-rounds-title">
           Stoppage odds · if reached
           <span class="fc-rounds-legend">
-            <span style="color:var(--gold-mid)">&#9644; chess</span>
-            <span style="color:var(--even-blue)">&#9644; boxing</span>
+            <span style="color:var(--gold-mid)">&#9644; you win</span>
+            <span style="color:var(--even-blue)">&#9644; opp wins</span>
           </span>
         </div>
         <div id="fc-round-rows"></div>
@@ -1119,27 +1117,39 @@ const ROUND_PARAMS = [
   { type: 'box',   a: 1.8596, k:   0     }, // R8
 ];
 
-function pStop(r, dChess, dBox) {
-  const { type, a, k } = ROUND_PARAMS[r - 1];
-  const x = type === 'chess' ? dChess : dBox;
-  const e = Math.exp(a * x) + Math.exp(-a * x);
-  return e / (e + k);
+function computeMatchupProbs(dChess, dBox) {
+  let cont = 1;
+  let cumA = 0, cumB = 0;
+  const out = [];
+  for (let r = 1; r <= 8; r++) {
+    const { type, a, k } = ROUND_PARAMS[r - 1];
+    const x = type === 'chess' ? dChess : dBox;
+    const eA = Math.exp(a * x), eB = Math.exp(-a * x);
+    const Z = eA + eB + k;
+    cumA += cont * eA / Z;
+    cumB += cont * eB / Z;
+    cont *= k / Z;
+    out.push({ pA: cumA, pB: cumB, pCont: cont });
+  }
+  return out;
 }
 
 function renderRoundChart(dChess, dBox) {
   const container = document.getElementById('fc-round-rows');
   container.innerHTML = '';
+  const probs = computeMatchupProbs(dChess, dBox);
   for (let r = 1; r <= 8; r++) {
-    const { type } = ROUND_PARAMS[r - 1];
-    const p = pStop(r, dChess, dBox);
-    const pct = Math.round(p * 100);
-    const col = type === 'chess' ? 'var(--gold-mid)' : 'var(--even-blue)';
+    const { pA, pB } = probs[r - 1];
+    const wA = Math.round(pA * 100);
+    const wB = Math.round(pB * 100);
     const row = document.createElement('div');
     row.className = 'fc-round-row';
     row.innerHTML =
-      `<span class="fc-round-label" style="color:${col}">R${r}</span>` +
-      `<div class="fc-round-bar"><div class="fc-round-fill fc-round-fill--${type}" style="width:${pct}%"></div></div>` +
-      `<span class="fc-round-pct">${pct}%</span>`;
+      `<span class="fc-round-label">R${r}</span>` +
+      `<div class="fc-round-bar">` +
+        `<div class="fc-round-fill-a" style="width:${wA}%"></div>` +
+        `<div class="fc-round-fill-b" style="left:${wA}%;width:${wB}%"></div>` +
+      `</div>`;
     container.appendChild(row);
   }
 }
