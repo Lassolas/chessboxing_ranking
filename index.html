@@ -1159,6 +1159,7 @@ function renderRoundChart(dChess, dBox) {
   const probs = computeMatchupProbs(dChess, dBox);
   for (let r = 1; r <= 8; r++) {
     const { pA, pB } = probs[r - 1];
+    const { type } = ROUND_PARAMS[r - 1];
     const wA = Math.round(pA * 100);
     const wB = Math.round(pB * 100);
     const row = document.createElement('div');
