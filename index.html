@@ -482,6 +482,17 @@ body {
   background: var(--even-blue);
   transition: left 0.4s ease, width 0.4s ease;
 }
+.fc-round-detail {
+  flex: 0 0 56px;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  text-align: right;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.fc-round-row:hover .fc-round-detail { opacity: 1; }
 
 /* ── GRID ── */
 #explore-section { padding-bottom: 16px; }
@@ -1172,7 +1183,12 @@ function renderRoundChart(dChess, dBox) {
       `<div class="fc-round-bar">` +
         `<div class="fc-round-fill-a" style="width:${wA}%"></div>` +
         `<div class="fc-round-fill-b" style="left:${wA}%;width:${wB}%"></div>` +
-      `</div>`;
+      `</div>` +
+      `<span class="fc-round-detail">` +
+        `<span style="color:var(--gold-mid)">${wA}%</span>` +
+        ` · ` +
+        `<span style="color:var(--even-blue)">${wB}%</span>` +
+      `</span>`;
     container.appendChild(row);
   }
 }
