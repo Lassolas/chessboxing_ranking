@@ -459,6 +459,8 @@ body {
   background: var(--gold-bright);
   transition: width 0.4s ease;
 }
+#fc-chess-bar { background: var(--gold-mid); }
+#fc-box-bar   { background: var(--even-blue); }
 
 /* ── ROUND CHART ── */
 .fc-rounds {
@@ -975,6 +977,22 @@ function getMatchupProbs(dChess, dBox) {
   return out;
 }
 
+function getWinBreakdown(dChess, dBox) {
+  const probs = getMatchupProbs(dChess, dBox);
+  let prevA = 0;
+  let chessWin = 0;
+  let boxWin = 0;
+
+  for (let r = 1; r <= 8; r++) {
+    const deltaA = Math.max(0, probs[r - 1].pA - prevA);
+    if (ROUND_PARAMS[r - 1].type === 'chess') chessWin += deltaA;
+    else boxWin += deltaA;
+    prevA = probs[r - 1].pA;
+  }
+
+  return { chessWin, boxWin, probs };
+}
+
 function pWin(myC, myB, oppC, oppB) {
   return getMatchupProbs(myC - oppC, myB - oppB)[7].pA;
 }
@@ -1276,7 +1294,7 @@ function outcomeColor(p) {
 function renderRoundChart(dChess, dBox) {
   const container = document.getElementById('fc-round-rows');
   container.innerHTML = '';
-  const probs = getMatchupProbs(dChess, dBox);
+  const { probs } = getWinBreakdown(dChess, dBox);
   for (let r = 1; r <= 8; r++) {
     const { pA, pB } = probs[r - 1];
     const { type } = ROUND_PARAMS[r - 1];
@@ -1326,10 +1344,13 @@ function showFightCard(idx) {
   document.getElementById('fc-outcome-label').textContent = outcomeLabel(p);
   document.getElementById('fc-outcome').style.borderColor = col;
 
-  const chessBar = 50 + (myChess - oc) / (CHESS_MAX - CHESS_MIN) * 50;
-  const boxBar   = 50 + (myBox   - ob) / (BOX_MAX   - BOX_MIN)   * 50;
-  document.getElementById('fc-chess-bar').style.width = Math.max(2, Math.min(98, chessBar)) + '%';
-  document.getElementById('fc-box-bar').style.width   = Math.max(2, Math.min(98, boxBar))   + '%';
+  const { chessWin, boxWin } = getWinBreakdown(myChess - oc, myBox - ob);
+  const chessBarEl = document.getElementById('fc-chess-bar');
+  const boxBarEl = document.getElementById('fc-box-bar');
+  chessBarEl.style.width = (chessWin * 100).toFixed(1) + '%';
+  boxBarEl.style.width   = (boxWin * 100).toFixed(1) + '%';
+  chessBarEl.title = `Probability to win by chess: ${Math.round(chessWin * 100)}%`;
+  boxBarEl.title   = `Probability to win by boxing: ${Math.round(boxWin * 100)}%`;
 
   const eloDiff = eloOf(myChess) - eloOf(oc);
   const boxDiff = +(myBox - ob).toFixed(1);
