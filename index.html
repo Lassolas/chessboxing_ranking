@@ -127,19 +127,25 @@ body {
   margin-left: 8px;
 }
 
-/* ── DRUMS ROW ── */
-.drums-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* ── SLIDERS ROW ── */
+.sliders-row {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border);
 }
-
-.drum-section {
-  padding: 10px 0 0;
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-.drum-section:first-child { border-right: 1px solid var(--border); }
-
-.drum-label {
+.slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.slider-label {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -148,92 +154,64 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-secondary);
-  padding: 0 12px 6px;
 }
-.drum-label img { width: 16px; height: 16px; object-fit: contain; opacity: 0.75; }
-
-/* The clip wrapper hides overflow and provides gradient masks */
-.drum-clip {
-  position: relative;
-  height: calc(var(--item-h) * 3); /* show 3 items */
-  overflow: hidden;
-  box-shadow: inset 0 4px 12px rgba(0,0,0,0.4), inset 0 -4px 12px rgba(0,0,0,0.4);
-  background: rgba(0,0,0,0.2);
-}
-
-/* Center-slot highlight */
-.drum-clip::before {
-  content: '';
-  position: absolute;
-  left: 6px; right: 6px;
-  top: var(--item-h); /* one item down = center slot */
-  height: var(--item-h);
-  background: rgba(245, 200, 66, 0.07);
-  border-top: 1px solid rgba(245, 200, 66, 0.22);
-  border-bottom: 1px solid rgba(245, 200, 66, 0.22);
-  border-radius: 6px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Top/bottom fade */
-.drum-clip::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to bottom, var(--bg-deep) 0%, transparent 28%),
-    linear-gradient(to top,    var(--bg-deep) 0%, transparent 28%);
-  pointer-events: none;
-  z-index: 3;
-}
-
-.drum {
-  height: 100%;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  cursor: ns-resize;
-  overscroll-behavior: contain;
-}
-.drum::-webkit-scrollbar { display: none; }
-
-.drum-spacer { height: var(--item-h); flex-shrink: 0; }
-
-.drum-item {
-  height: var(--item-h);
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 0 8px;
-  cursor: pointer;
-  opacity: 0.35;
-  transition: opacity 0.15s;
-  user-select: none;
-  -webkit-user-select: none;
-  text-align: center;
-}
-.drum-item.active { opacity: 1; }
-
-.drum-item__name {
-  font-size: 14px;
+.slider-label img { width: 16px; height: 16px; object-fit: contain; opacity: 0.75; }
+.slider-value {
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.2;
+  font-family: var(--font-mono);
 }
-.drum-item.active .drum-item__name { color: var(--gold-bright); }
-
-.drum-item__sub {
+.slider-sub {
   font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.2;
+  color: var(--text-muted);
+  margin-left: 6px;
+  font-weight: 400;
+  font-family: var(--font-body);
 }
-.drum-item.active .drum-item__sub { color: var(--gold-mid); }
+input[type=range].modern-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--bg-panel-alt);
+  border-radius: 3px;
+  outline: none;
+  margin: 10px 0;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+input[type=range].modern-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+input[type=range].modern-slider::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+input[type=range].modern-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+input[type=range].modern-slider::-moz-range-thumb:active {
+  transform: scale(1.2);
+}
+input[type=range].modern-slider.opp-slider::-webkit-slider-thumb {
+  background: var(--even-blue);
+}
+input[type=range].modern-slider.opp-slider::-moz-range-thumb {
+  background: var(--even-blue);
+}
 
 /* ── FIGHTER CARD ── */
 .fighter-card {
@@ -337,57 +315,56 @@ body {
 }
 .fc-close:hover { color: var(--text-primary); }
 
-.fc-fighters {
+.fc-comparison {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: start;
-  gap: 16px;
-  padding: 12px 16px 8px;
+  grid-template-columns: auto 1fr 1fr;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 16px;
 }
-
-.fc-fighter {
-  display: grid;
-  grid-template-rows: auto minmax(20px, auto) minmax(16px, auto) minmax(20px, auto) minmax(16px, auto) minmax(19px, auto);
-  align-items: start;
-  gap: 2px;
-  min-width: 0;
-}
-.fc-fighter--a  { text-align: left; }
-.fc-fighter--opp { text-align: right; }
-
-.fc-corner {
-  font-size: 12px;
+.fc-comp-row { display: contents; }
+.fc-comp-label {
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 2px;
-  min-height: 14px;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-.fc-fighter--a .fc-corner { color: var(--gold-dim); }
-
-.fc-stat-line {
-  display: inline-flex;
+  text-align: right;
+  display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
-  min-width: 0;
-  text-align: left;
+  margin-top: -6px; /* align better */
 }
-.fc-stat-line img {
-  width: 14px;
-  height: 14px;
-  object-fit: contain;
-  opacity: 0.75;
-  flex-shrink: 0;
+.fc-comp-label img { width: 14px; height: 14px; opacity: 0.6; }
+.fc-comp-val {
+  text-align: center;
+  line-height: 1.2;
 }
-.fc-chess-level { font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-.fc-chess-elo   { font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); }
-.fc-box-level   { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
-.fc-box-sub     { display: block; font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); margin-top: 2px; }
-.fc-stars-row   { margin-top: 4px; min-height: 19px; }
+.fc-comp-val--you { color: var(--gold-mid); }
+.fc-comp-val--opp { color: var(--even-blue); }
 
+.fc-comp-primary { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.fc-comp-secondary { font-size: 11px; font-family: var(--font-mono); margin-top: 4px; display: block; }
+.fc-comp-val--you .fc-comp-secondary { color: var(--gold-mid); }
+.fc-comp-val--opp .fc-comp-secondary { color: var(--even-blue); }
+
+.fc-comp-header {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.fc-comp-header--you { color: var(--gold-dim); }
+.fc-comp-header--opp { color: var(--even-blue); opacity: 0.8; }
+.fc-comp-corner-empty {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
 .fc-outcome {
   display: flex;
   align-items: center;
@@ -799,8 +776,10 @@ input[type=range].stoppage-slider {
 }
 
 @media (max-width: 380px) {
-  .drum-item__name { font-size: 12px; }
-  .drum-item__sub  { font-size: 10px; }
+  .slider-value { font-size: 12px; }
+  .slider-sub { font-size: 10px; }
+  .fc-comp-primary { font-size: 12px; }
+  .fc-comp-secondary { font-size: 10px; }
 }
 </style>
 </head>
@@ -825,24 +804,20 @@ input[type=range].stoppage-slider {
   <section id="fighter-setup">
     <h2 class="section-title" data-i18n="your_profile">Your Profile</h2>
 
-    <div class="drums-row">
-      <!-- Chess drum -->
-      <div class="drum-section">
-        <div class="drum-label">
-          <img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span>
+    <div class="sliders-row">
+      <div class="slider-group">
+        <div class="slider-header">
+          <div class="slider-label"><img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span></div>
+          <div class="slider-value" id="my-chess-val">—</div>
         </div>
-        <div class="drum-clip">
-          <div class="drum" id="chess-drum" role="listbox" aria-label="Chess level" tabindex="0"></div>
-        </div>
+        <input type="range" class="modern-slider" id="my-chess-slider" min="0" max="7" step="0.2" value="3.0">
       </div>
-      <!-- Boxing drum -->
-      <div class="drum-section">
-        <div class="drum-label">
-          <img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span>
+      <div class="slider-group">
+        <div class="slider-header">
+          <div class="slider-label"><img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span></div>
+          <div class="slider-value" id="my-box-val">—</div>
         </div>
-        <div class="drum-clip">
-          <div class="drum" id="boxing-drum" role="listbox" aria-label="Boxing level" tabindex="0"></div>
-        </div>
+        <input type="range" class="modern-slider" id="my-box-slider" min="0" max="5" step="0.2" value="2.0">
       </div>
     </div>
 
@@ -863,24 +838,20 @@ input[type=range].stoppage-slider {
 
   <!-- ── OPPONENT SETUP ── -->
   <section id="opponent-setup">
-    <div class="drums-row">
-      <!-- Opponent Chess drum -->
-      <div class="drum-section">
-        <div class="drum-label">
-          <img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span>
+    <div class="sliders-row">
+      <div class="slider-group">
+        <div class="slider-header">
+          <div class="slider-label"><img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span></div>
+          <div class="slider-value" id="opp-chess-val">—</div>
         </div>
-        <div class="drum-clip">
-          <div class="drum" id="opp-chess-drum" role="listbox" aria-label="Opponent Chess level" tabindex="0"></div>
-        </div>
+        <input type="range" class="modern-slider opp-slider" id="opp-chess-slider" min="0" max="7" step="0.2" value="4.0">
       </div>
-      <!-- Opponent Boxing drum -->
-      <div class="drum-section">
-        <div class="drum-label">
-          <img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span>
+      <div class="slider-group">
+        <div class="slider-header">
+          <div class="slider-label"><img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span></div>
+          <div class="slider-value" id="opp-box-val">—</div>
         </div>
-        <div class="drum-clip">
-          <div class="drum" id="opp-boxing-drum" role="listbox" aria-label="Opponent Boxing level" tabindex="0"></div>
-        </div>
+        <input type="range" class="modern-slider opp-slider" id="opp-box-slider" min="0" max="5" step="0.2" value="2.0">
       </div>
     </div>
 
@@ -895,24 +866,32 @@ input[type=range].stoppage-slider {
         <div class="fc-outcome__prob"  id="hP">—</div>
         <div class="fc-outcome__label" id="fc-outcome-label">vs</div>
       </div>
-      <div class="fc-fighters">
-        <div class="fc-fighter fc-fighter--a">
-          <div class="fc-corner" data-i18n="your_corner">Your Corner</div>
-          <div class="fc-chess-level" id="fc-my-chess">—</div>
-          <div class="fc-chess-elo"   id="fc-my-elo">—</div>
-          <div class="fc-box-level"   id="fc-my-box">—</div>
-          <div class="fc-stars-row">
-            <svg class="stars-svg" id="fc-my-stars" width="95" height="19" viewBox="0 0 500 100"></svg>
+      <div class="fc-comparison">
+        <div class="fc-comp-row">
+          <div class="fc-comp-corner-empty"></div>
+          <div class="fc-comp-header fc-comp-header--you" data-i18n="your_corner">Your Corner</div>
+          <div class="fc-comp-header fc-comp-header--opp" data-i18n="opponent">Opponent</div>
+        </div>
+        <div class="fc-comp-row">
+          <div class="fc-comp-label">Rating</div>
+          <div class="fc-comp-val"><svg class="stars-svg" id="fc-my-stars" width="95" height="19" viewBox="0 0 500 100"></svg></div>
+          <div class="fc-comp-val"><svg class="stars-svg" id="oppStars" width="95" height="19" viewBox="0 0 500 100"></svg></div>
+        </div>
+        <div class="fc-comp-row">
+          <div class="fc-comp-label"><img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span></div>
+          <div class="fc-comp-val fc-comp-val--you">
+            <div class="fc-comp-primary" id="fc-my-chess">—</div>
+            <div class="fc-comp-secondary" id="fc-my-elo">—</div>
+          </div>
+          <div class="fc-comp-val fc-comp-val--opp">
+            <div class="fc-comp-primary" id="hChess">—</div>
+            <div class="fc-comp-secondary" id="hElo">—</div>
           </div>
         </div>
-        <div class="fc-fighter fc-fighter--opp">
-          <div class="fc-corner" data-i18n="opponent">Opponent</div>
-          <div class="fc-chess-level" id="hChess">—</div>
-          <div class="fc-chess-elo"   id="hElo">—</div>
-          <div class="fc-box-level"   id="hBox">—</div>
-          <div class="fc-stars-row">
-            <svg class="stars-svg" id="oppStars" width="95" height="19" viewBox="0 0 500 100"></svg>
-          </div>
+        <div class="fc-comp-row">
+          <div class="fc-comp-label"><img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span></div>
+          <div class="fc-comp-val fc-comp-val--you" id="fc-my-box">—</div>
+          <div class="fc-comp-val fc-comp-val--opp" id="hBox">—</div>
         </div>
       </div>
       <div class="fc-bars">
@@ -1178,11 +1157,11 @@ function boxLabelHTML(v, levelClass = 'fighter-card__box', metaClass = 'fighter-
 }
 
 function fightCardChessHTML(label) {
-  return `<span class="fc-stat-line"><img src="assets/icon-chess.png" alt=""><span>${escapeHtml(label)}</span></span>`;
+  return escapeHtml(label);
 }
 
 function fightCardBoxHTML(v) {
-  return `<span class="fc-stat-line"><img src="assets/icon-boxing.png" alt=""><span>${boxLabelHTML(v, 'fc-box-level', 'fc-box-sub')}</span></span>`;
+  return boxLabelHTML(v, 'fc-comp-primary', 'fc-comp-secondary');
 }
 
 function tooltipLineHTML(icon, mainHtml, subHtml = '') {
@@ -1616,11 +1595,11 @@ function showFightCard(idx, updateDrums = true) {
   const t = i18n[currentLang];
   const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
 
-  if (updateDrums && typeof oppChessDrumObj !== 'undefined') {
+  if (updateDrums && typeof oppChessSliderObj !== 'undefined') {
     oppChess = oc;
     oppBox = ob;
-    oppChessDrumObj.setValue(oc);
-    oppBoxDrumObj.setValue(ob);
+    oppChessSliderObj.setValue(oc);
+    oppBoxSliderObj.setValue(ob);
   }
   const p   = pWin(myChess, myBox, oc, ob);
   const cn  = chessCategory(oc);
@@ -1772,92 +1751,31 @@ canvas.addEventListener('mousemove', e => {
   showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
 });
 
-// ── DRUM PICKER ──
-function buildDrum(containerEl, namedLevels, initialValue, onSelect) {
-  let activeValue = namedLevels.reduce((best, item) =>
-    Math.abs(item.value - initialValue) < Math.abs(best - initialValue) ? item.value : best,
-    namedLevels[0].value);
-  let scrollTimer = null;
-
-  // top spacer
-  const topSpacer = document.createElement('div');
-  topSpacer.className = 'drum-spacer';
-  containerEl.appendChild(topSpacer);
-
-  namedLevels.forEach((item, idx) => {
-    const el = document.createElement('div');
-    el.className = 'drum-item' + (item.value === activeValue ? ' active' : '');
-    el.dataset.value = item.value;
-    el.dataset.idx   = idx;
-    el.setAttribute('role', 'option');
-    el.setAttribute('aria-selected', String(item.value === activeValue));
-    el.innerHTML = `<div class="drum-item__name">${item.short}</div><div class="drum-item__sub">${item.sub}</div>`;
-    el.addEventListener('click', () => scrollToIdx(idx));
-    containerEl.appendChild(el);
-  });
-
-  // bottom spacer
-  const botSpacer = document.createElement('div');
-  botSpacer.className = 'drum-spacer';
-  containerEl.appendChild(botSpacer);
-
-  function setActive(val) {
-    activeValue = val;
-    [...containerEl.querySelectorAll('.drum-item')].forEach(el => {
-      const match = Number(el.dataset.value) === val;
-      el.classList.toggle('active', match);
-      el.setAttribute('aria-selected', String(match));
-    });
+// ── SLIDER PICKER ──
+function setupSlider(sliderId, valId, getLevelsFn, initialValue, onSelect) {
+  const slider = document.getElementById(sliderId);
+  const valDisplay = document.getElementById(valId);
+  
+  function updateDisplay(val) {
+    const levels = getLevelsFn();
+    const nearest = levels.reduce((best, item) =>
+      Math.abs(item.value - val) < Math.abs(best.value - val) ? item : best, levels[0]);
+    valDisplay.innerHTML = `${nearest.short}<span class="slider-sub">${nearest.sub}</span>`;
   }
-
-  function scrollToIdx(idx, smooth = true) {
-    const target = idx * ITEM_H;
-    if (smooth) {
-      containerEl.scrollTo({ top: target, behavior: 'smooth' });
-    } else {
-      containerEl.scrollTop = target;
-    }
-    const val = namedLevels[idx].value;
-    setActive(val);
+  
+  slider.value = initialValue;
+  updateDisplay(initialValue);
+  
+  slider.addEventListener('input', e => {
+    const val = parseFloat(e.target.value);
+    updateDisplay(val);
     onSelect(val);
-  }
-
-  // after scroll settles, snap to nearest integer index
-  containerEl.addEventListener('scroll', () => {
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => {
-      const raw = containerEl.scrollTop / ITEM_H;
-      const idx = Math.max(0, Math.min(namedLevels.length - 1, Math.round(raw)));
-      const val = namedLevels[idx].value;
-      // snap if not already aligned
-      if (Math.abs(raw - idx) > 0.03) {
-        containerEl.scrollTo({ top: idx * ITEM_H, behavior: 'smooth' });
-      }
-      if (val !== activeValue) { setActive(val); onSelect(val); }
-    }, 100);
-  }, { passive: true });
-
-  // keyboard
-  containerEl.addEventListener('keydown', e => {
-    const cur = namedLevels.findIndex(x => x.value === activeValue);
-    if (e.key === 'ArrowDown' && cur < namedLevels.length - 1) { e.preventDefault(); scrollToIdx(cur + 1); }
-    if (e.key === 'ArrowUp'   && cur > 0)                      { e.preventDefault(); scrollToIdx(cur - 1); }
   });
-
-  // init position (delayed to ensure layout is complete)
-  setTimeout(() => {
-    const initIdx = namedLevels.findIndex(x => x.value === activeValue);
-    if (initIdx >= 0) containerEl.scrollTop = initIdx * ITEM_H;
-  }, 60);
-
+  
   return {
     setValue: (val) => {
-      if (val === activeValue) return;
-      const idx = namedLevels.findIndex(x => x.value === val);
-      if (idx >= 0) {
-        setActive(val);
-        containerEl.scrollTo({ top: idx * ITEM_H, behavior: 'smooth' });
-      }
+      slider.value = val;
+      updateDisplay(val);
     }
   };
 }
@@ -1870,23 +1788,20 @@ function pulseCard() {
   setTimeout(() => card.classList.remove('pulse'), 500);
 }
 
-buildDrum(
-  document.getElementById('chess-drum'),
-  getChessDrumLevels(), myChess,
+const myChessSliderObj = setupSlider(
+  'my-chess-slider', 'my-chess-val', getChessDrumLevels, myChess,
   val => { myChess = val; updateMine(); draw(); pulseCard(); }
 );
-buildDrum(
-  document.getElementById('boxing-drum'),
-  getBoxingDrumLevels(), myBox,
+const myBoxSliderObj = setupSlider(
+  'my-box-slider', 'my-box-val', getBoxingDrumLevels, myBox,
   val => { myBox = val; updateMine(); draw(); pulseCard(); }
 );
 
 let oppChess = 4.0;
 let oppBox   = 2.0;
 
-const oppChessDrumObj = buildDrum(
-  document.getElementById('opp-chess-drum'),
-  getChessDrumLevels(), oppChess,
+const oppChessSliderObj = setupSlider(
+  'opp-chess-slider', 'opp-chess-val', getChessDrumLevels, oppChess,
   val => {
     oppChess = val;
     const i = Math.round((oppChess - CHESS_MIN) / CHESS_STEP);
@@ -1894,9 +1809,8 @@ const oppChessDrumObj = buildDrum(
     showFightCard({ i, j }, false);
   }
 );
-const oppBoxDrumObj = buildDrum(
-  document.getElementById('opp-boxing-drum'),
-  getBoxingDrumLevels(), oppBox,
+const oppBoxSliderObj = setupSlider(
+  'opp-box-slider', 'opp-box-val', getBoxingDrumLevels, oppBox,
   val => {
     oppBox = val;
     const i = Math.round((oppChess - CHESS_MIN) / CHESS_STEP);
@@ -1934,18 +1848,10 @@ function setLang(lang) {
 
   document.getElementById('stoppage-val').textContent = stoppageLimit === 0 ? t.off : stoppageLimit.toFixed(1) + ' ' + t.rnds_short;
 
-  const cLevels = getChessDrumLevels();
-  document.querySelectorAll('#chess-drum .drum-item, #opp-chess-drum .drum-item').forEach(el => {
-    const idx = el.dataset.idx;
-    el.querySelector('.drum-item__name').textContent = cLevels[idx].short;
-    el.querySelector('.drum-item__sub').textContent  = cLevels[idx].sub;
-  });
-  const bLevels = getBoxingDrumLevels();
-  document.querySelectorAll('#boxing-drum .drum-item, #opp-boxing-drum .drum-item').forEach(el => {
-    const idx = el.dataset.idx;
-    el.querySelector('.drum-item__name').textContent = bLevels[idx].short;
-    el.querySelector('.drum-item__sub').textContent  = bLevels[idx].sub;
-  });
+  myChessSliderObj.setValue(myChess);
+  myBoxSliderObj.setValue(myBox);
+  oppChessSliderObj.setValue(oppChess);
+  oppBoxSliderObj.setValue(oppBox);
 
   updateMine();
   draw();
