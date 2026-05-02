@@ -139,6 +139,8 @@ body {
   position: relative;
   height: calc(var(--item-h) * 3); /* show 3 items */
   overflow: hidden;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.4), inset 0 -4px 12px rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.2);
 }
 
 /* Center-slot highlight */
@@ -323,9 +325,9 @@ body {
 
 .fc-fighters {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: 1fr 1fr;
   align-items: start;
-  gap: 8px;
+  gap: 16px;
   padding: 12px 16px 8px;
 }
 
@@ -357,9 +359,7 @@ body {
   align-items: center;
   gap: 6px;
   min-width: 0;
-}
-.fc-fighter--opp .fc-stat-line {
-  flex-direction: row-reverse;
+  text-align: left;
 }
 .fc-stat-line img {
   width: 14px;
@@ -368,23 +368,23 @@ body {
   opacity: 0.75;
   flex-shrink: 0;
 }
-.fc-chess-level { font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1.2; white-space: nowrap; }
-.fc-chess-elo   { font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); white-space: nowrap; }
-.fc-box-level   { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 2px; white-space: nowrap; }
+.fc-chess-level { font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+.fc-chess-elo   { font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); }
+.fc-box-level   { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
 .fc-box-sub     { display: block; font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); margin-top: 2px; }
 .fc-stars-row   { margin-top: 4px; min-height: 19px; }
 
 .fc-outcome {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 80px; height: 80px;
-  border-radius: 50%;
+  gap: 12px;
+  margin: 12px 16px 0;
+  padding: 10px;
+  border-radius: 8px;
   background: var(--bg-panel-alt);
-  border: 2px solid var(--gold-mid);
+  border: 1px solid var(--gold-mid);
   transition: border-color 0.3s;
-  flex-shrink: 0;
 }
 .fc-outcome__prob {
   font-size: 22px;
@@ -395,11 +395,10 @@ body {
   transition: color 0.3s;
 }
 .fc-outcome__label {
-  font-size: 11px;
+  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-secondary);
-  margin-top: 3px;
 }
 
 .fc-divider {
@@ -416,16 +415,43 @@ body {
   padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+.fc-bars-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 .fc-bar-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
   font-size: 12px;
   color: var(--text-secondary);
 }
 .fc-bar-row > span:not(.fc-diff) { flex: 0 0 58px; text-align: right; }
+.fc-bar-stack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fc-bar-prob {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+.fc-bar-prob-you {
+  color: var(--gold-bright);
+}
+.fc-bar-prob-opp {
+  color: var(--even-blue);
+}
 .fc-diff {
   flex: 0 0 78px;
   font-size: 11px;
@@ -434,33 +460,29 @@ body {
   white-space: nowrap;
 }
 .fc-bar {
-  flex: 1;
-  height: 8px;
+  width: 100%;
+  height: 14px;
   background: var(--bg-panel-alt);
-  border-radius: 3px;
+  border-radius: 7px;
   overflow: hidden;
   position: relative;
-}
-.fc-bar::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: -2px;
-  bottom: -2px;
-  width: 1px;
-  background: rgba(255,255,255,0.5);
-  transform: translateX(-0.5px);
-  z-index: 2;
+  border: 1px solid rgba(255,255,255,0.12);
 }
 .fc-bar__fill {
   position: absolute;
-  left: 0; top: 0; bottom: 0;
-  border-radius: 3px;
-  background: var(--gold-bright);
-  transition: width 0.4s ease;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  transition: width 0.4s ease, left 0.4s ease;
 }
-#fc-chess-bar { background: var(--gold-mid); }
-#fc-box-bar   { background: var(--even-blue); }
+.fc-bar__fill--you {
+  border-radius: 7px 0 0 7px;
+  background: var(--gold-mid);
+}
+.fc-bar__fill--opp {
+  border-radius: 0 7px 7px 0;
+  background: var(--even-blue);
+}
 
 /* ── ROUND CHART ── */
 .fc-rounds {
@@ -539,11 +561,40 @@ body {
   font-family: var(--font-mono);
   text-align: right;
   white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.15s;
-  pointer-events: none;
+  opacity: 1;
 }
-.fc-round-row:hover .fc-round-detail { opacity: 1; }
+
+/* ── EXPECTED DURATION ── */
+.fc-expected-box {
+  margin: 0 16px 8px;
+  padding: 10px 16px;
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.fc-expected-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.fc-expected-val {
+  font-size: 13px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.fc-expected-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-weight: 400;
+  margin-left: 6px;
+}
 
 /* ── GRID ── */
 #explore-section { padding-bottom: 16px; }
@@ -554,18 +605,24 @@ body {
   align-items: center;
   padding: 16px 16px 0;
   gap: 10px;
+  width: 100%;
 }
 
-#grid-container { position: relative; max-width: 100%; }
+#grid-container {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+}
 
 canvas#grid {
   display: block;
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: 6px;
-  max-width: 100%;
-  height: auto;
-  touch-action: none;
+  margin: 0 auto;
+  touch-action: pan-x pan-y;
   user-select: none;
   -webkit-user-select: none;
   cursor: crosshair;
@@ -581,7 +638,7 @@ canvas#grid {
   border: 1px solid var(--border);
   font: 13px/1.4 var(--font-mono);
   white-space: nowrap;
-  transform: translate(-50%, calc(-100% - 14px));
+  transform: translate(-50%, -100%);
   display: none;
   z-index: 10;
   box-shadow: 0 4px 16px rgba(0,0,0,0.5);
@@ -658,6 +715,30 @@ canvas#grid {
   background: rgba(255,255,255,0.5);
 }
 
+.grid-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 700px;
+  padding: 0 4px;
+  margin-bottom: 4px;
+}
+.grid-controls label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.grid-controls label span {
+  color: var(--lose-red);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+input[type=range].stoppage-slider {
+  flex: 1;
+  accent-color: var(--lose-red);
+}
+
 /* ── DESKTOP ── */
 @media (min-width: 760px) {
   #main {
@@ -681,13 +762,14 @@ canvas#grid {
 
   /* fight card: inline in sidebar on desktop */
   #fight-card {
-    position: static;
+    position: sticky;
+    bottom: 12px;
+    z-index: 100;
     transform: none !important;
     border-radius: 10px;
     border: 1px solid var(--gold-mid);
-    border-top: 1px solid var(--gold-mid);
-    box-shadow: none;
-    max-height: none;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.8);
+    max-height: calc(100vh - 24px);
     margin: 10px 12px 12px;
     padding-bottom: 0;
     opacity: 0;
@@ -763,6 +845,10 @@ canvas#grid {
         <span class="fc-title">Fight Card</span>
         <button class="fc-close" id="fc-close-btn" aria-label="Close">✕</button>
       </div>
+      <div class="fc-outcome" id="fc-outcome">
+        <div class="fc-outcome__prob"  id="hP">—</div>
+        <div class="fc-outcome__label" id="fc-outcome-label">vs</div>
+      </div>
       <div class="fc-fighters">
         <div class="fc-fighter fc-fighter--a">
           <div class="fc-corner">Your Corner</div>
@@ -772,10 +858,6 @@ canvas#grid {
           <div class="fc-stars-row">
             <svg class="stars-svg" id="fc-my-stars" width="95" height="19" viewBox="0 0 500 100"></svg>
           </div>
-        </div>
-        <div class="fc-outcome" id="fc-outcome">
-          <div class="fc-outcome__prob"  id="hP">—</div>
-          <div class="fc-outcome__label" id="fc-outcome-label">vs</div>
         </div>
         <div class="fc-fighter fc-fighter--opp">
           <div class="fc-corner">Opponent</div>
@@ -788,16 +870,39 @@ canvas#grid {
         </div>
       </div>
       <div class="fc-bars">
+        <div class="fc-bars-title">Probability to win by</div>
         <div class="fc-bar-row">
           <span>Chess</span>
-          <div class="fc-bar"><div class="fc-bar__fill" id="fc-chess-bar" style="width:50%"></div></div>
+          <div class="fc-bar-stack">
+            <div class="fc-bar-prob">
+              <span class="fc-bar-prob-you" id="fc-chess-prob-you">—</span>
+              <span class="fc-bar-prob-opp" id="fc-chess-prob-opp">—</span>
+            </div>
+            <div class="fc-bar">
+              <div class="fc-bar__fill fc-bar__fill--you" id="fc-chess-bar-you" style="width:50%"></div>
+              <div class="fc-bar__fill fc-bar__fill--opp" id="fc-chess-bar-opp" style="left:50%;width:50%"></div>
+            </div>
+          </div>
           <span class="fc-diff" id="fc-chess-diff">—</span>
         </div>
         <div class="fc-bar-row">
           <span>Boxing</span>
-          <div class="fc-bar"><div class="fc-bar__fill" id="fc-box-bar" style="width:50%"></div></div>
+          <div class="fc-bar-stack">
+            <div class="fc-bar-prob">
+              <span class="fc-bar-prob-you" id="fc-box-prob-you">—</span>
+              <span class="fc-bar-prob-opp" id="fc-box-prob-opp">—</span>
+            </div>
+            <div class="fc-bar">
+              <div class="fc-bar__fill fc-bar__fill--you" id="fc-box-bar-you" style="width:50%"></div>
+              <div class="fc-bar__fill fc-bar__fill--opp" id="fc-box-bar-opp" style="left:50%;width:50%"></div>
+            </div>
+          </div>
           <span class="fc-diff" id="fc-box-diff">—</span>
         </div>
+      </div>
+      <div class="fc-expected-box">
+        <span class="fc-expected-label">Expected Length</span>
+        <span class="fc-expected-val" id="fc-expected-length">—</span>
       </div>
       <div class="fc-rounds" id="fc-rounds">
         <div class="fc-rounds-title">
@@ -816,6 +921,10 @@ canvas#grid {
   <section id="explore-section">
     <h2 class="section-title">Explore Matchups <span class="section-hint">tap a cell to see that fight</span></h2>
     <div id="grid-wrap">
+      <div class="grid-controls">
+        <label for="stoppage-slider">Highlight early stoppages (&lt; <span id="stoppage-val">Off</span>)</label>
+        <input type="range" id="stoppage-slider" class="stoppage-slider" min="2.9" max="4.5" step="0.1" value="2.9">
+      </div>
       <div id="grid-container">
         <canvas id="grid"></canvas>
         <div id="tooltip"></div>
@@ -979,18 +1088,29 @@ function getMatchupProbs(dChess, dBox) {
 
 function getWinBreakdown(dChess, dBox) {
   const probs = getMatchupProbs(dChess, dBox);
-  let prevA = 0;
+  let prevA = 0, prevB = 0;
   let chessWin = 0;
   let boxWin = 0;
+  let chessLoss = 0;
+  let boxLoss = 0;
+  let expectedRounds = 0;
 
   for (let r = 1; r <= 8; r++) {
     const deltaA = Math.max(0, probs[r - 1].pA - prevA);
-    if (ROUND_PARAMS[r - 1].type === 'chess') chessWin += deltaA;
-    else boxWin += deltaA;
+    const deltaB = Math.max(0, probs[r - 1].pB - prevB);
+    expectedRounds += r * (deltaA + deltaB);
+    if (ROUND_PARAMS[r - 1].type === 'chess') {
+      chessWin += deltaA;
+      chessLoss += deltaB;
+    } else {
+      boxWin += deltaA;
+      boxLoss += deltaB;
+    }
     prevA = probs[r - 1].pA;
+    prevB = probs[r - 1].pB;
   }
 
-  return { chessWin, boxWin, probs };
+  return { chessWin, boxWin, chessLoss, boxLoss, expectedRounds, probs };
 }
 
 function pWin(myC, myB, oppC, oppB) {
@@ -1077,6 +1197,7 @@ function escapeHtml(str) {
 // ── STATE ──
 let myChess = 3.0;
 let myBox   = 2.0;
+let stoppageLimit = 0;
 
 function closestNamed(arr, v) {
   let best = arr[0], bd = Infinity;
@@ -1125,12 +1246,26 @@ function strokeLine(pts, col, width, dash) {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // heatmap cells
+  // heatmap cells (win probability base)
   for (let j = 0; j < NY; j++) {
     for (let i = 0; i < NX; i++) {
       const { x, y } = cell2px(i, j);
       ctx.fillStyle = color(pWin(myChess, myBox, chessLevels[i], boxLevels[j]));
       ctx.fillRect(x, y, CELL, CELL);
+    }
+  }
+
+  // ── VOLATILITY ZONES (EXPECTED ROUNDS OVERLAY) ──
+  if (stoppageLimit > 0) {
+    for (let j = 0; j < NY; j++) {
+      for (let i = 0; i < NX; i++) {
+        const { expectedRounds } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
+        if (expectedRounds < stoppageLimit) {
+          const { x, y } = cell2px(i, j);
+          ctx.fillStyle = 'rgba(224, 60, 60, 0.4)';
+          ctx.fillRect(x, y, CELL, CELL);
+        }
+      }
     }
   }
 
@@ -1144,18 +1279,6 @@ function draw() {
   for (let j = 0; j <= NY; j++) {
     const y = MARGIN.top + j * CELL + 0.5;
     ctx.beginPath(); ctx.moveTo(MARGIN.left, y); ctx.lineTo(MARGIN.left + NX * CELL, y); ctx.stroke();
-  }
-
-  // ── FAIR FIGHT ZONE: soft fill on 45-55% cells ──
-  ctx.fillStyle = 'rgba(255,245,180,0.06)';
-  for (let j = 0; j < NY; j++) {
-    for (let i = 0; i < NX; i++) {
-      const p = pWin(myChess, myBox, chessLevels[i], boxLevels[j]);
-      if (p >= 0.45 && p <= 0.55) {
-        const { x, y } = cell2px(i, j);
-        ctx.fillRect(x, y, CELL, CELL);
-      }
-    }
   }
 
   // ── ISOLINES: strong gold center line, lighter white secondary contours ──
@@ -1344,13 +1467,36 @@ function showFightCard(idx) {
   document.getElementById('fc-outcome-label').textContent = outcomeLabel(p);
   document.getElementById('fc-outcome').style.borderColor = col;
 
-  const { chessWin, boxWin } = getWinBreakdown(myChess - oc, myBox - ob);
-  const chessBarEl = document.getElementById('fc-chess-bar');
-  const boxBarEl = document.getElementById('fc-box-bar');
-  chessBarEl.style.width = (chessWin * 100).toFixed(1) + '%';
-  boxBarEl.style.width   = (boxWin * 100).toFixed(1) + '%';
-  chessBarEl.title = `Probability to win by chess: ${Math.round(chessWin * 100)}%`;
-  boxBarEl.title   = `Probability to win by boxing: ${Math.round(boxWin * 100)}%`;
+  const { chessWin, boxWin, chessLoss, boxLoss, expectedRounds } = getWinBreakdown(myChess - oc, myBox - ob);
+  const chessBarYouEl = document.getElementById('fc-chess-bar-you');
+  const chessBarOppEl = document.getElementById('fc-chess-bar-opp');
+  const boxBarYouEl = document.getElementById('fc-box-bar-you');
+  const boxBarOppEl = document.getElementById('fc-box-bar-opp');
+  const chessProbYouEl = document.getElementById('fc-chess-prob-you');
+  const chessProbOppEl = document.getElementById('fc-chess-prob-opp');
+  const boxProbYouEl = document.getElementById('fc-box-prob-you');
+  const boxProbOppEl = document.getElementById('fc-box-prob-opp');
+
+  const chessYouPct = chessWin * 100;
+  const chessOppPct = chessLoss * 100;
+  const boxYouPct = boxWin * 100;
+  const boxOppPct = boxLoss * 100;
+
+  chessBarYouEl.style.width = chessYouPct.toFixed(1) + '%';
+  chessBarOppEl.style.left  = chessYouPct.toFixed(1) + '%';
+  chessBarOppEl.style.width = chessOppPct.toFixed(1) + '%';
+  boxBarYouEl.style.width   = boxYouPct.toFixed(1) + '%';
+  boxBarOppEl.style.left    = boxYouPct.toFixed(1) + '%';
+  boxBarOppEl.style.width   = boxOppPct.toFixed(1) + '%';
+
+  chessProbYouEl.textContent = `You ${Math.round(chessWin * 100)}%`;
+  chessProbOppEl.textContent = `Opp ${Math.round(chessLoss * 100)}%`;
+  boxProbYouEl.textContent   = `You ${Math.round(boxWin * 100)}%`;
+  boxProbOppEl.textContent   = `Opp ${Math.round(boxLoss * 100)}%`;
+  chessBarYouEl.title = `Probability to win by chess: ${Math.round(chessWin * 100)}%`;
+  chessBarOppEl.title = `Opponent probability to win by chess: ${Math.round(chessLoss * 100)}%`;
+  boxBarYouEl.title   = `Probability to win by boxing: ${Math.round(boxWin * 100)}%`;
+  boxBarOppEl.title   = `Opponent probability to win by boxing: ${Math.round(boxLoss * 100)}%`;
 
   const eloDiff = eloOf(myChess) - eloOf(oc);
   const boxDiff = +(myBox - ob).toFixed(1);
@@ -1360,6 +1506,12 @@ function showFightCard(idx) {
   if (cdEl) { cdEl.textContent = signStr(eloDiff) + eloDiff + ' ELO'; cdEl.style.color = diffCol(eloDiff); }
   const bdEl = document.getElementById('fc-box-diff');
   if (bdEl) { bdEl.textContent = signStr(boxDiff) + boxDiff + ' lvl'; bdEl.style.color = diffCol(boxDiff); }
+
+  let pace = '';
+  if (expectedRounds < 4.0) pace = '(High chance of early stoppage)';
+  else if (expectedRounds > 6.5) pace = '(Likely to go the distance)';
+  
+  document.getElementById('fc-expected-length').innerHTML = `${expectedRounds.toFixed(1)} Rounds <span class="fc-expected-desc">${pace}</span>`;
 
   setStars(oppStarsClip, starsOf(idx.i, idx.j));
   renderRoundChart(myChess - oc, myBox - ob);
@@ -1398,13 +1550,30 @@ function showTooltip(idx, cssX, cssY) {
   const p   = pWin(myChess, myBox, oc, ob);
   const cn  = chessCategory(oc);
   tooltip.style.display = 'block';
-  tooltip.style.left = cssX + 'px';
-  tooltip.style.top  = cssY + 'px';
   tooltip.innerHTML =
     tooltipLineHTML('assets/icon-chess.png', `<b>${escapeHtml(cn.short)}</b>`, `<span class="tt-elo">ELO ${eloOf(oc)}</span>`) + `<br>` +
     tooltipLineHTML('assets/icon-boxing.png', `<b>${escapeHtml(boxCategory(ob))}</b>`, `<span class="tt-elo">${escapeHtml(boxMeta(ob))}</span>`) + `<br>` +
     `<b style="color:${outcomeColor(p)}">${Math.round(p*100)}%</b>` +
     `<span class="tt-stars">${miniStarsHTML(starsOf(idx.i, idx.j))}</span>`;
+
+  // Dynamic Boundary Protection
+  const ttW = tooltip.offsetWidth || 150;
+  const ttH = tooltip.offsetHeight || 80;
+  let left = cssX;
+  let top = cssY - 14;
+
+  if (left - ttW / 2 < 10) left = ttW / 2 + 10;
+  if (left + ttW / 2 > canvas.width - 10) left = canvas.width - ttW / 2 - 10;
+
+  if (top - ttH < 10) {
+    top = cssY + 24; // show below the cursor
+    tooltip.style.transform = 'translate(-50%, 0)';
+  } else {
+    tooltip.style.transform = 'translate(-50%, -100%)';
+  }
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top + 'px';
 }
 
 // ── GRID EVENTS ──
@@ -1419,7 +1588,6 @@ function eventCoords(e) {
 let pdTime = 0, pdX = 0, pdY = 0, dragging = false;
 
 canvas.addEventListener('pointerdown', e => {
-  e.preventDefault();
   try { canvas.setPointerCapture(e.pointerId); } catch(_) {}
   pdTime = Date.now(); pdX = e.clientX; pdY = e.clientY; dragging = false;
   const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
@@ -1443,8 +1611,6 @@ canvas.addEventListener('pointerup', e => {
 });
 canvas.addEventListener('pointerleave',  () => { tooltip.style.display = 'none'; });
 canvas.addEventListener('pointercancel', () => { tooltip.style.display = 'none'; });
-canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
-canvas.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
 canvas.addEventListener('mousemove', e => {
   if (e.buttons !== 0) return;
   const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
@@ -1558,6 +1724,13 @@ buildDrum(
     lctx.fillRect(x, 0, 1, lc.height);
   }
 })();
+
+document.getElementById('stoppage-slider').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  stoppageLimit = v < 3.0 ? 0 : v;
+  document.getElementById('stoppage-val').textContent = stoppageLimit === 0 ? 'Off' : stoppageLimit.toFixed(1) + ' rnds';
+  draw();
+});
 
 updateMine();
 draw();
