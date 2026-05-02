@@ -88,7 +88,7 @@ export function strokeLine(ctx, pts, col, width, dash) {
   ctx.restore();
 }
 
-export function draw(canvas, ctx, myChess, myBox, showProbableFighters, currentOppIdx) {
+export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx) {
   const t = i18n[currentLang];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -100,12 +100,20 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, currentO
     }
   }
 
-  if (showProbableFighters) {
+  if (showProbableFighters || strictMatchmaking) {
     for (let j = 0; j < NY; j++) {
       for (let i = 0; i < NX; i++) {
         const boxDiff = Math.abs(myBox - boxLevels[j]);
         const winProb = pWin(myChess, myBox, chessLevels[i], boxLevels[j]);
-        if (boxDiff > 2 || winProb > 0.90 || winProb < 0.10) {
+        
+        let isInvalid = false;
+        if (strictMatchmaking) {
+          isInvalid = boxDiff > 1 || winProb > 0.70 || winProb < 0.30;
+        } else if (showProbableFighters) {
+          isInvalid = boxDiff > 2 || winProb > 0.90 || winProb < 0.10;
+        }
+
+        if (isInvalid) {
           const { x, y } = cell2px(i, j);
           ctx.fillStyle = 'rgba(12, 12, 20, 0.7)';
           ctx.fillRect(x, y, CELL, CELL);
