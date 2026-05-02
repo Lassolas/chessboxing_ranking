@@ -173,6 +173,27 @@ body {
   color: var(--text-muted);
   font-family: var(--font-mono);
 }
+.slider-container {
+  position: relative;
+  flex: 1;
+}
+.slider-ticks {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  right: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-evenly;
+  pointer-events: none;
+  z-index: 0;
+}
+.tick {
+  width: 2px;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 1px;
+}
 input[type=range].modern-slider {
   -webkit-appearance: none;
   width: 100%;
@@ -719,6 +740,21 @@ canvas#grid {
   max-width: 700px;
   padding: 0 4px;
   margin-bottom: 4px;
+}
+.matchmaking-rules {
+  width: 100%;
+  max-width: 700px;
+  padding: 8px 12px;
+  margin: 0 4px 12px;
+  background: rgba(245, 200, 66, 0.05);
+  border: 1px solid rgba(245, 200, 66, 0.2);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.matchmaking-rules b {
+  color: var(--gold-mid);
 }
 .toggle-switch {
   display: inline-flex;

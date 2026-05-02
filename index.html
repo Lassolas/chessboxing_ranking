@@ -35,7 +35,10 @@
         </div>
         <div class="slider-track-wrap">
           <span class="slider-coord">0</span>
-          <input type="range" class="modern-slider" id="my-chess-slider" min="0" max="7" step="0.2" value="3.0">
+          <div class="slider-container">
+            <div class="slider-ticks chess-ticks"><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div></div>
+            <input type="range" class="modern-slider" id="my-chess-slider" min="0" max="7" step="0.2" value="3.0">
+          </div>
           <span class="slider-coord">7</span>
         </div>
       </div>
@@ -46,7 +49,10 @@
         </div>
         <div class="slider-track-wrap">
           <span class="slider-coord">0</span>
-          <input type="range" class="modern-slider" id="my-box-slider" min="0" max="5" step="0.2" value="2.0">
+          <div class="slider-container">
+            <div class="slider-ticks box-ticks"><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div></div>
+            <input type="range" class="modern-slider" id="my-box-slider" min="0" max="5" step="0.2" value="2.0">
+          </div>
           <span class="slider-coord">5</span>
         </div>
       </div>
@@ -78,7 +84,10 @@
         </div>
         <div class="slider-track-wrap">
           <span class="slider-coord">0</span>
-          <input type="range" class="modern-slider opp-slider" id="opp-chess-slider" min="0" max="7" step="0.2" value="4.0">
+          <div class="slider-container">
+            <div class="slider-ticks chess-ticks"><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div></div>
+            <input type="range" class="modern-slider opp-slider" id="opp-chess-slider" min="0" max="7" step="0.2" value="4.0">
+          </div>
           <span class="slider-coord">7</span>
         </div>
       </div>
@@ -89,7 +98,10 @@
         </div>
         <div class="slider-track-wrap">
           <span class="slider-coord">0</span>
-          <input type="range" class="modern-slider opp-slider" id="opp-box-slider" min="0" max="5" step="0.2" value="2.0">
+          <div class="slider-container">
+            <div class="slider-ticks box-ticks"><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div></div>
+            <input type="range" class="modern-slider opp-slider" id="opp-box-slider" min="0" max="5" step="0.2" value="2.0">
+          </div>
           <span class="slider-coord">5</span>
         </div>
       </div>
@@ -198,6 +210,10 @@
           <span class="toggle-slider"></span>
           <span class="toggle-label" data-i18n="strict_matchmaking">Strict Matchmaking</span>
         </label>
+      </div>
+      <div class="matchmaking-rules" data-i18n="matchmaking_rules">
+        <b>Selectionable:</b> Max boxing diff 2. Win probability 10% – 90%.<br>
+        <b>Strict:</b> Max boxing diff 1. Win probability 30% – 70%.
       </div>
       <div id="grid-container">
         <canvas id="grid"></canvas>
