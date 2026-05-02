@@ -416,6 +416,68 @@ body {
   transition: width 0.4s ease;
 }
 
+/* ── ROUND CHART ── */
+.fc-rounds {
+  padding: 2px 16px 14px;
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+}
+.fc-rounds-title {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 9px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fc-rounds-legend {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  display: flex;
+  gap: 8px;
+  font-size: 9px;
+}
+.fc-round-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 5px;
+}
+.fc-round-label {
+  flex: 0 0 22px;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  text-align: right;
+  font-weight: 700;
+}
+.fc-round-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-panel-alt);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.fc-round-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.fc-round-fill--chess { background: var(--gold-mid); }
+.fc-round-fill--box   { background: var(--even-blue); }
+.fc-round-pct {
+  flex: 0 0 32px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  text-align: right;
+}
+
 /* ── GRID ── */
 #explore-section { padding-bottom: 16px; }
 
@@ -653,6 +715,16 @@ canvas#grid {
           <div class="fc-bar"><div class="fc-bar__fill" id="fc-box-bar" style="width:50%"></div></div>
           <span class="fc-diff" id="fc-box-diff">—</span>
         </div>
+      </div>
+      <div class="fc-rounds" id="fc-rounds">
+        <div class="fc-rounds-title">
+          Stoppage odds · if reached
+          <span class="fc-rounds-legend">
+            <span style="color:var(--gold-mid)">&#9644; chess</span>
+            <span style="color:var(--even-blue)">&#9644; boxing</span>
+          </span>
+        </div>
+        <div id="fc-round-rows"></div>
       </div>
     </div>
   </section>
@@ -1035,6 +1107,43 @@ function outcomeColor(p) {
   return '#e03c3c';
 }
 
+// ── ROUND STOPPAGE MODEL ──
+const ROUND_PARAMS = [
+  { type: 'chess', a: 0.4516, k: 124.207 }, // R1
+  { type: 'box',   a: 1.0689, k:   8.077 }, // R2
+  { type: 'chess', a: 0.3974, k:   7.889 }, // R3
+  { type: 'box',   a: 1.1695, k:  15.236 }, // R4
+  { type: 'chess', a: 0.6434, k:   2.103 }, // R5
+  { type: 'box',   a: 1.3734, k:  38.332 }, // R6
+  { type: 'chess', a: 0.3801, k:   0.419 }, // R7
+  { type: 'box',   a: 1.8596, k:   0     }, // R8
+];
+
+function pStop(r, dChess, dBox) {
+  const { type, a, k } = ROUND_PARAMS[r - 1];
+  const x = type === 'chess' ? dChess : dBox;
+  const e = Math.exp(a * x) + Math.exp(-a * x);
+  return e / (e + k);
+}
+
+function renderRoundChart(dChess, dBox) {
+  const container = document.getElementById('fc-round-rows');
+  container.innerHTML = '';
+  for (let r = 1; r <= 8; r++) {
+    const { type } = ROUND_PARAMS[r - 1];
+    const p = pStop(r, dChess, dBox);
+    const pct = Math.round(p * 100);
+    const col = type === 'chess' ? 'var(--gold-mid)' : 'var(--even-blue)';
+    const row = document.createElement('div');
+    row.className = 'fc-round-row';
+    row.innerHTML =
+      `<span class="fc-round-label" style="color:${col}">R${r}</span>` +
+      `<div class="fc-round-bar"><div class="fc-round-fill fc-round-fill--${type}" style="width:${pct}%"></div></div>` +
+      `<span class="fc-round-pct">${pct}%</span>`;
+    container.appendChild(row);
+  }
+}
+
 // ── FIGHT CARD ──
 const fightCard = document.getElementById('fight-card');
 let currentOppIdx = null;
@@ -1070,6 +1179,7 @@ function showFightCard(idx) {
   if (bdEl) { bdEl.textContent = signStr(boxDiff) + boxDiff + ' lvl'; bdEl.style.color = diffCol(boxDiff); }
 
   setStars(oppStarsClip, starsOf(idx.i, idx.j));
+  renderRoundChart(myChess - oc, myBox - ob);
 
   fightCard.classList.add('visible');
 }
