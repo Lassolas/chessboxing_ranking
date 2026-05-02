@@ -2,6 +2,7 @@ export const i18n = {
   en: {
     tagline: "Where do you stand in the ring?",
     your_profile: "Your Profile",
+    opponent_profile: "Opponent Profile",
     chess: "Chess",
     boxing: "Boxing",
     your_corner: "Your Corner",
@@ -57,6 +58,7 @@ export const i18n = {
   fr: {
     tagline: "Où vous situez-vous sur le ring ?",
     your_profile: "Votre Profil",
+    opponent_profile: "Profil de l'adversaire",
     chess: "Échecs",
     boxing: "Boxe",
     your_corner: "Votre Coin",
