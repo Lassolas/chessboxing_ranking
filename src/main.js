@@ -206,6 +206,20 @@ canvas.addEventListener('mousemove', e => {
   showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
 });
 
+window.addEventListener('keydown', e => {
+  if (!currentOppIdx || !document.getElementById('opponent-setup').classList.contains('visible')) return;
+  let changed = false;
+  let { i, j } = currentOppIdx;
+  if (e.key === 'ArrowUp') { j = Math.max(0, j - 1); changed = true; e.preventDefault(); }
+  else if (e.key === 'ArrowDown') { j = Math.min(NY - 1, j + 1); changed = true; e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { i = Math.max(0, i - 1); changed = true; e.preventDefault(); }
+  else if (e.key === 'ArrowRight') { i = Math.min(NX - 1, i + 1); changed = true; e.preventDefault(); }
+  
+  if (changed && (i !== currentOppIdx.i || j !== currentOppIdx.j)) {
+    showFightCard({ i, j });
+  }
+});
+
 const myChessSliderObj = setupSlider(
   'my-chess-slider', 'my-chess-val', getChessDrumLevels, myChess,
   val => { myChess = val; updateMine(); draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx); pulseCard(); }
