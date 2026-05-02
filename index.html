@@ -447,8 +447,15 @@ body {
   gap: 7px;
   margin-bottom: 5px;
 }
+.fc-round-icon {
+  flex: 0 0 11px;
+  width: 11px;
+  height: 11px;
+  object-fit: contain;
+  opacity: 0.6;
+}
 .fc-round-label {
-  flex: 0 0 22px;
+  flex: 0 0 28px;
   font-size: 9px;
   font-family: var(--font-mono);
   text-align: right;
@@ -518,7 +525,9 @@ canvas#grid {
   box-shadow: 0 4px 16px rgba(0,0,0,0.5);
   max-width: 90vw;
 }
-#tooltip .tt-stars { display: block; margin-top: 4px; }
+#tooltip .tt-stars { display: inline-block; margin-left: 5px; vertical-align: middle; }
+#tooltip .tt-elo   { color: #c9922a; font-size: 10px; margin-left: 5px; }
+#tooltip .tt-sub   { color: #9090a8; font-size: 10px; }
 
 .legend-row {
   display: flex;
@@ -1006,6 +1015,16 @@ function draw() {
   strokeLine(getIsoline(0.90), 'rgba(255,255,255,0.34)', 1.1, [2, 2]);
   strokeLine(getIsoline(0.50), 'rgba(245,200,66,0.98)', 3.5);
 
+  // ── OPPONENT CELL: blue highlight ──
+  if (currentOppIdx) {
+    const { x: ox, y: oy } = cell2px(currentOppIdx.i, currentOppIdx.j);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(74,158,255,0.95)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(ox + 1.5, oy + 1.5, CELL - 3, CELL - 3);
+    ctx.restore();
+  }
+
   // ── SELECTED CELL: gold diamond marker ──
   const myI = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
   const myJ = Math.round((myBox   - BOX_MIN)   / BOX_STEP);
@@ -1144,8 +1163,11 @@ function renderRoundChart(dChess, dBox) {
     const wB = Math.round(pB * 100);
     const row = document.createElement('div');
     row.className = 'fc-round-row';
+    const icon = type === 'chess' ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
+    const label = r === 8 ? 'Dec' : `R${r}`;
     row.innerHTML =
-      `<span class="fc-round-label">R${r}</span>` +
+      `<img class="fc-round-icon" src="${icon}" alt="">` +
+      `<span class="fc-round-label">${label}</span>` +
       `<div class="fc-round-bar">` +
         `<div class="fc-round-fill-a" style="width:${wA}%"></div>` +
         `<div class="fc-round-fill-b" style="left:${wA}%;width:${wB}%"></div>` +
@@ -1192,11 +1214,13 @@ function showFightCard(idx) {
   renderRoundChart(myChess - oc, myBox - ob);
 
   fightCard.classList.add('visible');
+  draw();
 }
 
 function dismissFightCard() {
   fightCard.classList.remove('visible');
   currentOppIdx = null;
+  draw();
 }
 
 document.getElementById('fc-close-btn').addEventListener('click', dismissFightCard);
@@ -1227,7 +1251,9 @@ function showTooltip(idx, cssX, cssY) {
   tooltip.style.left = cssX + 'px';
   tooltip.style.top  = cssY + 'px';
   tooltip.innerHTML =
-    `${cn.short} · ${bn.short}  →  <b style="color:${outcomeColor(p)}">${Math.round(p*100)}%</b>` +
+    `<b>${cn.short}</b><span class="tt-elo">ELO ${eloOf(oc)}</span><br>` +
+    `<span class="tt-sub">${bn.short}</span><br>` +
+    `<b style="color:${outcomeColor(p)}">${Math.round(p*100)}%</b>` +
     `<span class="tt-stars">${miniStarsHTML(starsOf(idx.i, idx.j))}</span>`;
 }
 
