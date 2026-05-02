@@ -111,7 +111,7 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
         if (strictMatchmaking) {
           isInvalid = boxDiff > 1 || winProb > 0.70 || winProb < 0.30 || expectedRounds < 4.0;
         } else if (showProbableFighters) {
-          isInvalid = boxDiff > 2 || winProb > 0.50;
+          isInvalid = boxDiff > 2 || winProb > 0.90;
         }
 
         if (isInvalid) {
