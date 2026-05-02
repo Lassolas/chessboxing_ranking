@@ -88,7 +88,7 @@ export function strokeLine(ctx, pts, col, width, dash) {
   ctx.restore();
 }
 
-export function draw(canvas, ctx, myChess, myBox, stoppageLimit, currentOppIdx) {
+export function draw(canvas, ctx, myChess, myBox, showProbableFighters, currentOppIdx) {
   const t = i18n[currentLang];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -100,18 +100,14 @@ export function draw(canvas, ctx, myChess, myBox, stoppageLimit, currentOppIdx) 
     }
   }
 
-  if (stoppageLimit > 0) {
+  if (showProbableFighters) {
     for (let j = 0; j < NY; j++) {
       for (let i = 0; i < NX; i++) {
-        const { expectedRounds, chessWin, boxWin } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
-        if (expectedRounds < stoppageLimit) {
+        const boxDiff = Math.abs(myBox - boxLevels[j]);
+        const winProb = pWin(myChess, myBox, chessLevels[i], boxLevels[j]);
+        if (boxDiff > 2 || winProb > 0.90 || winProb < 0.10) {
           const { x, y } = cell2px(i, j);
-          const winProb = chessWin + boxWin;
-          if (winProb < 0.5) {
-            ctx.fillStyle = 'rgba(224, 60, 60, 0.4)'; // Danger zone (red)
-          } else {
-            ctx.fillStyle = 'rgba(57, 211, 83, 0.4)'; // Domination zone (green)
-          }
+          ctx.fillStyle = 'rgba(12, 12, 20, 0.7)';
           ctx.fillRect(x, y, CELL, CELL);
         }
       }
