@@ -1,0 +1,26 @@
+{
+  "name": "chessboxing_ranking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lassolas/chessboxing_ranking.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Lassolas/chessboxing_ranking/issues"
+  },
+  "homepage": "https://github.com/Lassolas/chessboxing_ranking#readme",
+  "devDependencies": {
+    "vite": "^8.0.10"
+  }
+}
