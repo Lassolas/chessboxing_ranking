@@ -352,6 +352,22 @@ body {
 }
 .fc-fighter--a .fc-corner { color: var(--gold-dim); }
 
+.fc-stat-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.fc-fighter--opp .fc-stat-line {
+  flex-direction: row-reverse;
+}
+.fc-stat-line img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  opacity: 0.75;
+  flex-shrink: 0;
+}
 .fc-chess-level { font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1.2; white-space: nowrap; }
 .fc-chess-elo   { font-size: 12px; color: var(--gold-mid); font-family: var(--font-mono); white-space: nowrap; }
 .fc-box-level   { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 2px; white-space: nowrap; }
@@ -387,8 +403,8 @@ body {
 }
 
 .fc-divider {
-  width: 100%;
-  height: auto;
+  width: 70%;
+  height: 36px;
   max-height: 72px;
   display: block;
   margin: 4px auto 8px;
@@ -572,6 +588,18 @@ canvas#grid {
 #tooltip .tt-stars { display: inline-block; margin-left: 5px; vertical-align: middle; }
 #tooltip .tt-elo   { color: #c9922a; font-size: 11px; margin-left: 6px; }
 #tooltip .tt-sub   { color: #9090a8; font-size: 11px; }
+#tooltip .tt-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#tooltip .tt-line img {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+  opacity: 0.78;
+  flex-shrink: 0;
+}
 
 .legend-row {
   display: flex;
@@ -757,7 +785,6 @@ canvas#grid {
           </div>
         </div>
       </div>
-      <img src="assets/divider.png" class="fc-divider" alt="">
       <div class="fc-bars">
         <div class="fc-bar-row">
           <span>Chess</span>
@@ -772,7 +799,7 @@ canvas#grid {
       </div>
       <div class="fc-rounds" id="fc-rounds">
         <div class="fc-rounds-title">
-          Stoppage odds · if reached
+          Stoppage odds
           <span class="fc-rounds-legend">
             <span style="color:var(--gold-mid)">&#9644; you win</span>
             <span style="color:var(--even-blue)">&#9644; opp wins</span>
@@ -878,6 +905,18 @@ function boxMeta(v) {
 
 function boxLabelHTML(v, levelClass = 'fighter-card__box', metaClass = 'fighter-card__box-sub') {
   return `<b class="${levelClass}">${boxCategory(v)}</b><span class="${metaClass}">${boxMeta(v)}</span>`;
+}
+
+function fightCardChessHTML(label) {
+  return `<span class="fc-stat-line"><img src="assets/icon-chess.png" alt=""><span>${escapeHtml(label)}</span></span>`;
+}
+
+function fightCardBoxHTML(v) {
+  return `<span class="fc-stat-line"><img src="assets/icon-boxing.png" alt=""><span>${boxLabelHTML(v, 'fc-box-level', 'fc-box-sub')}</span></span>`;
+}
+
+function tooltipLineHTML(icon, mainHtml, subHtml = '') {
+  return `<span class="tt-line"><img src="${icon}" alt=""><span>${mainHtml}${subHtml}</span></span>`;
 }
 
 function buildLevels(min, max, step) {
@@ -1113,10 +1152,20 @@ function draw() {
   // ── OPPONENT CELL: blue highlight ──
   if (currentOppIdx) {
     const { x: ox, y: oy } = cell2px(currentOppIdx.i, currentOppIdx.j);
+    const ocx = ox + CELL / 2, ocy = oy + CELL / 2;
+    const ods = CELL / 2 + 3;
     ctx.save();
-    ctx.strokeStyle = 'rgba(74,158,255,0.95)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(ox + 1.5, oy + 1.5, CELL - 3, CELL - 3);
+    ctx.beginPath();
+    ctx.moveTo(ocx, ocy - ods);
+    ctx.lineTo(ocx + ods, ocy);
+    ctx.lineTo(ocx, ocy + ods);
+    ctx.lineTo(ocx - ods, ocy);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(74,158,255,0.9)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.82)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
     ctx.restore();
   }
 
@@ -1202,9 +1251,9 @@ function updateMine() {
   setStars(fcMyStarsClip, starsOf(i, j));
 
   // keep fight card my-corner in sync
-  document.getElementById('fc-my-chess').textContent = cn.short;
+  document.getElementById('fc-my-chess').innerHTML   = fightCardChessHTML(cn.short);
   document.getElementById('fc-my-elo').textContent   = 'ELO ' + eloOf(myChess);
-  document.getElementById('fc-my-box').innerHTML     = boxLabelHTML(myBox, 'fc-box-level', 'fc-box-sub');
+  document.getElementById('fc-my-box').innerHTML     = fightCardBoxHTML(myBox);
 
   // refresh fight card if open
   if (currentOppIdx && fightCard.classList.contains('visible')) showFightCard(currentOppIdx);
@@ -1269,9 +1318,9 @@ function showFightCard(idx) {
   const cn  = chessCategory(oc);
   const col = outcomeColor(p);
 
-  document.getElementById('hChess').textContent = cn.short;
+  document.getElementById('hChess').innerHTML   = fightCardChessHTML(cn.short);
   document.getElementById('hElo').textContent   = 'ELO ' + eloOf(oc);
-  document.getElementById('hBox').innerHTML     = boxLabelHTML(ob, 'fc-box-level', 'fc-box-sub');
+  document.getElementById('hBox').innerHTML     = fightCardBoxHTML(ob);
   document.getElementById('hP').textContent     = Math.round(p * 100) + '%';
   document.getElementById('hP').style.color     = col;
   document.getElementById('fc-outcome-label').textContent = outcomeLabel(p);
@@ -1331,8 +1380,8 @@ function showTooltip(idx, cssX, cssY) {
   tooltip.style.left = cssX + 'px';
   tooltip.style.top  = cssY + 'px';
   tooltip.innerHTML =
-    `<b>${escapeHtml(cn.short)}</b><span class="tt-elo">ELO ${eloOf(oc)}</span><br>` +
-    `<b>${escapeHtml(boxCategory(ob))}</b><span class="tt-elo">${escapeHtml(boxMeta(ob))}</span><br>` +
+    tooltipLineHTML('assets/icon-chess.png', `<b>${escapeHtml(cn.short)}</b>`, `<span class="tt-elo">ELO ${eloOf(oc)}</span>`) + `<br>` +
+    tooltipLineHTML('assets/icon-boxing.png', `<b>${escapeHtml(boxCategory(ob))}</b>`, `<span class="tt-elo">${escapeHtml(boxMeta(ob))}</span>`) + `<br>` +
     `<b style="color:${outcomeColor(p)}">${Math.round(p*100)}%</b>` +
     `<span class="tt-stars">${miniStarsHTML(starsOf(idx.i, idx.j))}</span>`;
 }
