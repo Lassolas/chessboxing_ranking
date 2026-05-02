@@ -76,6 +76,20 @@ body {
   object-fit: contain;
   filter: drop-shadow(0 0 6px rgba(245,200,66,0.5));
 }
+#site-header .lang-switch {
+  display: inline-block;
+  margin-top: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--gold-mid);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 20;
+}
 .site-tagline {
   color: var(--text-secondary);
   font-size: 12px;
@@ -794,20 +808,24 @@ input[type=range].stoppage-slider {
     CHESSBOXING
     <img src="assets/icon-boxing.png" alt="">
   </div>
-  <p class="site-tagline">Where do you stand in the ring?</p>
+  <p class="site-tagline" data-i18n="tagline">Where do you stand in the ring?</p>
+  <select id="lang-switch" class="lang-switch">
+    <option value="en">EN</option>
+    <option value="fr">FR</option>
+  </select>
 </header>
 
 <div id="main">
 
   <!-- ── FIGHTER SETUP ── -->
   <section id="fighter-setup">
-    <h2 class="section-title">Your Profile</h2>
+    <h2 class="section-title" data-i18n="your_profile">Your Profile</h2>
 
     <div class="drums-row">
       <!-- Chess drum -->
       <div class="drum-section">
         <div class="drum-label">
-          <img src="assets/icon-chess.png" alt="">Chess
+          <img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span>
         </div>
         <div class="drum-clip">
           <div class="drum" id="chess-drum" role="listbox" aria-label="Chess level" tabindex="0"></div>
@@ -816,7 +834,7 @@ input[type=range].stoppage-slider {
       <!-- Boxing drum -->
       <div class="drum-section">
         <div class="drum-label">
-          <img src="assets/icon-boxing.png" alt="">Boxing
+          <img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span>
         </div>
         <div class="drum-clip">
           <div class="drum" id="boxing-drum" role="listbox" aria-label="Boxing level" tabindex="0"></div>
@@ -827,7 +845,7 @@ input[type=range].stoppage-slider {
     <!-- Fighter summary card -->
     <div class="fighter-card" id="my-fighter-card">
       <div>
-        <div class="fighter-card__label">Your Corner</div>
+        <div class="fighter-card__label" data-i18n="your_corner">Your Corner</div>
         <div class="fighter-card__chess" id="myChessLabel">—</div>
         <div class="fighter-card__chess-sub" id="myElo">—</div>
         <div class="fighter-card__box" id="myBoxLabel">—</div>
@@ -842,7 +860,7 @@ input[type=range].stoppage-slider {
     <div id="fight-card">
       <div class="fc-handle"></div>
       <div class="fc-header">
-        <span class="fc-title">Fight Card</span>
+        <span class="fc-title" data-i18n="fight_card">Fight Card</span>
         <button class="fc-close" id="fc-close-btn" aria-label="Close">✕</button>
       </div>
       <div class="fc-outcome" id="fc-outcome">
@@ -851,7 +869,7 @@ input[type=range].stoppage-slider {
       </div>
       <div class="fc-fighters">
         <div class="fc-fighter fc-fighter--a">
-          <div class="fc-corner">Your Corner</div>
+          <div class="fc-corner" data-i18n="your_corner">Your Corner</div>
           <div class="fc-chess-level" id="fc-my-chess">—</div>
           <div class="fc-chess-elo"   id="fc-my-elo">—</div>
           <div class="fc-box-level"   id="fc-my-box">—</div>
@@ -860,7 +878,7 @@ input[type=range].stoppage-slider {
           </div>
         </div>
         <div class="fc-fighter fc-fighter--opp">
-          <div class="fc-corner">Opponent</div>
+          <div class="fc-corner" data-i18n="opponent">Opponent</div>
           <div class="fc-chess-level" id="hChess">—</div>
           <div class="fc-chess-elo"   id="hElo">—</div>
           <div class="fc-box-level"   id="hBox">—</div>
@@ -870,9 +888,9 @@ input[type=range].stoppage-slider {
         </div>
       </div>
       <div class="fc-bars">
-        <div class="fc-bars-title">Probability to win by</div>
+        <div class="fc-bars-title" data-i18n="prob_win">Probability to win by</div>
         <div class="fc-bar-row">
-          <span>Chess</span>
+          <span data-i18n="chess">Chess</span>
           <div class="fc-bar-stack">
             <div class="fc-bar-prob">
               <span class="fc-bar-prob-you" id="fc-chess-prob-you">—</span>
@@ -886,7 +904,7 @@ input[type=range].stoppage-slider {
           <span class="fc-diff" id="fc-chess-diff">—</span>
         </div>
         <div class="fc-bar-row">
-          <span>Boxing</span>
+          <span data-i18n="boxing">Boxing</span>
           <div class="fc-bar-stack">
             <div class="fc-bar-prob">
               <span class="fc-bar-prob-you" id="fc-box-prob-you">—</span>
@@ -901,15 +919,15 @@ input[type=range].stoppage-slider {
         </div>
       </div>
       <div class="fc-expected-box">
-        <span class="fc-expected-label">Expected Length</span>
+        <span class="fc-expected-label" data-i18n="expected_length">Expected Length</span>
         <span class="fc-expected-val" id="fc-expected-length">—</span>
       </div>
       <div class="fc-rounds" id="fc-rounds">
         <div class="fc-rounds-title">
-          Stoppage odds
+          <span data-i18n="stoppage_odds">Stoppage odds</span>
           <span class="fc-rounds-legend">
-            <span style="color:var(--gold-mid)">&#9644; you win</span>
-            <span style="color:var(--even-blue)">&#9644; opp wins</span>
+            <span style="color:var(--gold-mid)">&#9644; <span data-i18n="you_win">you win</span></span>
+            <span style="color:var(--even-blue)">&#9644; <span data-i18n="opp_wins">opp wins</span></span>
           </span>
         </div>
         <div id="fc-round-rows"></div>
@@ -919,10 +937,10 @@ input[type=range].stoppage-slider {
 
   <!-- ── EXPLORE GRID ── -->
   <section id="explore-section">
-    <h2 class="section-title">Explore Matchups <span class="section-hint">tap a cell to see that fight</span></h2>
+    <h2 class="section-title"><span data-i18n="explore_matchups">Explore Matchups</span> <span class="section-hint" data-i18n="tap_hint">tap a cell to see that fight</span></h2>
     <div id="grid-wrap">
       <div class="grid-controls">
-        <label for="stoppage-slider">Highlight early stoppages (&lt; <span id="stoppage-val">Off</span>)</label>
+        <label for="stoppage-slider"><span data-i18n="stoppage_highlight">Highlight early stoppages (&lt; </span><span id="stoppage-val">Off</span>)</label>
         <input type="range" id="stoppage-slider" class="stoppage-slider" min="2.9" max="4.5" step="0.1" value="2.9">
       </div>
       <div id="grid-container">
@@ -935,8 +953,8 @@ input[type=range].stoppage-slider {
         <span>100%</span>
       </div>
       <div class="legend-markers">
-        <span><span class="swatch you-mark"></span>You</span>
-        <span><span class="iso-line"></span>50 % (even)</span>
+        <span><span class="swatch you-mark"></span><span data-i18n="you">You</span></span>
+        <span><span class="iso-line"></span><span data-i18n="even">50 % (even)</span></span>
         <span><span class="iso-band iso-band--balanced"></span>45–55 %</span>
         <span><span class="iso-band"></span>25/75 %</span>
         <span><span class="iso-band iso-band--outer"></span>10/90 %</span>
@@ -947,6 +965,122 @@ input[type=range].stoppage-slider {
 </div><!-- #main -->
 
 <script>
+// ── LOCALIZATION ──
+const i18n = {
+  en: {
+    tagline: "Where do you stand in the ring?",
+    your_profile: "Your Profile",
+    chess: "Chess",
+    boxing: "Boxing",
+    your_corner: "Your Corner",
+    explore_matchups: "Explore Matchups",
+    tap_hint: "tap a cell to see that fight",
+    stoppage_highlight: "Highlight early stoppages (< ",
+    off: "Off",
+    even: "50 % (even)",
+    fight_card: "Fight Card",
+    opponent: "Opponent",
+    prob_win: "Probability to win by",
+    expected_length: "Expected Length",
+    stoppage_odds: "Stoppage odds",
+    you_win: "you win",
+    opp_wins: "opp wins",
+    you: "You",
+    opp: "Opp",
+    win: "Win",
+    dominate: "Dominate",
+    even_short: "Even",
+    tough: "Tough",
+    long_shot: "Long shot",
+    early_stoppage: "(High chance of early stoppage)",
+    distance: "(Likely to go the distance)",
+    decision: "Decision",
+    rnds: "Rounds",
+    rnds_short: "rnds",
+    lvl: "lvl",
+    top: "Top",
+    color_legend: "Opponent grid — color = your win probability",
+    chess_axis: "Chess level  (ELO)",
+    box_axis: "Boxing level",
+    chess_names: [
+      { short: 'Total Beginner', sub: '800 ELO' },
+      { short: 'Beginner',       sub: '1028 ELO' },
+      { short: 'Casual Player',  sub: '1257 ELO' },
+      { short: 'Club Player',    sub: '1485 ELO' },
+      { short: 'Strong Club',    sub: '1714 ELO' },
+      { short: 'Expert',         sub: '1942 ELO' },
+      { short: 'Master',         sub: '2171 ELO' },
+      { short: 'Elite / GM',     sub: '2400 ELO' }
+    ],
+    boxing_names: [
+      { short: 'Novice',        sub: 'Never sparred' },
+      { short: 'Beginner',      sub: 'Gym < 1 year' },
+      { short: 'Amateur',       sub: '1–3 yrs training' },
+      { short: 'Regional',      sub: 'First amateur bouts' },
+      { short: 'Semi-Pro',      sub: '10+ fights' },
+      { short: 'Professional',  sub: '40+ fights or pro' }
+    ]
+  },
+  fr: {
+    tagline: "Où vous situez-vous sur le ring ?",
+    your_profile: "Votre Profil",
+    chess: "Échecs",
+    boxing: "Boxe",
+    your_corner: "Votre Coin",
+    explore_matchups: "Explorer les Matchups",
+    tap_hint: "appuyez sur une case pour ce combat",
+    stoppage_highlight: "Mettre en évidence les arrêts précoces (< ",
+    off: "Désactivé",
+    even: "50 % (égal)",
+    fight_card: "Carte de Combat",
+    opponent: "Adversaire",
+    prob_win: "Probabilité de victoire par",
+    expected_length: "Durée Estimée",
+    stoppage_odds: "Probabilités d'arrêt",
+    you_win: "vous gagnez",
+    opp_wins: "adv gagne",
+    you: "Vous",
+    opp: "Adv",
+    win: "Gagnant",
+    dominate: "Domine",
+    even_short: "Égal",
+    tough: "Difficile",
+    long_shot: "Peu probable",
+    early_stoppage: "(Forte chance d'arrêt précoce)",
+    distance: "(Susceptible d'aller à la décision)",
+    decision: "Décision",
+    rnds: "Rounds",
+    rnds_short: "rnds",
+    lvl: "niv",
+    top: "Top",
+    color_legend: "Grille adv. — couleur = votre probabilité de victoire",
+    chess_axis: "Niveau d'Échecs  (ELO)",
+    box_axis: "Niveau de Boxe",
+    chess_names: [
+      { short: 'Grand Débutant', sub: '800 ELO' },
+      { short: 'Débutant',       sub: '1028 ELO' },
+      { short: 'Joueur Occas.',  sub: '1257 ELO' },
+      { short: 'Joueur de Club', sub: '1485 ELO' },
+      { short: 'Bon Club',       sub: '1714 ELO' },
+      { short: 'Expert',         sub: '1942 ELO' },
+      { short: 'Maître',         sub: '2171 ELO' },
+      { short: 'Élite / GMI',    sub: '2400 ELO' }
+    ],
+    boxing_names: [
+      { short: 'Novice',        sub: 'Jamais sparré' },
+      { short: 'Débutant',      sub: 'Salle < 1 an' },
+      { short: 'Amateur',       sub: '1–3 ans d\'entraînement' },
+      { short: 'Régional',      sub: 'Premiers combats am.' },
+      { short: 'Semi-Pro',      sub: '10+ combats' },
+      { short: 'Professionnel', sub: '40+ combats ou pro' }
+    ]
+  }
+};
+
+let currentLang = 'en';
+function getChessNamed() { return i18n[currentLang].chess_names.map((n, i) => ({ value: i, ...n })); }
+function getBoxingNamed() { return i18n[currentLang].boxing_names.map((n, i) => ({ value: i, ...n })); }
+
 // ── CONFIG ──
 const CHESS_MIN = 0, CHESS_MAX = 7, CHESS_STEP = 0.2;
 const BOX_MIN   = 0, BOX_MAX   = 5, BOX_STEP   = 0.2;
@@ -955,59 +1089,55 @@ const ITEM_H = 58; // must match CSS --item-h
 
 const MARGIN = { top: 50, right: 34, bottom: 94, left: 150 };
 
-const CHESS_NAMED = [
-  { value: 0, short: 'Total Beginner', sub: '800 ELO'  },
-  { value: 1, short: 'Beginner',       sub: '1028 ELO' },
-  { value: 2, short: 'Casual Player',  sub: '1257 ELO' },
-  { value: 3, short: 'Club Player',    sub: '1485 ELO' },
-  { value: 4, short: 'Strong Club',    sub: '1714 ELO' },
-  { value: 5, short: 'Expert',         sub: '1942 ELO' },
-  { value: 6, short: 'Master',         sub: '2171 ELO' },
-  { value: 7, short: 'Elite / GM',     sub: '2400 ELO' },
-];
-const BOXING_NAMED = [
-  { value: 0, short: 'Novice',        sub: 'Never sparred'       },
-  { value: 1, short: 'Beginner',      sub: 'Gym < 1 year'        },
-  { value: 2, short: 'Amateur',       sub: '1–3 yrs training'    },
-  { value: 3, short: 'Regional',      sub: 'First amateur bouts' },
-  { value: 4, short: 'Semi-Pro',      sub: '10+ fights'          },
-  { value: 5, short: 'Professional',  sub: '40+ fights or pro'   },
-];
+function closestNamed(arr, v) {
+  let best = arr[0], bd = Infinity;
+  for (const n of arr) { const d = Math.abs(n.value - v); if (d < bd) { bd = d; best = n; } }
+  return best;
+}
 
 // Drum-picker levels at 0.2-step granularity (intermediate items show ELO / level number)
 const _eloOf = c => Math.round(800 + c * (1600 / 7));
 function chessCategory(v) {
-  for (let i = CHESS_NAMED.length - 1; i >= 0; i--) {
-    if (v >= CHESS_NAMED[i].value) return CHESS_NAMED[i];
+  const arr = getChessNamed();
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (v >= arr[i].value) return arr[i];
   }
-  return CHESS_NAMED[0];
+  return arr[0];
 }
-const CHESS_DRUM_LEVELS = [];
-for (let k = 0; k <= Math.round((CHESS_MAX - CHESS_MIN) / CHESS_STEP); k++) {
-  const v = +(CHESS_MIN + k * CHESS_STEP).toFixed(1);
-  const named = CHESS_NAMED.find(n => n.value === v);
-  const category = chessCategory(v);
-  CHESS_DRUM_LEVELS.push({
-    value: v,
-    short: named ? named.short : category.short,
-    sub: named ? named.sub : (_eloOf(v) + ' ELO'),
-  });
+
+function getChessDrumLevels() {
+  const arr = getChessNamed();
+  const levels = [];
+  for (let k = 0; k <= Math.round((CHESS_MAX - CHESS_MIN) / CHESS_STEP); k++) {
+    const v = +(CHESS_MIN + k * CHESS_STEP).toFixed(1);
+    const named = arr.find(n => n.value === v);
+    const category = chessCategory(v);
+    levels.push({ value: v, short: named ? named.short : category.short, sub: named ? named.sub : (_eloOf(v) + ' ELO') });
+  }
+  return levels;
 }
-const BOXING_DRUM_LEVELS = [];
-for (let k = 0; k <= Math.round((BOX_MAX - BOX_MIN) / BOX_STEP); k++) {
-  const v = +(BOX_MIN + k * BOX_STEP).toFixed(1);
-  const named = BOXING_NAMED.find(n => n.value === v);
-  BOXING_DRUM_LEVELS.push({ value: v, short: named ? named.short : v.toFixed(1), sub: named ? named.sub : '' });
+
+function getBoxingDrumLevels() {
+  const arr = getBoxingNamed();
+  const levels = [];
+  for (let k = 0; k <= Math.round((BOX_MAX - BOX_MIN) / BOX_STEP); k++) {
+    const v = +(BOX_MIN + k * BOX_STEP).toFixed(1);
+    const named = arr.find(n => n.value === v);
+    levels.push({ value: v, short: named ? named.short : v.toFixed(1), sub: named ? named.sub : '' });
+  }
+  return levels;
 }
 
 function boxLabel(v) {
-  const named = BOXING_NAMED.find(n => n.value === v);
-  return named ? named.short + ' · ' + named.sub : closestNamed(BOXING_NAMED, v).short + ' · Lv ' + v.toFixed(1);
+  const arr = getBoxingNamed();
+  const named = arr.find(n => n.value === v);
+  return named ? named.short + ' · ' + named.sub : closestNamed(arr, v).short + ' · Lv ' + v.toFixed(1);
 }
 
 function boxCategory(v) {
-  const named = BOXING_NAMED.find(n => n.value === v);
-  return named ? named.short : closestNamed(BOXING_NAMED, v).short;
+  const arr = getBoxingNamed();
+  const named = arr.find(n => n.value === v);
+  return named ? named.short : closestNamed(arr, v).short;
 }
 
 function boxMeta(v) {
@@ -1199,12 +1329,6 @@ let myChess = 3.0;
 let myBox   = 2.0;
 let stoppageLimit = 0;
 
-function closestNamed(arr, v) {
-  let best = arr[0], bd = Infinity;
-  for (const n of arr) { const d = Math.abs(n.value - v); if (d < bd) { bd = d; best = n; } }
-  return best;
-}
-
 // ── ISOLINE: returns canvas points where pWin crosses threshold ──
 function getIsoline(threshold) {
   const pts = [];
@@ -1244,6 +1368,7 @@ function strokeLine(pts, col, width, dash) {
 
 // ── DRAW ──
 function draw() {
+  const t = i18n[currentLang];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // heatmap cells (win probability base)
@@ -1336,6 +1461,7 @@ function draw() {
 
   // ── X AXIS (chess) ──
   ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const cArr = getChessNamed();
   for (let v = CHESS_MIN; v <= CHESS_MAX; v++) {
     const i = Math.round((v - CHESS_MIN) / CHESS_STEP);
     const x = MARGIN.left + i * CELL + CELL / 2;
@@ -1343,16 +1469,18 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(x, yTop); ctx.lineTo(x, yTop + 5);
     ctx.strokeStyle = '#5a5a6a'; ctx.lineWidth = 1; ctx.stroke();
     ctx.font = '14px system-ui'; ctx.fillStyle = '#c8b880';
-    ctx.fillText(CHESS_NAMED[v] ? CHESS_NAMED[v].short.split(' ')[0] : v, x, yTop + 7);
+    const cNamed = cArr.find(n => n.value === v);
+    ctx.fillText(cNamed ? cNamed.short.split(' ')[0] : v, x, yTop + 7);
     ctx.font = '12px ' + getComputedStyle(document.body).getPropertyValue('--font-mono');
     ctx.fillStyle = '#7a6a40';
     ctx.fillText(eloOf(v), x, yTop + 24);
   }
   ctx.font = 'bold 15px system-ui'; ctx.fillStyle = '#8888a0';
-  ctx.fillText('Chess level  (ELO)', MARGIN.left + NX * CELL / 2, MARGIN.top + NY * CELL + 54);
+  ctx.fillText(t.chess_axis, MARGIN.left + NX * CELL / 2, MARGIN.top + NY * CELL + 54);
 
   // ── Y AXIS (boxing) ──
   ctx.font = '13px system-ui'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  const bArr = getBoxingNamed();
   for (let v = BOX_MIN; v <= BOX_MAX; v++) {
     const j = Math.round((v - BOX_MIN) / BOX_STEP);
     const { y } = cell2px(0, j);
@@ -1360,7 +1488,8 @@ function draw() {
     ctx.strokeStyle = '#5a5a6a'; ctx.lineWidth = 1; ctx.stroke();
     ctx.font = '13px system-ui';
     ctx.fillStyle = '#c8b880';
-    ctx.fillText(BOXING_NAMED[v] ? BOXING_NAMED[v].short : v, MARGIN.left - 10, y + CELL/2 - 8);
+    const bNamed = bArr.find(n => n.value === v);
+    ctx.fillText(bNamed ? bNamed.short : v, MARGIN.left - 10, y + CELL/2 - 8);
     ctx.font = '12px ' + getComputedStyle(document.body).getPropertyValue('--font-mono');
     ctx.fillStyle = '#7a6a40';
     ctx.fillText('Lv ' + v.toFixed(1), MARGIN.left - 10, y + CELL/2 + 10);
@@ -1370,13 +1499,13 @@ function draw() {
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = 'bold 15px system-ui'; ctx.fillStyle = '#8888a0';
-  ctx.fillText('Boxing level', 0, 0);
+  ctx.fillText(t.box_axis, 0, 0);
   ctx.restore();
 
   // title strip
   ctx.font = 'bold 13px system-ui'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
   ctx.fillStyle = '#6a6a80';
-  ctx.fillText('Opponent grid — color = your win probability', MARGIN.left, 14);
+  ctx.fillText(t.color_legend, MARGIN.left, 14);
 }
 
 // ── UPDATE FIGHTER CARD ──
@@ -1387,7 +1516,7 @@ function updateMine() {
   document.getElementById('myChessLabel').textContent = cn.short;
   document.getElementById('myElo').textContent        = 'ELO ' + eloOf(myChess);
   document.getElementById('myBoxLabel').innerHTML     = boxLabelHTML(myBox);
-  document.getElementById('myRating').textContent     = 'Top ' + Math.max(1, Math.round((1 - rankOf(i,j)) * 100)) + '%';
+  document.getElementById('myRating').textContent     = i18n[currentLang].top + ' ' + Math.max(1, Math.round((1 - rankOf(i,j)) * 100)) + '%';
   setStars(myStarsClip, starsOf(i, j));
   setStars(fcMyStarsClip, starsOf(i, j));
 
@@ -1402,11 +1531,12 @@ function updateMine() {
 
 // ── OUTCOME ──
 function outcomeLabel(p) {
-  if (p > 0.70) return 'Dominate';
-  if (p > 0.55) return 'Win';
-  if (p >= 0.45) return 'Even';
-  if (p > 0.30) return 'Tough';
-  return 'Long shot';
+  const t = i18n[currentLang];
+  if (p > 0.70) return t.dominate;
+  if (p > 0.55) return t.win;
+  if (p >= 0.45) return t.even_short;
+  if (p > 0.30) return t.tough;
+  return t.long_shot;
 }
 function outcomeColor(p) {
   if (p > 0.55) return '#39d353';
@@ -1427,7 +1557,7 @@ function renderRoundChart(dChess, dBox) {
     row.className = 'fc-round-row';
     const showIcon = r !== 8;
     const icon = type === 'chess' ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
-    const label = r === 8 ? 'Decision' : `R${r}`;
+    const label = r === 8 ? i18n[currentLang].decision : `R${r}`;
     const iconMarkup = showIcon
       ? `<img class="fc-round-icon" src="${icon}" alt="">`
       : `<span class="fc-round-icon-spacer" aria-hidden="true"></span>`;
@@ -1454,6 +1584,7 @@ let currentOppIdx = null;
 function showFightCard(idx) {
   if (!idx) return;
   currentOppIdx = idx;
+  const t = i18n[currentLang];
   const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
   const p   = pWin(myChess, myBox, oc, ob);
   const cn  = chessCategory(oc);
@@ -1489,14 +1620,14 @@ function showFightCard(idx) {
   boxBarOppEl.style.left    = boxYouPct.toFixed(1) + '%';
   boxBarOppEl.style.width   = boxOppPct.toFixed(1) + '%';
 
-  chessProbYouEl.textContent = `You ${Math.round(chessWin * 100)}%`;
-  chessProbOppEl.textContent = `Opp ${Math.round(chessLoss * 100)}%`;
-  boxProbYouEl.textContent   = `You ${Math.round(boxWin * 100)}%`;
-  boxProbOppEl.textContent   = `Opp ${Math.round(boxLoss * 100)}%`;
-  chessBarYouEl.title = `Probability to win by chess: ${Math.round(chessWin * 100)}%`;
-  chessBarOppEl.title = `Opponent probability to win by chess: ${Math.round(chessLoss * 100)}%`;
-  boxBarYouEl.title   = `Probability to win by boxing: ${Math.round(boxWin * 100)}%`;
-  boxBarOppEl.title   = `Opponent probability to win by boxing: ${Math.round(boxLoss * 100)}%`;
+  chessProbYouEl.textContent = `${t.you} ${Math.round(chessWin * 100)}%`;
+  chessProbOppEl.textContent = `${t.opp} ${Math.round(chessLoss * 100)}%`;
+  boxProbYouEl.textContent   = `${t.you} ${Math.round(boxWin * 100)}%`;
+  boxProbOppEl.textContent   = `${t.opp} ${Math.round(boxLoss * 100)}%`;
+  chessBarYouEl.title = `${t.prob_win} ${t.chess}: ${Math.round(chessWin * 100)}%`;
+  chessBarOppEl.title = `${t.opponent} ${t.prob_win.toLowerCase()} ${t.chess}: ${Math.round(chessLoss * 100)}%`;
+  boxBarYouEl.title   = `${t.prob_win} ${t.boxing}: ${Math.round(boxWin * 100)}%`;
+  boxBarOppEl.title   = `${t.opponent} ${t.prob_win.toLowerCase()} ${t.boxing}: ${Math.round(boxLoss * 100)}%`;
 
   const eloDiff = eloOf(myChess) - eloOf(oc);
   const boxDiff = +(myBox - ob).toFixed(1);
@@ -1505,13 +1636,13 @@ function showFightCard(idx) {
   const cdEl = document.getElementById('fc-chess-diff');
   if (cdEl) { cdEl.textContent = signStr(eloDiff) + eloDiff + ' ELO'; cdEl.style.color = diffCol(eloDiff); }
   const bdEl = document.getElementById('fc-box-diff');
-  if (bdEl) { bdEl.textContent = signStr(boxDiff) + boxDiff + ' lvl'; bdEl.style.color = diffCol(boxDiff); }
+  if (bdEl) { bdEl.textContent = signStr(boxDiff) + boxDiff + ' ' + t.lvl; bdEl.style.color = diffCol(boxDiff); }
 
   let pace = '';
-  if (expectedRounds < 4.0) pace = '(High chance of early stoppage)';
-  else if (expectedRounds > 6.5) pace = '(Likely to go the distance)';
+  if (expectedRounds < 4.0) pace = t.early_stoppage;
+  else if (expectedRounds > 6.5) pace = t.distance;
   
-  document.getElementById('fc-expected-length').innerHTML = `${expectedRounds.toFixed(1)} Rounds <span class="fc-expected-desc">${pace}</span>`;
+  document.getElementById('fc-expected-length').innerHTML = `${expectedRounds.toFixed(1)} ${t.rnds} <span class="fc-expected-desc">${pace}</span>`;
 
   setStars(oppStarsClip, starsOf(idx.i, idx.j));
   renderRoundChart(myChess - oc, myBox - ob);
@@ -1546,13 +1677,14 @@ const tooltip = document.getElementById('tooltip');
 
 function showTooltip(idx, cssX, cssY) {
   if (!idx) { tooltip.style.display = 'none'; return; }
+  const t   = i18n[currentLang];
   const oc  = chessLevels[idx.i], ob = boxLevels[idx.j];
   const p   = pWin(myChess, myBox, oc, ob);
   const cn  = chessCategory(oc);
   tooltip.style.display = 'block';
   tooltip.innerHTML =
     tooltipLineHTML('assets/icon-chess.png', `<b>${escapeHtml(cn.short)}</b>`, `<span class="tt-elo">ELO ${eloOf(oc)}</span>`) + `<br>` +
-    tooltipLineHTML('assets/icon-boxing.png', `<b>${escapeHtml(boxCategory(ob))}</b>`, `<span class="tt-elo">${escapeHtml(boxMeta(ob))}</span>`) + `<br>` +
+    tooltipLineHTML('assets/icon-boxing.png', `<b>${escapeHtml(boxCategory(ob))}</b>`, `<span class="tt-elo">${t.lvl} ${ob.toFixed(1)}</span>`) + `<br>` +
     `<b style="color:${outcomeColor(p)}">${Math.round(p*100)}%</b>` +
     `<span class="tt-stars">${miniStarsHTML(starsOf(idx.i, idx.j))}</span>`;
 
@@ -1706,12 +1838,12 @@ function pulseCard() {
 
 buildDrum(
   document.getElementById('chess-drum'),
-  CHESS_DRUM_LEVELS, myChess,
+  getChessDrumLevels(), myChess,
   val => { myChess = val; updateMine(); draw(); pulseCard(); }
 );
 buildDrum(
   document.getElementById('boxing-drum'),
-  BOXING_DRUM_LEVELS, myBox,
+  getBoxingDrumLevels(), myBox,
   val => { myBox = val; updateMine(); draw(); pulseCard(); }
 );
 
@@ -1728,9 +1860,40 @@ buildDrum(
 document.getElementById('stoppage-slider').addEventListener('input', e => {
   const v = parseFloat(e.target.value);
   stoppageLimit = v < 3.0 ? 0 : v;
-  document.getElementById('stoppage-val').textContent = stoppageLimit === 0 ? 'Off' : stoppageLimit.toFixed(1) + ' rnds';
+  const t = i18n[currentLang];
+  document.getElementById('stoppage-val').textContent = stoppageLimit === 0 ? t.off : stoppageLimit.toFixed(1) + ' ' + t.rnds_short;
   draw();
 });
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = i18n[lang];
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.innerHTML = t[key];
+  });
+
+  document.getElementById('stoppage-val').textContent = stoppageLimit === 0 ? t.off : stoppageLimit.toFixed(1) + ' ' + t.rnds_short;
+
+  const cLevels = getChessDrumLevels();
+  document.querySelectorAll('#chess-drum .drum-item').forEach(el => {
+    const idx = el.dataset.idx;
+    el.querySelector('.drum-item__name').textContent = cLevels[idx].short;
+    el.querySelector('.drum-item__sub').textContent  = cLevels[idx].sub;
+  });
+  const bLevels = getBoxingDrumLevels();
+  document.querySelectorAll('#boxing-drum .drum-item').forEach(el => {
+    const idx = el.dataset.idx;
+    el.querySelector('.drum-item__name').textContent = bLevels[idx].short;
+    el.querySelector('.drum-item__sub').textContent  = bLevels[idx].sub;
+  });
+
+  updateMine();
+  draw();
+}
+
+document.getElementById('lang-switch').addEventListener('change', e => setLang(e.target.value));
 
 updateMine();
 draw();
