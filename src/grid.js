@@ -127,7 +127,7 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
           isInvalid = boxDiff > c.boxDiffMax || winProb > c.maxWinProb || winProb < c.minWinProb || expectedRounds < minRnds;
         } else if (showProbableFighters) {
           const c = MATCHMAKING_CONSTRAINTS.selectionable;
-          isInvalid = myBoxAdvantage > c.myBoxAdvantageMax || winProb > c.maxWinProb || expectedRounds < minRnds;
+          isInvalid = myBoxAdvantage > c.myBoxAdvantageMax || winProb > c.maxWinProb;
         }
 
         if (isInvalid) {
