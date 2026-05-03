@@ -3,8 +3,8 @@ export const BOX_MIN = 0, BOX_MAX = 5, BOX_STEP = 0.2;
 
 export const MATCHMAKING_CONSTRAINTS = {
   selectionable: {
-    myBoxAdvantageMax: 2,
-    maxWinProb: 0.90
+    myBoxAdvantageMax: 1.5,
+    maxWinProb: 0.80
   },
   strict: {
     boxDiffMax: 1,
