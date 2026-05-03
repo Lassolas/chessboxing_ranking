@@ -312,5 +312,6 @@ document.querySelectorAll('.round-selector__btn').forEach(btn => {
   });
 });
 
+setLang(currentLang);
 updateMine();
 draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
