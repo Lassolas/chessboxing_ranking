@@ -13,7 +13,7 @@ export const i18n = {
     selectionable_fighters: "Highlight Selectionable Fighters",
     strict_matchmaking: "Strict Matchmaking",
     early_stoppage_zone: "Early Stoppage Zone",
-    matchmaking_rules: `<b>Selectionable:</b> My boxing adv. max ${MATCHMAKING_CONSTRAINTS.selectionable.myBoxAdvantageMax}. Win prob < ${MATCHMAKING_CONSTRAINTS.selectionable.maxWinProb * 100}%.<br><b>Strict:</b> Max boxing diff ${MATCHMAKING_CONSTRAINTS.strict.boxDiffMax}. Win prob ${MATCHMAKING_CONSTRAINTS.strict.minWinProb * 100}%–${MATCHMAKING_CONSTRAINTS.strict.maxWinProb * 100}%.`,
+    matchmaking_rules: `<b>Selectionable:</b> Boxing diff max ${MATCHMAKING_CONSTRAINTS.selectionable.myBoxAdvantageMax}. Win prob < ${MATCHMAKING_CONSTRAINTS.selectionable.maxWinProb * 100}%.<br><b>Strict:</b> Max boxing diff ${MATCHMAKING_CONSTRAINTS.strict.boxDiffMax}. Win prob ${MATCHMAKING_CONSTRAINTS.strict.minWinProb * 100}%–${MATCHMAKING_CONSTRAINTS.strict.maxWinProb * 100}%.`,
     off: "Off",
     even: "50 % (even)",
     fight_card: "Fight Card",
@@ -43,21 +43,21 @@ export const i18n = {
     box_axis: "Boxing level",
     chess_names: [
       { short: 'Total Beginner', sub: '800 ELO' },
-      { short: 'Beginner',       sub: '1028 ELO' },
-      { short: 'Casual Player',  sub: '1257 ELO' },
-      { short: 'Club Player',    sub: '1485 ELO' },
-      { short: 'Strong Club',    sub: '1714 ELO' },
-      { short: 'Expert',         sub: '1942 ELO' },
-      { short: 'Master',         sub: '2171 ELO' },
-      { short: 'Elite / GM',     sub: '2400 ELO' }
+      { short: 'Beginner', sub: '1028 ELO' },
+      { short: 'Casual Player', sub: '1257 ELO' },
+      { short: 'Club Player', sub: '1485 ELO' },
+      { short: 'Strong Club', sub: '1714 ELO' },
+      { short: 'Expert', sub: '1942 ELO' },
+      { short: 'Master', sub: '2171 ELO' },
+      { short: 'Elite / GM', sub: '2400 ELO' }
     ],
     boxing_names: [
-      { short: 'Novice',        sub: 'Never sparred' },
-      { short: 'Beginner',      sub: 'Gym < 1 year' },
-      { short: 'Amateur',       sub: '1–3 yrs training' },
-      { short: 'Regional',      sub: 'First amateur bouts' },
-      { short: 'Semi-Pro',      sub: '10+ fights' },
-      { short: 'Professional',  sub: '40+ fights or pro' }
+      { short: 'Novice', sub: 'Never sparred' },
+      { short: 'Beginner', sub: 'Gym < 1 year' },
+      { short: 'Amateur', sub: '1–3 yrs training' },
+      { short: 'Regional', sub: 'First amateur bouts' },
+      { short: 'Semi-Pro', sub: '10+ fights' },
+      { short: 'Professional', sub: '40+ fights or pro' }
     ]
   },
   fr: {
@@ -102,20 +102,20 @@ export const i18n = {
     box_axis: "Niveau de Boxe",
     chess_names: [
       { short: 'Grand Débutant', sub: '800 ELO' },
-      { short: 'Débutant',       sub: '1028 ELO' },
-      { short: 'Joueur Occas.',  sub: '1257 ELO' },
+      { short: 'Débutant', sub: '1028 ELO' },
+      { short: 'Joueur Occas.', sub: '1257 ELO' },
       { short: 'Joueur de Club', sub: '1485 ELO' },
-      { short: 'Bon Club',       sub: '1714 ELO' },
-      { short: 'Expert',         sub: '1942 ELO' },
-      { short: 'Maître',         sub: '2171 ELO' },
-      { short: 'Élite / GMI',    sub: '2400 ELO' }
+      { short: 'Bon Club', sub: '1714 ELO' },
+      { short: 'Expert', sub: '1942 ELO' },
+      { short: 'Maître', sub: '2171 ELO' },
+      { short: 'Élite / GMI', sub: '2400 ELO' }
     ],
     boxing_names: [
-      { short: 'Novice',        sub: 'Jamais sparré' },
-      { short: 'Débutant',      sub: 'Salle < 1 an' },
-      { short: 'Amateur',       sub: '1–3 ans d\'entraînement' },
-      { short: 'Régional',      sub: 'Premiers combats am.' },
-      { short: 'Semi-Pro',      sub: '10+ combats' },
+      { short: 'Novice', sub: 'Jamais sparré' },
+      { short: 'Débutant', sub: 'Salle < 1 an' },
+      { short: 'Amateur', sub: '1–3 ans d\'entraînement' },
+      { short: 'Régional', sub: 'Premiers combats am.' },
+      { short: 'Semi-Pro', sub: '10+ combats' },
       { short: 'Professionnel', sub: '40+ combats ou pro' }
     ]
   }

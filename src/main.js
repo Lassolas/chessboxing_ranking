@@ -125,13 +125,13 @@ function showFightCard(idx, updateDrums = true) {
   renderRoundChart(myChess - oc, myBox - ob);
 
   document.getElementById('opponent-setup').classList.add('visible');
-  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 }
 
 function dismissFightCard() {
   document.getElementById('opponent-setup').classList.remove('visible');
   currentOppIdx = null;
-  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 }
 
 document.getElementById('fc-close-btn').addEventListener('click', dismissFightCard);
