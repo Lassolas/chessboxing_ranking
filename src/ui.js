@@ -1,5 +1,5 @@
 import { i18n, currentLang, getChessNamed, getBoxingNamed } from './i18n.js';
-import { eloOf, pWin, getWinBreakdown, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { eloOf, pWin, getWinBreakdown, getActiveConfig, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 import { chessLevels, boxLevels, starsOf, rankOf, draw, color } from './grid.js';
 
 export function closestNamed(arr, v) {
@@ -115,23 +115,23 @@ export function setStars(r, v) { r.setAttribute('width', Math.max(0, Math.min(5,
 export function setupSlider(sliderId, valId, getLevelsFn, initialValue, onSelect) {
   const slider = document.getElementById(sliderId);
   const valDisplay = document.getElementById(valId);
-  
+
   function updateDisplay(val) {
     const levels = getLevelsFn();
     const nearest = levels.reduce((best, item) =>
       Math.abs(item.value - val) < Math.abs(best.value - val) ? item : best, levels[0]);
     valDisplay.innerHTML = `${nearest.short}<span class="slider-sub">${nearest.sub}</span>`;
   }
-  
+
   slider.value = initialValue;
   updateDisplay(initialValue);
-  
+
   slider.addEventListener('input', e => {
     const val = parseFloat(e.target.value);
     updateDisplay(val);
     onSelect(val);
   });
-  
+
   return {
     setValue: (val) => {
       slider.value = val;
@@ -148,21 +148,24 @@ export function pulseCard() {
   setTimeout(() => card.classList.remove('pulse'), 500);
 }
 
-export function renderRoundChart(dChess, dBox, ROUND_PARAMS) {
+export function renderRoundChart(dChess, dBox) {
   const container = document.getElementById('fc-round-rows');
   container.innerHTML = '';
   const { probs } = getWinBreakdown(dChess, dBox);
-  for (let r = 1; r <= 8; r++) {
+  const params = getActiveConfig().params;
+  const totalRounds = params.length;
+
+  for (let r = 1; r <= totalRounds; r++) {
     const { pA, pB } = probs[r - 1];
-    const { type } = ROUND_PARAMS[r - 1];
+    const { type }   = params[r - 1];
     const wA = Math.round(pA * 100);
     const wB = Math.round(pB * 100);
     const row = document.createElement('div');
     row.className = 'fc-round-row';
-    const showIcon = r !== 8;
-    const icon = type === 'chess' ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
-    const label = r === 8 ? i18n[currentLang].decision : `R${r}`;
-    const iconMarkup = showIcon
+    const isDecision = r === totalRounds;
+    const icon    = type === 'chess' ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
+    const label   = isDecision ? i18n[currentLang].decision : `R${r}`;
+    const iconMarkup = !isDecision
       ? `<img class="fc-round-icon" src="${icon}" alt="">`
       : `<span class="fc-round-icon-spacer" aria-hidden="true"></span>`;
     row.innerHTML =

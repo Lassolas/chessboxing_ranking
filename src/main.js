@@ -1,10 +1,10 @@
 import './style.css';
 import { i18n, currentLang, setLangState, getChessNamed, getBoxingNamed } from './i18n.js';
-import { eloOf, pWin, getWinBreakdown, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP, ROUND_PARAMS } from './model.js';
-import { chessLevels, boxLevels, starsOf, rankOf, draw, color, px2cell, CELL, MARGIN, NX, NY } from './grid.js';
-import { 
-  chessCategory, getChessDrumLevels, getBoxingDrumLevels, boxLabelHTML, 
-  fightCardChessHTML, fightCardBoxHTML, outcomeLabel, outcomeColor, 
+import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { chessLevels, boxLevels, starsOf, rankOf, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
+import {
+  chessCategory, getChessDrumLevels, getBoxingDrumLevels, boxLabelHTML,
+  fightCardChessHTML, fightCardBoxHTML, outcomeLabel, outcomeColor,
   buildStarSvg, setStars, setupSlider, pulseCard, renderRoundChart,
   miniStarsHTML, tooltipLineHTML, escapeHtml, boxCategory
 } from './ui.js';
@@ -113,14 +113,15 @@ function showFightCard(idx, updateDrums = true) {
   const bdEl = document.getElementById('fc-box-diff');
   if (bdEl) { bdEl.textContent = signStr(boxDiff) + boxDiff + ' ' + t.lvl; bdEl.style.color = diffCol(boxDiff); }
 
+  const totalR = getActiveConfig().params.length;
   let pace = '';
-  if (expectedRounds < 4.0) pace = t.early_stoppage;
-  else if (expectedRounds > 6.5) pace = t.distance;
+  if (expectedRounds < totalR * 0.5) pace = t.early_stoppage;
+  else if (expectedRounds > totalR * 0.82) pace = t.distance;
   
   document.getElementById('fc-expected-length').innerHTML = `${expectedRounds.toFixed(1)} ${t.rnds} <span class="fc-expected-desc">${pace}</span>`;
 
   setStars(oppStarsClip, starsOf(idx.i, idx.j));
-  renderRoundChart(myChess - oc, myBox - ob, ROUND_PARAMS);
+  renderRoundChart(myChess - oc, myBox - ob);
 
   document.getElementById('opponent-setup').classList.add('visible');
   draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
@@ -288,6 +289,20 @@ function setLang(lang) {
 }
 
 document.getElementById('lang-switch').addEventListener('change', e => setLang(e.target.value));
+
+document.querySelectorAll('.round-selector__btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.round-selector__btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    setActiveConfig(btn.dataset.rounds);
+    invalidateGrid();
+    updateMine();
+    draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
+    if (currentOppIdx && document.getElementById('opponent-setup').classList.contains('visible')) {
+      showFightCard(currentOppIdx, false);
+    }
+  });
+});
 
 updateMine();
 draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);

@@ -1,6 +1,5 @@
-import { pWin, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP, eloOf } from './model.js';
+import { pWin, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP, eloOf, getActiveConfig, getWinBreakdown } from './model.js';
 import { getChessNamed, getBoxingNamed, i18n, currentLang } from './i18n.js';
-import { getWinBreakdown } from './model.js';
 
 export function buildLevels(min, max, step) {
   const out = [];
@@ -15,22 +14,35 @@ export const NY = boxLevels.length;
 export const CELL = 16;
 export const MARGIN = { top: 50, right: 34, bottom: 94, left: 150 };
 
-export const avgP = new Float32Array(NX * NY);
-for (let j = 0; j < NY; j++) {
-  for (let i = 0; i < NX; i++) {
-    const c1 = chessLevels[i], b1 = boxLevels[j];
-    let sum = 0;
-    for (let j2 = 0; j2 < NY; j2++) for (let i2 = 0; i2 < NX; i2++) sum += pWin(c1, b1, chessLevels[i2], boxLevels[j2]);
-    avgP[j * NX + i] = sum / (NX * NY);
+// Lazy grid: recomputed whenever invalidateGrid() is called (i.e. on format change).
+let _avgP = null, _minAvg = 0, _maxAvg = 1;
+
+function ensureGrid() {
+  if (_avgP) return;
+  _avgP = new Float32Array(NX * NY);
+  _minAvg = Infinity; _maxAvg = -Infinity;
+  for (let j = 0; j < NY; j++) {
+    for (let i = 0; i < NX; i++) {
+      const c1 = chessLevels[i], b1 = boxLevels[j];
+      let sum = 0;
+      for (let j2 = 0; j2 < NY; j2++)
+        for (let i2 = 0; i2 < NX; i2++)
+          sum += pWin(c1, b1, chessLevels[i2], boxLevels[j2]);
+      _avgP[j * NX + i] = sum / (NX * NY);
+    }
+  }
+  for (let k = 0; k < _avgP.length; k++) {
+    if (_avgP[k] < _minAvg) _minAvg = _avgP[k];
+    if (_avgP[k] > _maxAvg) _maxAvg = _avgP[k];
   }
 }
-export let minAvg = Infinity, maxAvg = -Infinity;
-for (let k = 0; k < avgP.length; k++) {
-  if (avgP[k] < minAvg) minAvg = avgP[k];
-  if (avgP[k] > maxAvg) maxAvg = avgP[k];
-}
 
-export function rankOf(i, j)  { return (avgP[j * NX + i] - minAvg) / (maxAvg - minAvg); }
+export function invalidateGrid() { _avgP = null; }
+
+export function rankOf(i, j)  {
+  ensureGrid();
+  return (_avgP[j * NX + i] - _minAvg) / (_maxAvg - _minAvg);
+}
 export function starsOf(i, j) { return rankOf(i, j) * 5; }
 
 export function color(p) {
@@ -107,12 +119,13 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
         const myBoxAdvantage = myBox - boxLevels[j];
         const { expectedRounds, chessWin, boxWin } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
         const winProb = chessWin + boxWin;
-        
+
+        const minRnds = getActiveConfig().minExpectedRounds;
         let isInvalid = false;
         if (strictMatchmaking) {
-          isInvalid = boxDiff > 1 || winProb > 0.70 || winProb < 0.30 || expectedRounds < 4.0;
+          isInvalid = boxDiff > 1 || winProb > 0.70 || winProb < 0.30 || expectedRounds < minRnds;
         } else if (showProbableFighters) {
-          isInvalid = myBoxAdvantage > 2 || winProb > 0.90;
+          isInvalid = myBoxAdvantage > 2 || winProb > 0.90 || expectedRounds < minRnds;
         }
 
         if (isInvalid) {
