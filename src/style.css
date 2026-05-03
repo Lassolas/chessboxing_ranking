@@ -742,6 +742,7 @@ canvas#grid {
   margin-bottom: 4px;
 }
 .matchmaking-rules {
+  display: none;
   width: 100%;
   max-width: 700px;
   padding: 8px 12px;

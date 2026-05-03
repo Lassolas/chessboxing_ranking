@@ -261,18 +261,32 @@ const oppBoxSliderObj = setupSlider(
   }
 })();
 
+function updateRulesDisplay() {
+  const t = i18n[currentLang];
+  const rules = [];
+  if (showProbableFighters) rules.push(t.rule_selectionable);
+  if (strictMatchmaking)    rules.push(t.rule_strict);
+  if (showEarlyStoppageZone) rules.push(t.rule_early_stoppage);
+  const el = document.getElementById('active-rules-container');
+  el.innerHTML = rules.join('&ensp;·&ensp;');
+  el.style.display = rules.length ? '' : 'none';
+}
+
 document.getElementById('probable-fighters-toggle').addEventListener('change', e => {
   showProbableFighters = e.target.checked;
+  updateRulesDisplay();
   draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 });
 
 document.getElementById('strict-matchmaking-toggle').addEventListener('change', e => {
   strictMatchmaking = e.target.checked;
+  updateRulesDisplay();
   draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 });
 
 document.getElementById('early-stoppage-toggle').addEventListener('change', e => {
   showEarlyStoppageZone = e.target.checked;
+  updateRulesDisplay();
   draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 });
 
@@ -293,6 +307,7 @@ function setLang(lang) {
   oppBoxSliderObj.setValue(oppBox);
 
   updateMine();
+  updateRulesDisplay();
   draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 }
 
@@ -314,4 +329,5 @@ document.querySelectorAll('.round-selector__btn').forEach(btn => {
 
 setLang(currentLang);
 updateMine();
+updateRulesDisplay();
 draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
