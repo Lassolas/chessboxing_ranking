@@ -1,3 +1,5 @@
+import { MATCHMAKING_CONSTRAINTS } from './model.js';
+
 export const i18n = {
   en: {
     tagline: "Where do you stand in the ring?",
@@ -10,7 +12,7 @@ export const i18n = {
     tap_hint: "tap a cell to see that fight",
     selectionable_fighters: "Highlight Selectionable Fighters",
     strict_matchmaking: "Strict Matchmaking",
-    matchmaking_rules: "<b>Selectionable:</b> My boxing adv. max 2. Win prob < 90%.<br><b>Strict:</b> Max boxing diff 1. Win prob 30%–70%. Exp. length ≥ 4.0 rnds.",
+    matchmaking_rules: `<b>Selectionable:</b> My boxing adv. max ${MATCHMAKING_CONSTRAINTS.selectionable.myBoxAdvantageMax}. Win prob < ${MATCHMAKING_CONSTRAINTS.selectionable.maxWinProb * 100}%.<br><b>Strict:</b> Max boxing diff ${MATCHMAKING_CONSTRAINTS.strict.boxDiffMax}. Win prob ${MATCHMAKING_CONSTRAINTS.strict.minWinProb * 100}%–${MATCHMAKING_CONSTRAINTS.strict.maxWinProb * 100}%.`,
     off: "Off",
     even: "50 % (even)",
     fight_card: "Fight Card",
@@ -68,7 +70,7 @@ export const i18n = {
     tap_hint: "appuyez sur une case pour ce combat",
     selectionable_fighters: "Combattants sélectionnables",
     strict_matchmaking: "Matchmaking strict",
-    matchmaking_rules: "<b>Sélectionnables :</b> Mon avantage boxe max 2. Victoire < 90%.<br><b>Strict :</b> Diff. boxe max 1. Victoire 30%–70%. Durée estimée ≥ 4.0 rnds.",
+    matchmaking_rules: `<b>Sélectionnables :</b> Mon avantage boxe max ${MATCHMAKING_CONSTRAINTS.selectionable.myBoxAdvantageMax}. Victoire < ${MATCHMAKING_CONSTRAINTS.selectionable.maxWinProb * 100}%.<br><b>Strict :</b> Diff. boxe max ${MATCHMAKING_CONSTRAINTS.strict.boxDiffMax}. Victoire ${MATCHMAKING_CONSTRAINTS.strict.minWinProb * 100}%–${MATCHMAKING_CONSTRAINTS.strict.maxWinProb * 100}%.`,
     off: "Désactivé",
     even: "50 % (égal)",
     fight_card: "Carte de Combat",

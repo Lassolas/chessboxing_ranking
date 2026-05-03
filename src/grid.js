@@ -1,4 +1,4 @@
-import { pWin, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP, eloOf, getActiveConfig, getWinBreakdown } from './model.js';
+import { pWin, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP, eloOf, getActiveConfig, getWinBreakdown, MATCHMAKING_CONSTRAINTS } from './model.js';
 import { getChessNamed, getBoxingNamed, i18n, currentLang } from './i18n.js';
 
 export function buildLevels(min, max, step) {
@@ -123,9 +123,11 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
         const minRnds = getActiveConfig().minExpectedRounds;
         let isInvalid = false;
         if (strictMatchmaking) {
-          isInvalid = boxDiff > 1 || winProb > 0.70 || winProb < 0.30 || expectedRounds < minRnds;
+          const c = MATCHMAKING_CONSTRAINTS.strict;
+          isInvalid = boxDiff > c.boxDiffMax || winProb > c.maxWinProb || winProb < c.minWinProb || expectedRounds < minRnds;
         } else if (showProbableFighters) {
-          isInvalid = myBoxAdvantage > 2 || winProb > 0.90 || expectedRounds < minRnds;
+          const c = MATCHMAKING_CONSTRAINTS.selectionable;
+          isInvalid = myBoxAdvantage > c.myBoxAdvantageMax || winProb > c.maxWinProb || expectedRounds < minRnds;
         }
 
         if (isInvalid) {
