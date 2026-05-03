@@ -269,7 +269,7 @@ function updateRulesDisplay() {
   if (showEarlyStoppageZone) rules.push(t.rule_early_stoppage);
   const el = document.getElementById('active-rules-container');
   el.innerHTML = rules.join('&ensp;·&ensp;');
-  el.style.display = rules.length ? '' : 'none';
+  el.style.display = rules.length ? 'block' : 'none';
 }
 
 document.getElementById('probable-fighters-toggle').addEventListener('change', e => {
