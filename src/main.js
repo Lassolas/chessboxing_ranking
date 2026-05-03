@@ -15,6 +15,7 @@ let oppChess = 4.0;
 let oppBox = 2.0;
 let showProbableFighters = false;
 let strictMatchmaking = false;
+let showEarlyStoppageZone = false;
 let currentOppIdx = null;
 
 const canvas = document.getElementById('grid');
@@ -225,11 +226,11 @@ window.addEventListener('keydown', e => {
 
 const myChessSliderObj = setupSlider(
   'my-chess-slider', 'my-chess-val', getChessDrumLevels, myChess,
-  val => { myChess = val; updateMine(); draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx); pulseCard(); }
+  val => { myChess = val; updateMine(); draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone); pulseCard(); }
 );
 const myBoxSliderObj = setupSlider(
   'my-box-slider', 'my-box-val', getBoxingDrumLevels, myBox,
-  val => { myBox = val; updateMine(); draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx); pulseCard(); }
+  val => { myBox = val; updateMine(); draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone); pulseCard(); }
 );
 
 const oppChessSliderObj = setupSlider(
@@ -262,12 +263,17 @@ const oppBoxSliderObj = setupSlider(
 
 document.getElementById('probable-fighters-toggle').addEventListener('change', e => {
   showProbableFighters = e.target.checked;
-  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 });
 
 document.getElementById('strict-matchmaking-toggle').addEventListener('change', e => {
   strictMatchmaking = e.target.checked;
-  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
+});
+
+document.getElementById('early-stoppage-toggle').addEventListener('change', e => {
+  showEarlyStoppageZone = e.target.checked;
+  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 });
 
 function setLang(lang) {
@@ -287,7 +293,7 @@ function setLang(lang) {
   oppBoxSliderObj.setValue(oppBox);
 
   updateMine();
-  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 }
 
 document.getElementById('lang-switch').addEventListener('change', e => setLang(e.target.value));
@@ -299,7 +305,7 @@ document.querySelectorAll('.round-selector__btn').forEach(btn => {
     setActiveConfig(btn.dataset.rounds);
     invalidateGrid();
     updateMine();
-    draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
+    draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
     if (currentOppIdx && document.getElementById('opponent-setup').classList.contains('visible')) {
       showFightCard(currentOppIdx, false);
     }
@@ -307,4 +313,4 @@ document.querySelectorAll('.round-selector__btn').forEach(btn => {
 });
 
 updateMine();
-draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx);
+draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);

@@ -100,7 +100,7 @@ export function strokeLine(ctx, pts, col, width, dash) {
   ctx.restore();
 }
 
-export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx) {
+export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone) {
   const t = i18n[currentLang];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -112,7 +112,7 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
     }
   }
 
-  if (showProbableFighters || strictMatchmaking) {
+  if (showProbableFighters || strictMatchmaking || showEarlyStoppageZone) {
     for (let j = 0; j < NY; j++) {
       for (let i = 0; i < NX; i++) {
         const boxDiff = Math.abs(myBox - boxLevels[j]);
@@ -129,10 +129,20 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
           const c = MATCHMAKING_CONSTRAINTS.selectionable;
           isInvalid = myBoxAdvantage > c.myBoxAdvantageMax || winProb > c.maxWinProb;
         }
+        
+        let earlyStoppageColor = null;
+        if (showEarlyStoppageZone && expectedRounds < minRnds) {
+          if (winProb >= 0.5) earlyStoppageColor = 'rgba(40, 200, 40, 0.4)'; // Domination
+          else earlyStoppageColor = 'rgba(200, 40, 40, 0.4)'; // Danger
+        }
 
         if (isInvalid) {
           const { x, y } = cell2px(i, j);
           ctx.fillStyle = 'rgba(12, 12, 20, 0.7)';
+          ctx.fillRect(x, y, CELL, CELL);
+        } else if (earlyStoppageColor) {
+          const { x, y } = cell2px(i, j);
+          ctx.fillStyle = earlyStoppageColor;
           ctx.fillRect(x, y, CELL, CELL);
         }
       }
