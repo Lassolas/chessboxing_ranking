@@ -104,7 +104,7 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
     for (let j = 0; j < NY; j++) {
       for (let i = 0; i < NX; i++) {
         const boxDiff = Math.abs(myBox - boxLevels[j]);
-        const oppBoxAdvantage = boxLevels[j] - myBox;
+        const myBoxAdvantage = myBox - boxLevels[j];
         const { expectedRounds, chessWin, boxWin } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
         const winProb = chessWin + boxWin;
         
@@ -112,7 +112,7 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
         if (strictMatchmaking) {
           isInvalid = boxDiff > 1 || winProb > 0.70 || winProb < 0.30 || expectedRounds < 4.0;
         } else if (showProbableFighters) {
-          isInvalid = oppBoxAdvantage > 2 || winProb > 0.90;
+          isInvalid = myBoxAdvantage > 2 || winProb > 0.90;
         }
 
         if (isInvalid) {
