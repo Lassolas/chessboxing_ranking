@@ -263,10 +263,11 @@ const oppBoxSliderObj = setupSlider(
 
 function updateRulesDisplay() {
   const t = i18n[currentLang];
+  const minRnds = getActiveConfig().minExpectedRounds;
   const rules = [];
-  if (showProbableFighters) rules.push(t.rule_selectionable);
-  if (strictMatchmaking)    rules.push(t.rule_strict);
-  if (showEarlyStoppageZone) rules.push(t.rule_early_stoppage);
+  if (showProbableFighters)  rules.push(t.rule_selectionable);
+  if (strictMatchmaking)     rules.push(t.rule_strict(minRnds));
+  if (showEarlyStoppageZone) rules.push(t.rule_early_stoppage(minRnds));
   const el = document.getElementById('active-rules-container');
   el.innerHTML = rules.join('&ensp;·&ensp;');
   el.style.display = rules.length ? 'block' : 'none';
@@ -320,6 +321,7 @@ document.querySelectorAll('.round-selector__btn').forEach(btn => {
     setActiveConfig(btn.dataset.rounds);
     invalidateGrid();
     updateMine();
+    updateRulesDisplay();
     draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
     if (currentOppIdx && document.getElementById('opponent-setup').classList.contains('visible')) {
       showFightCard(currentOppIdx, false);
