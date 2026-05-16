@@ -647,33 +647,35 @@ canvas#grid {
 #tooltip {
   position: absolute;
   pointer-events: none;
-  background: rgba(12,12,20,0.96);
-  color: var(--text-primary);
-  padding: 6px 10px;
+  background: rgba(12,12,20,0.2);
+  color: #ffffff;
+  padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid var(--border);
-  font: 13px/1.4 var(--font-mono);
+  border: 1px solid rgba(255,255,255,0.15);
+  font: 11px/1.2 var(--font-mono);
   white-space: nowrap;
   transform: translate(-50%, -100%);
   display: none;
   z-index: 10;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   max-width: 90vw;
+  text-shadow: 0 1px 2px #000, 0 0 4px #000, 0 0 6px #000;
 }
 #tooltip .tt-stars { display: inline-block; margin-left: 5px; vertical-align: middle; }
-#tooltip .tt-elo   { color: #c9922a; font-size: 11px; margin-left: 6px; }
-#tooltip .tt-sub   { color: #9090a8; font-size: 11px; }
+#tooltip .tt-elo   { color: #ffd700; font-size: 10px; margin-left: 6px; }
+#tooltip .tt-sub   { color: #e0e0e0; font-size: 10px; }
 #tooltip .tt-line {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 #tooltip .tt-line img {
-  width: 13px;
-  height: 13px;
+  width: 11px;
+  height: 11px;
   object-fit: contain;
-  opacity: 0.78;
+  opacity: 0.9;
   flex-shrink: 0;
+  filter: drop-shadow(0 1px 1px #000);
 }
 
 .legend-row {
