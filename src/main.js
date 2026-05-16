@@ -289,6 +289,8 @@ document.getElementById('early-stoppage-toggle').addEventListener('change', e =>
   showEarlyStoppageZone = e.target.checked;
   updateRulesDisplay();
   draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
+  const legend = document.getElementById('early-stoppage-legend');
+  if (legend) legend.style.display = e.target.checked ? 'flex' : 'none';
 });
 
 function setLang(lang) {
