@@ -2,10 +2,6 @@ export const CHESS_MIN = 0, CHESS_MAX = 7, CHESS_STEP = 0.2;
 export const BOX_MIN = 0, BOX_MAX = 5, BOX_STEP = 0.2;
 
 export const MATCHMAKING_CONSTRAINTS = {
-  selectionable: {
-    myBoxAdvantageMax: 1.5,
-    maxWinProb: 0.80
-  },
   strict: {
     boxDiffMax: 1.5,
     minWinProb: 0.25,

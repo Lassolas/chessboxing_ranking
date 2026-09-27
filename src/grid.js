@@ -100,7 +100,7 @@ export function strokeLine(ctx, pts, col, width, dash) {
   ctx.restore();
 }
 
-export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone) {
+export function draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx) {
   const t = i18n[currentLang];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -112,37 +112,28 @@ export function draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMa
     }
   }
 
-  if (showProbableFighters || strictMatchmaking || showEarlyStoppageZone) {
-    for (let j = 0; j < NY; j++) {
-      for (let i = 0; i < NX; i++) {
-        const boxDiff = Math.abs(myBox - boxLevels[j]);
-        const myBoxAdvantage = myBox - boxLevels[j];
-        const { expectedRounds, chessWin, boxWin } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
-        const winProb = chessWin + boxWin;
+  // Early stoppage zone is always shown; the matchmaking filter dims bad
+  // matchups on top of it, so both read together.
+  const minRnds = getActiveConfig().minExpectedRounds;
+  for (let j = 0; j < NY; j++) {
+    for (let i = 0; i < NX; i++) {
+      const boxDiff = Math.abs(myBox - boxLevels[j]);
+      const { expectedRounds, chessWin, boxWin } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
+      const winProb = chessWin + boxWin;
+      const { x, y } = cell2px(i, j);
 
-        const minRnds = getActiveConfig().minExpectedRounds;
-        let isInvalid = false;
-        if (strictMatchmaking) {
-          const c = MATCHMAKING_CONSTRAINTS.strict;
-          isInvalid = boxDiff > c.boxDiffMax || winProb > c.maxWinProb || winProb < c.minWinProb || expectedRounds < minRnds;
-        } else if (showProbableFighters) {
-          const c = MATCHMAKING_CONSTRAINTS.selectionable;
-          isInvalid = myBoxAdvantage > c.myBoxAdvantageMax || winProb > c.maxWinProb;
-        }
-        
-        let earlyStoppageColor = null;
-        if (showEarlyStoppageZone && expectedRounds < minRnds) {
-          if (winProb >= 0.5) earlyStoppageColor = 'rgba(40, 200, 40, 0.4)'; // Domination
-          else earlyStoppageColor = 'rgba(200, 40, 40, 0.4)'; // Danger
-        }
+      if (expectedRounds < minRnds) {
+        ctx.fillStyle = winProb >= 0.5
+          ? 'rgba(40, 200, 40, 0.4)'  // Domination
+          : 'rgba(200, 40, 40, 0.4)'; // Danger
+        ctx.fillRect(x, y, CELL, CELL);
+      }
 
+      if (strictMatchmaking) {
+        const c = MATCHMAKING_CONSTRAINTS.strict;
+        const isInvalid = boxDiff > c.boxDiffMax || winProb > c.maxWinProb || winProb < c.minWinProb || expectedRounds < minRnds;
         if (isInvalid) {
-          const { x, y } = cell2px(i, j);
-          ctx.fillStyle = 'rgba(12, 12, 20, 0.7)';
-          ctx.fillRect(x, y, CELL, CELL);
-        } else if (earlyStoppageColor) {
-          const { x, y } = cell2px(i, j);
-          ctx.fillStyle = earlyStoppageColor;
+          ctx.fillStyle = 'rgba(12, 12, 20, 0.6)';
           ctx.fillRect(x, y, CELL, CELL);
         }
       }
