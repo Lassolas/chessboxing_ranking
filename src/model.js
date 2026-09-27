@@ -127,6 +127,10 @@ export const ROUND_CONFIGS = {
 //                higher-level chess games last longer and go to decision more.
 //   boxStoppage  boxing round end rate k × e^(−boxStoppage·(n − 2)):
 //                higher-level boxers stop each other more often.
+//   boxPace      boxing round end rate also × boxPace × e^(−boxGap·|Δbox|):
+//   boxGap       close boxers rarely stop each other early (fights go long),
+//                a big boxing mismatch ends in a quick knockout. Tuned on a
+//                test set of expert-judged matchups.
 //   chessGap     chess round end rate also × e^(−chessGap·|Δchess|): a big
 //                chess mismatch collapses fast, whatever the level. Not in
 //                round 1: players stall in the opening, mates there are rare.
@@ -134,7 +138,7 @@ export const ROUND_CONFIGS = {
 //                (m ≥ 5), shrinking to a fifth of it for total beginners.
 //                0.1 ≈ white wins 55 % of equal fights decided at the board.
 // With chessLength = boxStoppage = 0 the model is the fitted club-level one.
-export const LEVEL = { chessLength: 0.2, chessGap: 0.5, boxStoppage: 0.4, whiteEdge: 0.1 };
+export const LEVEL = { chessLength: 0.2, chessGap: 0.5, boxStoppage: 0.4, boxPace: 4, boxGap: 0.9, whiteEdge: 0.1 };
 
 let _activeKey = '7';
 // Your pieces: +1 white, -1 black, 0 not drawn yet (average of both).
@@ -157,11 +161,12 @@ export const whiteEdgeAt = m => LEVEL.whiteEdge * Math.min(1, 0.2 + 0.8 * m / 5)
 export const kChessFactor = m => Math.exp(LEVEL.chessLength * (m - 3));
 export const kGapFactor = dChess => Math.exp(-LEVEL.chessGap * Math.abs(dChess));
 export const kBoxFactor = n => Math.exp(-LEVEL.boxStoppage * (n - 2));
+export const kBoxGapFactor = dBox => LEVEL.boxPace * Math.exp(-LEVEL.boxGap * Math.abs(dBox));
 
 function matchupProbsForSide(params, dChess, dBox, m, n, side) {
   const w = side * whiteEdgeAt(m);
   const kChess = kChessFactor(m), kGap = kGapFactor(dChess);
-  const kBox = kBoxFactor(n);
+  const kBox = kBoxFactor(n) * kBoxGapFactor(dBox);
   let cont = 1, cumA = 0, cumB = 0;
   const out = [];
   params.forEach(({ type, a, k: k0 }, r) => {

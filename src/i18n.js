@@ -107,9 +107,11 @@ P(you win the fight) = sum over all rounds</span>
                × e^(−0.5 × |chess gap|) from round 3: a big mismatch collapses fast
                                         (not round 1: players stall in the opening)
 boxing rounds: k × e^(−0.4 × (n − 2))  more stoppages between strong boxers
+               × 4 × e^(−0.9 × |boxing gap|)  close boxers go long,
+                                        a big mismatch is a quick knockout
 white edge:    s + w for white, s − w for black
                w = 0.1 × min(1, 0.2 + 0.8 × m / 5)</span>
-<p>In this fight: m = <b>${v.m}</b>, chess gap <b>${v.gap}</b> levels, n = <b>${v.n}</b>, so chess k × <b>${v.kc}</b> from round 3, boxing k × <b>${v.kb}</b> and white edge w = <b>${v.w}</b>.</p>
+<p>In this fight: m = <b>${v.m}</b>, chess gap <b>${v.gap}</b> levels, n = <b>${v.n}</b>, boxing gap <b>${v.bgap}</b>, so chess k × <b>${v.kc}</b> from round 3, boxing k × <b>${v.kb}</b> and white edge w = <b>${v.w}</b>.</p>
 <h3>6. Colours</h3>
 <p>With White or Black selected, the white edge goes to you or to your opponent. "Not drawn" averages both cases.</p>
 <h3>7. Stars</h3>
@@ -259,9 +261,11 @@ P(vous gagnez le combat)  = somme sur tous les rounds</span>
                   × e^(−0,5 × |écart échecs|) dès le round 3 : un gros écart finit vite
                                              (pas au round 1 : on temporise dans l'ouverture)
 rounds de boxe :  k × e^(−0,4 × (n − 2))   plus d'arrêts entre forts boxeurs
+                  × 4 × e^(−0,9 × |écart boxe|)  boxeurs proches : combat long,
+                                             gros écart : K.-O. rapide
 avantage blancs : s + w pour les blancs, s − w pour les noirs
                   w = 0,1 × min(1 ; 0,2 + 0,8 × m / 5)</span>
-<p>Dans ce combat : m = <b>${v.m}</b>, écart d'échecs <b>${v.gap}</b> niveaux, n = <b>${v.n}</b>, donc k échecs × <b>${v.kc}</b> dès le round 3, k boxe × <b>${v.kb}</b> et avantage blancs w = <b>${v.w}</b>.</p>
+<p>Dans ce combat : m = <b>${v.m}</b>, écart d'échecs <b>${v.gap}</b> niveaux, n = <b>${v.n}</b>, écart de boxe <b>${v.bgap}</b>, donc k échecs × <b>${v.kc}</b> dès le round 3, k boxe × <b>${v.kb}</b> et avantage blancs w = <b>${v.w}</b>.</p>
 <h3>6. Couleurs</h3>
 <p>Avec Blancs ou Noirs sélectionné, l'avantage des blancs va à vous ou à votre adversaire. « Pas tiré » fait la moyenne des deux cas.</p>
 <h3>7. Étoiles</h3>

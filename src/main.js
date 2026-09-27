@@ -1,6 +1,6 @@
 import './style.css';
 import { i18n, currentLang, setLangState } from './i18n.js';
-import { eloOf, levelOfElo, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kGapFactor, kBoxFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { eloOf, levelOfElo, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kGapFactor, kBoxFactor, kBoxGapFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 import { chessLevels, boxLevels, starsOf, starsAt, rankAt, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
 import {
   chessCategory, boxCategory, chessLabel, boxLabel,
@@ -168,10 +168,10 @@ function renderFight() {
 function renderMethod(rows) {
   const tt = t();
   const m = (myChess + oppChess) / 2, n = (myBox + oppBox) / 2;
-  const kc = kChessFactor(m) * kGapFactor(myChess - oppChess), kb = kBoxFactor(n);
+  const kc = kChessFactor(m) * kGapFactor(myChess - oppChess), kb = kBoxFactor(n) * kBoxGapFactor(myBox - oppBox);
   const num = v => currentLang === 'fr' ? String(v).replace('.', ',') : String(v);
   $('method-body').innerHTML = tt.method_html({
-    m: num(m.toFixed(1)), n: num(n.toFixed(1)), gap: num(Math.abs(myChess - oppChess).toFixed(2)),
+    m: num(m.toFixed(1)), n: num(n.toFixed(1)), gap: num(Math.abs(myChess - oppChess).toFixed(2)), bgap: num(Math.abs(myBox - oppBox).toFixed(1)),
     kc: num(kc.toFixed(2)), kb: num(kb.toFixed(2)), w: num(whiteEdgeAt(m).toFixed(3))
   });
   const params = getActiveConfig().params;
