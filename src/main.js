@@ -11,7 +11,7 @@ import {
 
 let myChess = 3.0;
 let myBox = 2.0;
-let oppChess = 4.0;
+let oppChess = 3.0; // ≈1500 ELO (1486)
 let oppBox = 2.0;
 let showProbableFighters = false;
 let strictMatchmaking = false;
@@ -334,4 +334,7 @@ document.querySelectorAll('.round-selector__btn').forEach(btn => {
 setLang(currentLang);
 updateMine();
 updateRulesDisplay();
-draw(canvas, ctx, myChess, myBox, showProbableFighters, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
+showFightCard({
+  i: Math.round((oppChess - CHESS_MIN) / CHESS_STEP),
+  j: Math.round((oppBox - BOX_MIN) / BOX_STEP)
+}, false);
