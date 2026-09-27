@@ -1,6 +1,6 @@
 import './style.css';
 import { i18n, currentLang, setLangState } from './i18n.js';
-import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, settings, setSetting, DEFAULT_SETTINGS, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kBoxFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 import { chessLevels, boxLevels, starsOf, rankOf, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
 import {
   chessCategory, boxCategory, getChessDrumLevels, getBoxingDrumLevels,
@@ -119,7 +119,6 @@ function keyRounds(rows, key) {
 
 function renderFight() {
   const tt = t();
-  const dC = myChess - oppChess, dB = myBox - oppBox;
   const p = pWin(myChess, myBox, oppChess, oppBox);
   $('win-pct').textContent = pct(p);
   const [label, cls] = verdict(p);
@@ -161,6 +160,31 @@ function renderFight() {
   setLever('train-chess', pChess, v => v, pct, pChess === null ? '' : gain(pChess));
 
   renderRounds(rows);
+  renderMethod(rows);
+}
+
+function renderMethod(rows) {
+  const tt = t();
+  const m = (myChess + oppChess) / 2, n = (myBox + oppBox) / 2;
+  const kc = kChessFactor(m), kb = kBoxFactor(n);
+  const num = v => currentLang === 'fr' ? String(v).replace('.', ',') : String(v);
+  $('method-body').innerHTML = tt.method_html({
+    m: num(m.toFixed(1)), n: num(n.toFixed(1)),
+    kc: num(kc.toFixed(2)), kb: num(kb.toFixed(2)), w: num(whiteEdgeAt(m).toFixed(3))
+  });
+  const params = getActiveConfig().params;
+  const fmtK = k => k >= 100 ? Math.round(k) : k >= 10 ? k.toFixed(1) : k.toFixed(2);
+  $('method-table').innerHTML =
+    `<thead><tr><th>${tt.mt_round}</th><th>${tt.mt_type}</th><th>${tt.mt_a}</th><th>${tt.mt_k}</th><th>${tt.mt_k_fight}</th><th>${tt.mt_win}</th><th>${tt.mt_loss}</th><th>${tt.mt_cont}</th></tr></thead><tbody>` +
+    rows.map((r, i) => {
+      const { type, a, k } = params[i];
+      const kHere = k * (type === 'chess' ? kc : kb);
+      return `<tr${r.win + r.loss >= 0.15 ? ' class="hl"' : ''}><td>${r.label}</td><td>${type === 'chess' ? tt.mt_chess : tt.mt_box}</td>` +
+        `<td>${num(a.toFixed(2))}</td><td>${num(fmtK(k))}</td><td>${num(fmtK(kHere))}</td>` +
+        `<td>${num((r.win * 100).toFixed(1))}%</td><td>${num((r.loss * 100).toFixed(1))}%</td><td>${num((r.cont * 100).toFixed(1))}%</td></tr>`;
+    }).join('') + '</tbody>';
+  const side = getSide() === 1 ? tt.side_white : getSide() === -1 ? tt.side_black : tt.side_none;
+  $('method-table-note').textContent = tt.mt_note(params.length - 1, side);
 }
 
 function renderRounds(rows) {
@@ -356,29 +380,6 @@ function setLang(lang) {
 }
 
 $('lang-switch').addEventListener('change', e => setLang(e.target.value));
-
-// Model settings ("How the numbers work")
-const settingInputs = [...document.querySelectorAll('[data-setting]')];
-function showSettings() {
-  settingInputs.forEach(el => {
-    el.value = settings[el.dataset.setting];
-    $('out-' + el.dataset.setting).textContent = (+el.value).toFixed(2);
-  });
-}
-function applySettings() {
-  invalidateGrid();
-  renderAll();
-}
-settingInputs.forEach(el => {
-  el.addEventListener('input', () => { $('out-' + el.dataset.setting).textContent = (+el.value).toFixed(2); });
-  el.addEventListener('change', () => { setSetting(el.dataset.setting, +el.value); applySettings(); });
-});
-$('settings-reset').addEventListener('click', () => {
-  Object.entries(DEFAULT_SETTINGS).forEach(([k, v]) => setSetting(k, v));
-  showSettings();
-  applySettings();
-});
-showSettings();
 
 document.querySelectorAll('input[name="side"]').forEach(r => r.addEventListener('change', e => {
   setSide(+e.target.value);

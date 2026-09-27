@@ -119,9 +119,9 @@ export const ROUND_CONFIGS = {
   },
 };
 
-// ── Level-dependent settings ────────────────────────────────────────────────
+// ── Level adjustments ───────────────────────────────────────────────────────
 // The fitted round parameters describe a club-level fight (chess ≈ 1486 ELO,
-// boxing ≈ Amateur). These settings bend them with the fighters' average level
+// boxing ≈ Amateur). These values bend them with the fighters' average level
 // (m = average chess level 0–7, n = average boxing level 0–5):
 //   chessLength  chess round end rate k × e^(chessLength·(m − 3)):
 //                higher-level chess games last longer and go to decision more.
@@ -131,8 +131,7 @@ export const ROUND_CONFIGS = {
 //                (m ≥ 5), shrinking to a fifth of it for total beginners.
 //                0.1 ≈ white wins 55 % of equal fights decided at the board.
 // With chessLength = boxStoppage = 0 the model is the fitted club-level one.
-export const DEFAULT_SETTINGS = { chessLength: 0.2, boxStoppage: 0.4, whiteEdge: 0.1 };
-export const settings = { ...DEFAULT_SETTINGS };
+export const LEVEL = { chessLength: 0.2, boxStoppage: 0.4, whiteEdge: 0.1 };
 
 let _activeKey = '7';
 // Your pieces: +1 white, -1 black, 0 not drawn yet (average of both).
@@ -149,17 +148,16 @@ export function setActiveConfig(key) {
   matchupProbCache.clear();
 }
 
-export function setSetting(name, value) {
-  settings[name] = value;
-  matchupProbCache.clear();
-}
+export const whiteEdgeAt = m => LEVEL.whiteEdge * Math.min(1, 0.2 + 0.8 * m / 5);
 
-const whiteEdgeAt = m => settings.whiteEdge * Math.min(1, 0.2 + 0.8 * m / 5);
+// Multipliers on the fitted k for a fight with average levels m (chess), n (boxing).
+export const kChessFactor = m => Math.exp(LEVEL.chessLength * (m - 3));
+export const kBoxFactor = n => Math.exp(-LEVEL.boxStoppage * (n - 2));
 
 function matchupProbsForSide(params, dChess, dBox, m, n, side) {
   const w = side * whiteEdgeAt(m);
-  const kChess = Math.exp(settings.chessLength * (m - 3));
-  const kBox = Math.exp(-settings.boxStoppage * (n - 2));
+  const kChess = kChessFactor(m);
+  const kBox = kBoxFactor(n);
   let cont = 1, cumA = 0, cumB = 0;
   const out = [];
   for (const { type, a, k: k0 } of params) {

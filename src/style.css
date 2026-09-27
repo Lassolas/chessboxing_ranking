@@ -591,20 +591,28 @@ button.fighter-row:hover { border-color: #1f3a5c; }
 .piece--both { background: linear-gradient(90deg, #f4f1e8 50%, #111 50%); }
 .verdict__colors { font-size: 13px; margin-top: 6px; min-height: 18px; }
 
-/* ── MODEL SETTINGS ── */
-.settings { display: flex; flex-direction: column; gap: 14px; padding-top: 4px; }
-.setting { display: flex; flex-direction: column; gap: 2px; }
-.setting__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 14px; font-weight: 600; }
-.setting__head output { font-family: var(--font-display); font-size: 18px; color: var(--gold-bright); }
-.btn-ghost {
-  align-self: flex-start;
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: none;
-  color: var(--text-primary);
-  font: 500 14px var(--font-body);
-  cursor: pointer;
+/* ── HOW THE NUMBERS WORK ── */
+.method { display: flex; flex-direction: column; gap: 12px; font-size: 14px; line-height: 1.55; color: var(--text-secondary); }
+.method h3 { margin: 6px 0 0; font-size: 14px; color: var(--text-primary); }
+.method p { margin: 0; }
+.method b { color: var(--text-primary); }
+.method code, .method .formula {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--gold-bright);
 }
-.btn-ghost:hover { border-color: var(--gold-dim); }
+.method .formula {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--bg-panel-alt);
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+.method-table-wrap { overflow-x: auto; }
+.method-table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.method-table th, .method-table td { padding: 6px 6px; text-align: right; border-bottom: 1px solid #1d1d28; white-space: nowrap; }
+.method-table th { color: var(--text-secondary); font-weight: 600; }
+.method-table th:first-child, .method-table td:first-child,
+.method-table th:nth-child(2), .method-table td:nth-child(2) { text-align: left; }
+.method-table .hl { background: rgba(245, 200, 66, 0.07); }

@@ -86,14 +86,47 @@ export const i18n = {
     you: "You",
     even: "50 % (even)",
     details_method: "How the numbers work",
-    method_text: "Each round is modelled from the gap between the two fighters in that discipline, plus a small edge for white in chess rounds. Parameters were fitted on a 7-round data table for club-level fighters; the other formats are derived from it, and the settings below adapt it to other levels. When colours are not drawn yet, the chances average white and black. Stars rank every fighter profile by how many others it beats with more than 50 %: being about 1 star ahead or more always makes you the favourite.",
-    set_chess_length: "Chess games last longer at higher level",
-    set_chess_length_hint: "0 = same game length at every level. Higher = beginners finish at the board early, strong players go to the ring and the decision more.",
-    set_box_stoppage: "More stoppages at higher boxing level",
-    set_box_stoppage_hint: "0 = same stoppage rate at every level. Higher = novices rarely stop each other, semi-pros and pros often do.",
-    set_white_edge: "White edge for strong players",
-    set_white_edge_hint: "Edge for white per chess round from Expert level up, a fifth of it for total beginners. 0.1 ≈ white wins 55 % of equal fights decided at the board.",
-    set_reset: "Reset to defaults",
+    method_html: (v) => `
+<h3>1. Two ratings on an even scale</h3>
+<p>Chess uses ELO: one chess level is 229 ELO (800 to 2400). Boxing uses levels 0 to 5 (Novice to Professional). Both scales are even: each step multiplies your odds by the same amount, whatever level you start from.</p>
+<h3>2. Every round has three outcomes</h3>
+<p>You win the round (at the board: mate, time or resignation; in the ring: stoppage), your opponent wins it, or the fight goes on. Their chances are in the ratio:</p>
+<span class="formula">you win : they win : fight goes on = e^(+s) : e^(−s) : k
+s = a × (your level − their level)
+    chess levels in chess rounds, boxing levels in boxing rounds</span>
+<p><b>a</b> is how much the level gap matters in that round. <b>k</b> is how hard it is to finish the fight in that round: early chess rounds have a large k because games rarely end there. The final boxing decision has k = 0, so someone always wins it on points.</p>
+<h3>3. Rounds are chained</h3>
+<span class="formula">P(you win round r)   = P(still on before r) × e^s / (e^s + e^−s + k)
+P(still on after r)  = P(still on before r) × k / (e^s + e^−s + k)
+P(you win the fight) = sum over all rounds</span>
+<h3>4. Where the round values come from</h3>
+<p>7 rounds: fitted on a table of per-round probabilities. 11 rounds: set by hand. 9 and 5 rounds: derived from those two. Some chess rounds carry an extra bias, such as round 3 in 5-round fights and round 5 in 7-round fights, where a stronger chess player can force a win on time. More rounds give the better boxer more chances in the ring and the weaker chess player more time to stall.</p>
+<h3>5. Adjusted to the fighters' level</h3>
+<p>The fitted values describe a club-level fight (about 1486 ELO, Amateur boxers). Other levels use the two fighters' average chess level <b>m</b> (0–7) and boxing level <b>n</b> (0–5):</p>
+<span class="formula">chess rounds:  k × e^(0.2 × (m − 3))    longer games between strong players
+boxing rounds: k × e^(−0.4 × (n − 2))  more stoppages between strong boxers
+white edge:    s + w for white, s − w for black
+               w = 0.1 × min(1, 0.2 + 0.8 × m / 5)</span>
+<p>In this fight: m = <b>${v.m}</b>, n = <b>${v.n}</b>, so chess k × <b>${v.kc}</b>, boxing k × <b>${v.kb}</b> and white edge w = <b>${v.w}</b>.</p>
+<h3>6. Colours</h3>
+<p>With White or Black selected, the white edge goes to you or to your opponent. "Not drawn" averages both cases.</p>
+<h3>7. Stars</h3>
+<p>Every possible profile (36 chess × 26 boxing steps) fights every other one with colours not drawn. Profiles are ranked by how many others they beat with more than 50 %, and that rank becomes 0 to 5 stars. "More stars always wins" cannot hold for every pair because the model has rock-paper-scissors cycles, but being about 1.1 stars ahead or more always makes you the favourite.</p>
+<h3>8. This fight, round by round</h3>`,
+    mt_round: "Round",
+    mt_type: "Type",
+    mt_a: "a",
+    mt_k: "k fitted",
+    mt_k_fight: "k here",
+    mt_win: "You win",
+    mt_loss: "They win",
+    mt_cont: "Still on",
+    mt_chess: "Chess",
+    mt_box: "Boxing",
+    mt_note: (fmt, side) => `${fmt} rounds, ${side}. "You win" and "They win" are the chances that the fight ends in that round with that winner.`,
+    side_white: "you play white",
+    side_black: "you play black",
+    side_none: "colours not drawn",
 
     // Fighters
     fighters_title: "Fighters",
@@ -203,14 +236,47 @@ export const i18n = {
     you: "Vous",
     even: "50 % (égal)",
     details_method: "Comment sont calculés les chiffres",
-    method_text: "Chaque round est modélisé à partir de l'écart entre les deux combattants dans cette discipline, plus un léger avantage aux blancs dans les rounds d'échecs. Les paramètres ont été ajustés sur une table de données en 7 rounds pour des combattants de niveau club ; les autres formats en sont dérivés, et les réglages ci-dessous l'adaptent aux autres niveaux. Tant que les couleurs ne sont pas tirées, les chances font la moyenne blancs/noirs. Les étoiles classent chaque profil selon le nombre d'autres profils qu'il bat à plus de 50 % : avec environ 1 étoile d'avance ou plus, vous êtes toujours favori.",
-    set_chess_length: "Parties d'échecs plus longues à haut niveau",
-    set_chess_length_hint: "0 = même durée de partie à tous les niveaux. Plus haut = les débutants finissent vite sur l'échiquier, les forts joueurs vont plus souvent au ring et à la décision.",
-    set_box_stoppage: "Plus d'arrêts à haut niveau de boxe",
-    set_box_stoppage_hint: "0 = même taux d'arrêt à tous les niveaux. Plus haut = les novices s'arrêtent rarement, les semi-pros et pros souvent.",
-    set_white_edge: "Avantage des blancs pour les forts joueurs",
-    set_white_edge_hint: "Avantage des blancs par round d'échecs à partir du niveau Expert, un cinquième pour les grands débutants. 0,1 ≈ les blancs gagnent 55 % des combats égaux décidés sur l'échiquier.",
-    set_reset: "Réinitialiser",
+    method_html: (v) => `
+<h3>1. Deux classements sur une échelle régulière</h3>
+<p>Les échecs utilisent l'ELO : un niveau d'échecs vaut 229 ELO (800 à 2400). La boxe utilise des niveaux de 0 à 5 (Novice à Professionnel). Les deux échelles sont régulières : chaque palier multiplie vos chances par le même facteur, quel que soit votre niveau de départ.</p>
+<h3>2. Chaque round a trois issues</h3>
+<p>Vous gagnez le round (sur l'échiquier : mat, temps ou abandon ; sur le ring : arrêt), votre adversaire le gagne, ou le combat continue. Leurs chances sont dans le rapport :</p>
+<span class="formula">vous gagnez : il gagne : le combat continue = e^(+s) : e^(−s) : k
+s = a × (votre niveau − son niveau)
+    niveau d'échecs aux rounds d'échecs, de boxe aux rounds de boxe</span>
+<p><b>a</b> mesure l'importance de l'écart de niveau dans ce round. <b>k</b> mesure la difficulté de finir le combat dans ce round : les premiers rounds d'échecs ont un k élevé car les parties s'y terminent rarement. La décision finale de boxe a k = 0 : quelqu'un la gagne toujours aux points.</p>
+<h3>3. Les rounds s'enchaînent</h3>
+<span class="formula">P(vous gagnez au round r) = P(en cours avant r) × e^s / (e^s + e^−s + k)
+P(en cours après r)       = P(en cours avant r) × k / (e^s + e^−s + k)
+P(vous gagnez le combat)  = somme sur tous les rounds</span>
+<h3>4. D'où viennent les valeurs des rounds</h3>
+<p>7 rounds : ajustés sur une table de probabilités par round. 11 rounds : fixés à la main. 9 et 5 rounds : dérivés des deux. Certains rounds d'échecs ont un biais en plus, comme le round 3 en 5 rounds et le round 5 en 7 rounds, où un meilleur joueur d'échecs peut forcer la victoire au temps. Plus de rounds donnent plus d'occasions au meilleur boxeur et plus de temps au joueur d'échecs plus faible pour gagner du temps.</p>
+<h3>5. Ajusté au niveau des combattants</h3>
+<p>Les valeurs ajustées décrivent un combat de niveau club (environ 1486 ELO, boxeurs Amateur). Pour les autres niveaux, on utilise le niveau moyen d'échecs <b>m</b> (0–7) et de boxe <b>n</b> (0–5) des deux combattants :</p>
+<span class="formula">rounds d'échecs : k × e^(0,2 × (m − 3))    parties plus longues entre forts joueurs
+rounds de boxe :  k × e^(−0,4 × (n − 2))   plus d'arrêts entre forts boxeurs
+avantage blancs : s + w pour les blancs, s − w pour les noirs
+                  w = 0,1 × min(1 ; 0,2 + 0,8 × m / 5)</span>
+<p>Dans ce combat : m = <b>${v.m}</b>, n = <b>${v.n}</b>, donc k échecs × <b>${v.kc}</b>, k boxe × <b>${v.kb}</b> et avantage blancs w = <b>${v.w}</b>.</p>
+<h3>6. Couleurs</h3>
+<p>Avec Blancs ou Noirs sélectionné, l'avantage des blancs va à vous ou à votre adversaire. « Pas tiré » fait la moyenne des deux cas.</p>
+<h3>7. Étoiles</h3>
+<p>Chaque profil possible (36 paliers d'échecs × 26 de boxe) affronte tous les autres, couleurs non tirées. Les profils sont classés selon le nombre d'autres profils qu'ils battent à plus de 50 %, et ce rang donne 0 à 5 étoiles. « Plus d'étoiles gagne toujours » ne peut pas être vrai pour chaque paire car le modèle a des cycles pierre-feuille-ciseaux, mais avec environ 1,1 étoile d'avance ou plus, vous êtes toujours favori.</p>
+<h3>8. Ce combat, round par round</h3>`,
+    mt_round: "Round",
+    mt_type: "Type",
+    mt_a: "a",
+    mt_k: "k ajusté",
+    mt_k_fight: "k ici",
+    mt_win: "Vous",
+    mt_loss: "Adv.",
+    mt_cont: "En cours",
+    mt_chess: "Échecs",
+    mt_box: "Boxe",
+    mt_note: (fmt, side) => `${fmt} rounds, ${side}. « Vous » et « Adv. » sont les chances que le combat se termine à ce round avec ce vainqueur.`,
+    side_white: "vous avez les blancs",
+    side_black: "vous avez les noirs",
+    side_none: "couleurs non tirées",
 
     fighters_title: "Combattants",
     fighters_hint: "Touchez un combattant pour l'affronter.",
