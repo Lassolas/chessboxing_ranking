@@ -459,7 +459,7 @@ reported without failing).
 |---|---|---|---|---|---|---|
 | 1 | 5 | 1900 / 0.5 | 1200 / 3 | B, KO in the first boxing round | 6 % | B by KO in R2 |
 | 2 | 11 | 1900 / 0.5 | 1200 / 3 | same as 1, KO in the second boxing round similar or lower | 1 % | B by KO in R2 |
-| 3 | 7 | 1600 / 2 | 1500 / 3 | B clear, long fight, KO around R6; a round-5 chess finish should be rare | 40 % | A at the board in R7, B by KO in R2, B by KO in R6 (8 %) |
+| 3 | 7 | 1600 / 2 | 1500 / 3 | B obvious favourite, long fight, KO around R6; a round-5 chess finish should be rare | 40 % | A at the board in R7, B by KO in R2, B by KO in R6 (8 %) |
 | 4 | 7 | 2200 / 1 | 1300 / 2 | A, on time in R5 | 81 % | A at the board, R3/R5 |
 | 5 | 9 | 1400 / 4 | 2000 / 3 | B, tough, at the board in R5 or R7 | 48 % | B at the board R5/R7, A by KO R2 |
 | 6 | 7 | 1800 / 2 | 1800 / 2.5 | B clear, tough | 38 % | long, board in R7 or decision |
@@ -470,13 +470,9 @@ reported without failing).
 | 11 | 5 | 1700 / 3 | 1300 / 4 | A | 62 % | A at the board |
 | 12 | 11 | 1700 / 3 | 1300 / 4 | balanced, B small favourite | 42 % | balanced, long |
 
-Still off after tuning:
-
-- **Case 3:** B is favourite (60 %) but not a clear one.
-- **Case 3, how it ends:** B should win by boxing late (around round 6). Round 6
-  was made more decisive (k 38.3 → 15): B now wins 60 % and 8 % of fights end
-  with B's knockout in round 6, but the chess player still often finishes in
-  round 7. Going further pushes case 10 past 55 % for A, so it stops here.
+All 12 cases now match. Case 3 was clarified: B is the obvious favourite, not
+a lopsided one, so B at 60 % is right. The model still ends it more often at
+the board in round 7 than by B's knockout around round 6.
 
 ## 11. Known limitations
 
