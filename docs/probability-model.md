@@ -411,7 +411,7 @@ Using chess level / 7 and boxing level / 5 (both 0–1):
 
 ### 8.5 Chances map filters
 
-- **Good Matchmaking for You:** dims opponents unless boxing gap ≤ 1.5, win chance
+- **Good Matchmaking:** dims opponents unless boxing gap ≤ 1.5, win chance
   25–75 % and expected length ≥ the format's threshold (3 / 4 / 5 / 6 rounds for
   5 / 7 / 9 / 11).
 - **Early Stoppage Zone:** colours opponents whose expected length is below that
