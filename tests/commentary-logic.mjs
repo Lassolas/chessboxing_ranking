@@ -88,6 +88,15 @@ for (const lang of ['en', 'fr']) {
   }
 }
 
+// Every line speaks to you, the fighter.
+for (const lang of ['en', 'fr']) {
+  const all = [];
+  const walk = o => { if (typeof o === 'string') all.push(o); else if (o && o.t) all.push(o.t); else if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') Object.values(o).forEach(walk); };
+  walk(COMMENTARY[lang]);
+  const re = lang === 'en' ? /^(Disaster! )?(You|Your)\b/ : /^(Catastrophe ! )?(Vous|Votre|Vos)\b/;
+  all.filter(t => !re.test(t)).forEach(t => errors.push(`${lang}: line not addressed to the fighter: ${t}`));
+}
+
 const unique = [...new Set(errors)];
 unique.slice(0, 20).forEach(e => console.log('FAIL', e));
 console.log(unique.length ? `\ncommentary: ${errors.length} problems (${unique.length} distinct)` : `commentary: ok (${2 * 4 * MATCHUPS.length * FIGHTS} simulated fights checked)`);

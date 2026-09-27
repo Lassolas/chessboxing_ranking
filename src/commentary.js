@@ -1,4 +1,5 @@
-// Commentary for the "Simulate fight" button, from your point of view.
+// Commentary for the "Simulate fight" button, spoken to you, the fighter:
+// every line says what you do or what happens to you.
 //
 // The fight's outcome is drawn first from the model (see simulateFight in
 // main.js). This module then tells a story that stays consistent with it:
@@ -22,171 +23,165 @@ const c = (t, you = 0, them = 0) => ({ t, you, them });
 export const COMMENTARY = {
   en: {
     chess: {
-      // First chess round, by who is better after it.
       open: {
         even: [
-          'Quiet opening, both keep it solid.',
-          'Both players blitz out their preparation.',
-          'A symmetrical opening, nobody wants to take risks.',
-          'Main-line theory, both know it well.',
-          'A calm start, both develop their pieces.',
-          'An offbeat opening, both think carefully.',
-          'Solid pawn structures on both sides.',
-          'Nobody castles yet; a careful first round.'
+          'You keep the opening quiet and solid.',
+          'You blitz out your preparation, and so does your opponent.',
+          'You play a symmetrical opening and take no risks.',
+          'You follow main-line theory. Nothing new yet.',
+          'You develop your pieces calmly. Level.',
+          'You face an offbeat opening and think carefully.',
+          'You set up a solid pawn structure. Level.',
+          'You keep your king in the centre for now. A careful first round.'
         ],
         you: [
-          'Your opening preparation hits: you get the better position.',
-          'You grab space early and your opponent looks passive.',
-          'Your opponent spends a lot of time in the opening.',
+          'Your preparation hits: you get the better position.',
+          'You grab space early; your opponent looks passive.',
+          'You play fast while your opponent spends time in the opening.',
           'You come out of the opening with the initiative.',
-          'Your opponent misplays the opening. Small edge for you.',
-          'Better development for you after the opening.'
+          'You punish a weak opening move. Small edge for you.',
+          'You finish your development first. Small edge.'
         ],
         them: [
-          'You walk into their preparation.',
-          'Your opponent grabs space early; you are a bit passive.',
+          'You walk into your opponent\'s preparation.',
+          'You let your opponent grab space; you feel passive.',
           'You spend a lot of time in the opening.',
-          'Your opponent comes out of the opening with the initiative.',
-          'You misplay the opening. Small edge for them.',
-          'Better development for your opponent after the opening.'
+          'You come out of the opening on the back foot.',
+          'You misplay the opening. Small edge for your opponent.',
+          'You fall behind in development.'
         ]
       },
-      // Later chess rounds, by the advantage after the round (from your side).
       mid: {
         a0: {
           calm: [
-            'Pieces come off the board, still level.',
-            'A slow manoeuvring game, nothing changes.',
-            'Nobody finds a way in; the position stays balanced.',
-            'Hands still shaking from the ring, both play it safe.',
-            'Equal material, equal chances.',
-            'A tidy queen trade keeps it level.',
-            'Both sides regroup. Still balanced.',
-            'The position is dry and even.'
+            'You trade pieces. Still level.',
+            'You manoeuvre slowly. Nothing changes.',
+            'You find no way in. The position stays balanced.',
+            'Your hands are still shaking from the ring; you play it safe.',
+            'You keep material and chances equal.',
+            'You trade queens. Still level.',
+            'You regroup your pieces. Still balanced.',
+            'You reach a dry, even position.'
           ],
           hot: [
-            'Both kings are exposed; one slip decides everything.',
-            'Wild tactics on both sides, the round ends mid-combination.',
-            'Sacrifice and counter-sacrifice: nobody knows who is winning.',
-            'A razor-sharp race of pawn storms.',
-            'Both players miss a mate in two. The bell saves everyone.',
-            'Opposite-side castling, all-out attack from both.',
-            'Both flags are getting low.',
-            'Mutual time trouble, pieces hanging everywhere.'
+            'Your king is exposed, and so is theirs. One slip decides everything.',
+            'You trade blows at the board; the round ends mid-combination.',
+            'You sacrifice, they sacrifice back. Nobody knows who is winning.',
+            'You race your pawn storm against theirs.',
+            'You miss a mate in two, and so does your opponent. The bell saves you both.',
+            'You castle on opposite sides and attack all-out.',
+            'Your flag is getting low, and so is theirs.',
+            'You are both in time trouble, pieces hanging everywhere.'
           ]
         },
         a1: [
           'You win a pawn and start to squeeze.',
-          'Your opponent burns a lot of time.',
+          'You make your opponent burn a lot of time.',
           'You get the better structure and a monster knight.',
-          'A pawn up with the safer king. Going well.',
-          'Clean technique: your advantage grows slowly.',
-          'You control the open file.'
+          'You are a pawn up with the safer king. Going well.',
+          'You grow your advantage with clean technique.',
+          'You take control of the open file.'
         ],
         a2: {
           calm: [
             'You win a piece. Going very well.',
-            'A full rook up. It is only a matter of time.',
-            'You win the exchange and their king is naked.',
+            'You are a full rook up. It is only a matter of time.',
+            'You win the exchange and strip their king.',
             'You fork king and queen and pick up the queen.',
-            'Two pawns up in the endgame. Winning at the board.',
+            'You are two pawns up in the endgame. Winning at the board.',
             'You are completely winning at the board.'
           ],
           hot: [
-            'A piece up and hunting the king, but the bell rings.',
-            'Mate in three on the board. The round ends one move too early.',
-            'Your attack crashes through; they barely survive the round.',
-            'Checks everywhere: they find the only moves to survive.',
-            'Their flag is hanging by a thread.',
-            'Your opponent is down to seconds on the clock.'
+            'You are a piece up and hunting the king, but the bell rings.',
+            'You have mate in three on the board. The round ends one move too early.',
+            'You crash through; your opponent barely survives the round.',
+            'You give check after check; your opponent finds the only moves.',
+            'You watch their flag hang by a thread.',
+            'You have your opponent down to seconds on the clock.'
           ]
         },
         m1: [
-          'Your opponent wins a pawn and squeezes.',
+          'You lose a pawn and feel the squeeze.',
           'You burn a lot of time on your clock.',
-          'Your position gets cramped.',
-          'Passive pieces and a weaker structure.',
-          'Your opponent takes the open file.',
-          'Slightly worse, but holding.'
+          'You get cramped.',
+          'You end up with passive pieces and a weaker structure.',
+          'You give up the open file.',
+          'You are slightly worse, but holding.'
         ],
         m2: {
           calm: [
             'You lose a piece. It looks bad at the board.',
-            'A full rook down. You need the ring, fast.',
+            'You are a full rook down. You need the ring, fast.',
             'You drop the exchange and your king is exposed.',
-            'A fork costs you your queen.',
-            'Two pawns down in the endgame. Lost at the board.',
+            'You walk into a fork and lose your queen.',
+            'You are two pawns down in the endgame. Lost at the board.',
             'You are lost at the board. Time to think about knockouts.'
           ],
           hot: [
-            'A piece down and your king is under fire. Saved by the bell.',
-            'Mate is coming. The bell rings just in time.',
-            'Their attack crashes through; you barely survive the round.',
-            'Only moves to survive this round.',
+            'You are a piece down with your king under fire. Saved by the bell.',
+            'You see mate coming. The bell rings just in time.',
+            'You barely survive the attack on your king.',
+            'You find only moves to survive this round.',
             'Your flag is hanging: seconds left on your clock.',
             'You are down to seconds on the clock.'
           ]
         }
       },
-      // Last chess round when the game ends drawn (the fight goes to points),
-      // by the advantage before it.
       draw: {
         a0: [
-          'Draw by repetition. The boxing points will decide.',
-          'Bare kings: the chess game is drawn.',
-          'Both agree a draw in a dead-level endgame.'
+          'You repeat moves: a draw. The boxing points will decide.',
+          'You trade down to bare kings: the chess game is drawn.',
+          'You agree a draw in a dead-level endgame.'
         ],
         a1: [
-          'Your extra pawn is not enough: the endgame is drawn.',
-          'Opposite-coloured bishops. A draw despite your edge.'
+          'You cannot convert the extra pawn: the endgame is drawn.',
+          'You reach opposite-coloured bishops. A draw despite your edge.'
         ],
         a2: [
-          'Stalemate! You let a won game slip into a draw.',
-          'They build a fortress and hold the draw.'
+          'You allow stalemate! A won game slips into a draw.',
+          'You cannot break their fortress. A draw.'
         ],
         m1: [
           'You hold the slightly worse endgame to a draw.',
-          'Opposite-coloured bishops save you: a draw.'
+          'You reach opposite-coloured bishops and save the draw.'
         ],
         m2: [
-          'Stalemate trick! You save a lost game with a draw.',
+          'You set up a stalemate trick and save a lost game!',
           'You build a fortress and hold the draw.'
         ]
       },
-      // Chess finishes. win: you win; loss: your opponent wins.
-      // winning: the winner was better; balanced: level; swindle: the winner was worse.
       win: {
         winning: [
           f('You deliver a clean checkmate.', 'mate'),
-          f('Your attack ends in checkmate.', 'mate'),
+          f('You finish your attack with checkmate.', 'mate'),
           f('You convert the extra material and mate.', 'mate'),
-          f('Mate with a queen and rook battery.', 'mate'),
-          f('Your opponent resigns, the position is hopeless.', 'resign'),
-          f('Your opponent stops the clock and shakes your hand.', 'resign'),
-          f('Your opponent resigns rather than face mate.', 'resign'),
-          f('Their flag falls in a lost position: you win on time.', 'time'),
-          f('Their clock runs out while they look for a defence.', 'time')
+          f('You mate with a queen and rook battery.', 'mate'),
+          f('You leave your opponent no hope: they resign.', 'resign'),
+          f('You see your opponent stop the clock and offer a handshake.', 'resign'),
+          f('You threaten mate and your opponent resigns.', 'resign'),
+          f('You watch their flag fall in a lost position: you win on time.', 'time'),
+          f('You keep up the pressure until their clock runs out.', 'time')
         ],
         balanced: [
-          f('A sharp position tips your way: checkmate!', 'mate'),
-          f('They miss your tactic and get mated.', 'mate'),
-          f('Level on the board, but their flag falls first.', 'time')
+          f('You tip a sharp position your way: checkmate!', 'mate'),
+          f('You spring a tactic your opponent misses: mate.', 'mate'),
+          f('You are level on the board, but their flag falls first.', 'time')
         ],
         swindle: [
-          f('Swindle! Your opponent blunders into mate from a winning position.', 'mate'),
-          f('Out of nowhere: a queen sacrifice and mate!', 'mate'),
-          f('A desperate trick works: they walk into mate.', 'mate'),
-          f('Their flag falls in a completely winning position!', 'time'),
-          f('They lose on time with extra material!', 'time'),
-          f('A shocking blunder and your opponent resigns.', 'resign')
+          f('You swindle a winning opponent into a blunder and mate!', 'mate'),
+          f('You find a queen sacrifice out of nowhere and mate!', 'mate'),
+          f('You set a desperate trap and they walk into mate.', 'mate'),
+          f('You are lost, but their flag falls first!', 'time'),
+          f('You are down material, but they lose on time!', 'time'),
+          f('You provoke a shocking blunder and your opponent resigns.', 'resign')
         ]
       },
       loss: {
         winning: [
           f('You get checkmated.', 'mate'),
-          f('Your king falls to a mating attack.', 'mate'),
-          f('They convert the extra material and mate you.', 'mate'),
-          f('Their queen and rook mate your king.', 'mate'),
+          f('You cannot stop the mating attack.', 'mate'),
+          f('You cannot hold the extra material: you get mated.', 'mate'),
+          f('You get mated by queen and rook.', 'mate'),
           f('You resign, the position is hopeless.', 'resign'),
           f('You stop the clock and shake hands.', 'resign'),
           f('You resign rather than face mate.', 'resign'),
@@ -194,152 +189,147 @@ export const COMMENTARY = {
           f('Your clock runs out while you look for a defence.', 'time')
         ],
         balanced: [
-          f('A sharp position tips their way: checkmate.', 'mate'),
-          f('You miss their tactic and get mated.', 'mate'),
-          f('Level on the board, but your flag falls first.', 'time')
+          f('You lose the thread in a sharp position: checkmate.', 'mate'),
+          f('You miss a tactic and get mated.', 'mate'),
+          f('You are level on the board, but your flag falls first.', 'time')
         ],
         swindle: [
           f('Disaster! You blunder into mate from a winning position.', 'mate'),
-          f('Out of nowhere: they sacrifice the queen and mate you.', 'mate'),
-          f('Their desperate trick works: you walk into mate.', 'mate'),
-          f('Your flag falls in a completely winning position!', 'time'),
-          f('You lose on time with extra material!', 'time'),
-          f('A shocking blunder and you resign.', 'resign')
+          f('You miss a queen sacrifice and get mated.', 'mate'),
+          f('You fall for a desperate trap and get mated.', 'mate'),
+          f('You are winning, but your flag falls first!', 'time'),
+          f('You are up material, but you lose on time!', 'time'),
+          f('You make a shocking blunder and resign.', 'resign')
         ]
       }
     },
     box: {
-      // Rounds that go on, by who won the round on points.
       calm: {
         even: [
-          'Both trade jabs, nobody is hurt.',
-          'Cautious round, lots of feints.',
-          'Scrappy exchanges in the middle of the ring.',
-          'Both boxers save energy for the board.',
-          'A tactical round: distance, jab, reset.',
-          'Plenty of clinching. The referee separates them twice.',
-          'Body shots from both sides, nothing decisive.',
-          'A tidy, technical round. Hard to score.'
+          'You trade jabs; nobody gets hurt.',
+          'You feint a lot in a cautious round.',
+          'You get into scrappy exchanges in the middle of the ring.',
+          'You save your energy for the board.',
+          'You work the distance: jab, reset, jab.',
+          'You clinch a lot; the referee separates you twice.',
+          'You trade body shots. Nothing decisive.',
+          'You box a tidy, technical round. Hard to score.'
         ],
         you: [
           'You land a clean combination.',
-          'You push them to the ropes.',
-          'Your jab controls the round.',
+          'You push your opponent to the ropes.',
+          'You control the round with your jab.',
           'You win the round clearly on points.',
-          'Your body shots slow them down.',
-          'You slip their punches and counter.',
-          'You dictate the pace. Going well.',
-          'Your footwork makes them miss.'
+          'You slow your opponent down with body shots.',
+          'You slip the punches and counter.',
+          'You set the pace. Going well.',
+          'You make your opponent miss with your footwork.'
         ],
         them: [
-          'They land a heavy right hand.',
+          'You eat a heavy right hand.',
           'You get pinned on the ropes.',
-          'Their jab keeps snapping your head back.',
+          'You keep getting snapped back by the jab.',
           'You lose the round clearly on points.',
-          'Their body shots take your breath away.',
+          'You take body shots that steal your breath.',
           'You struggle to find your range.',
-          'They dictate the pace.',
+          'You cannot set the pace; you are always a step behind.',
           'You miss a lot and pay for it.'
         ]
       },
-      // Close calls: standing counts (you = counts you take, them = counts they take).
       hot: {
         even: [
-          c('A knockdown each! Wild round.', 1, 1),
-          c('Both boxers take a standing count.', 1, 1),
-          c('Toe-to-toe war! Both are wobbled, no count.', 0, 0),
-          c('Both land bombs. The crowd is on its feet.', 0, 0),
-          c('Slugfest: nobody is defending anymore.', 0, 0)
+          c('You go down and so does your opponent! Wild round.', 1, 1),
+          c('You both take a standing count.', 1, 1),
+          c('You stand toe-to-toe; you both wobble, no count.', 0, 0),
+          c('You trade bombs. The crowd is on its feet.', 0, 0),
+          c('You stop defending and slug it out.', 0, 0)
         ],
         you: [
-          c('Big right hand! They take a standing count.', 0, 1),
-          c('You floor them, they beat the count.', 0, 1),
-          c('Two standing counts against them in the round. The bell saves them.', 0, 2),
-          c('A huge uppercut drops them. They get up at eight.', 0, 1),
-          c('They are wobbling on the ropes when the bell rings.', 0, 0),
-          c('Their legs are gone. Saved by the bell.', 0, 0),
-          c('The referee is watching them closely. One more shot would do it.', 0, 0),
-          c('Two knockdowns in the round, they survive both.', 0, 2)
+          c('You land a big right hand: standing count for your opponent.', 0, 1),
+          c('You floor your opponent; they beat the count.', 0, 1),
+          c('You force two standing counts in the round. The bell saves them.', 0, 2),
+          c('You drop them with a huge uppercut. They get up at eight.', 0, 1),
+          c('You have them wobbling on the ropes when the bell rings.', 0, 0),
+          c('You take their legs away. They are saved by the bell.', 0, 0),
+          c('You are one shot away; the referee is watching them closely.', 0, 0),
+          c('You score two knockdowns in the round; they survive both.', 0, 2)
         ],
         them: [
-          c('Big right hand! You take a standing count.', 1, 0),
+          c('You eat a big right hand and take a standing count.', 1, 0),
           c('You go down, but beat the count.', 1, 0),
-          c('Two standing counts against you in the round. Saved by the bell!', 2, 0),
-          c('A huge uppercut drops you. You get up at eight.', 1, 0),
-          c('Wobbling on the ropes when the bell rings.', 0, 0),
+          c('You take two standing counts in the round. Saved by the bell!', 2, 0),
+          c('You get dropped by a huge uppercut. You get up at eight.', 1, 0),
+          c('You are wobbling on the ropes when the bell rings.', 0, 0),
           c('Your legs are gone. The bell rings just in time.', 0, 0),
-          c('The referee is watching you closely.', 0, 0),
-          c('Two knockdowns in the round, you survive both.', 2, 0)
+          c('You feel the referee watching you closely.', 0, 0),
+          c('You go down twice in the round and survive both.', 2, 0)
         ]
       },
-      // A cut that the doctor checks (and that can end the fight later).
       cut: {
         you: 'You open a cut over their eye; the doctor takes a look.',
-        them: 'A cut opens over your eye; the doctor takes a look.'
+        them: 'You get cut over the eye; the doctor takes a look.'
       },
-      // Boxing finishes. win: you win; loss: your opponent wins.
       win: {
         ko: [
-          f('Knockout! The referee waves it off.', 'ko'),
-          f('Clean knockout with a right hand.', 'ko'),
-          f('A body shot drops them for the count.', 'ko'),
-          f('A left hook ends it.', 'ko'),
-          f('They cannot beat the count.', 'ko')
+          f('You knock them out. The referee waves it off.', 'ko'),
+          f('You land a clean right hand: knockout.', 'ko'),
+          f('You drop them with a body shot for the count.', 'ko'),
+          f('You end it with a left hook.', 'ko'),
+          f('You watch them fail to beat the count.', 'ko')
         ],
         stop: [
-          f('A crushing combination and the referee steps in.', 'tko'),
-          f('Their corner throws in the towel.', 'tko'),
-          f('Trapped on the ropes and not answering: the referee stops it.', 'tko')
+          f('You unload a crushing combination and the referee steps in.', 'tko'),
+          f('You batter them until their corner throws in the towel.', 'tko'),
+          f('You trap them on the ropes; they stop answering and the referee stops it.', 'tko')
         ],
         doctor: [
-          f('The cut over their eye reopens. The doctor stops the fight.', 'tko'),
-          f('The doctor looks at the cut again and waves it off.', 'tko')
+          f('You reopen the cut over their eye. The doctor stops the fight.', 'tko'),
+          f('You keep hitting the cut; the doctor waves it off.', 'tko')
         ],
         surprise: [
-          f('Surprise punch! A counter out of nowhere knocks them out!', 'ko'),
-          f('Lucky punch: one hook and they are down and out!', 'ko'),
-          f('Losing the round, you land one perfect uppercut. Knockout!', 'ko'),
-          f('A desperate overhand right lands flush. Lights out!', 'ko'),
-          f('They walk into your counter and cannot get up!', 'ko'),
-          f('Against the run of play, a sudden flurry and the referee stops it!', 'tko')
+          f('You land a surprise counter out of nowhere. Knockout!', 'ko'),
+          f('You throw one lucky hook and they are down and out!', 'ko'),
+          f('You are losing the round, then one perfect uppercut. Knockout!', 'ko'),
+          f('You throw a desperate overhand right and it lands flush. Lights out!', 'ko'),
+          f('You catch them walking in with your counter. They cannot get up!', 'ko'),
+          f('You explode with a sudden flurry against the run of play: stopped!', 'tko')
         ],
-        // Stoppage on counts; the one to use depends on counts already taken.
-        count3: f('Third standing count of the round: the referee stops the fight.', 'tko'),
-        count4of2: f('Two more counts in the round make four in the fight: stopped.', 'tko'),
-        count4: f('Their fourth standing count of the fight: the referee stops it.', 'tko')
+        count3: f('You force a third standing count in the round: the referee stops the fight.', 'tko'),
+        count4of2: f('You force two more counts in the round, four in the fight: stopped.', 'tko'),
+        count4: f('You force their fourth standing count of the fight: the referee stops it.', 'tko')
       },
       loss: {
         ko: [
           f('You are knocked out. The referee waves it off.', 'ko'),
-          f('A right hand knocks you out cold.', 'ko'),
-          f('A body shot drops you for the count.', 'ko'),
-          f('A left hook ends your night.', 'ko'),
+          f('You get knocked out cold by a right hand.', 'ko'),
+          f('You go down from a body shot and cannot beat the count.', 'ko'),
+          f('You walk into a left hook that ends your night.', 'ko'),
           f('You cannot beat the count.', 'ko')
         ],
         stop: [
-          f('A crushing combination and the referee steps in.', 'tko'),
-          f('Your corner throws in the towel.', 'tko'),
-          f('Trapped on the ropes and not answering: the referee stops it.', 'tko')
+          f('You get caught by a crushing combination and the referee steps in.', 'tko'),
+          f('You take too much; your corner throws in the towel.', 'tko'),
+          f('You are trapped on the ropes and stop answering: the referee stops it.', 'tko')
         ],
         doctor: [
-          f('The cut over your eye reopens. The doctor stops the fight.', 'tko'),
-          f('The doctor looks at your cut again and waves it off.', 'tko')
+          f('Your cut reopens. The doctor stops the fight.', 'tko'),
+          f('You bleed from the cut again; the doctor waves it off.', 'tko')
         ],
         surprise: [
-          f('Surprise punch! A counter out of nowhere knocks you out!', 'ko'),
-          f('Lucky punch: one hook and you are down and out!', 'ko'),
-          f('Winning the round, you walk into one perfect uppercut. Knockout!', 'ko'),
-          f('A wild overhand right lands flush. Lights out!', 'ko'),
-          f('You walk into their counter and cannot get up!', 'ko'),
-          f('Against the run of play, a sudden flurry and the referee stops it!', 'tko')
+          f('You get caught by a counter out of nowhere. Knockout!', 'ko'),
+          f('You eat one lucky hook and you are down and out!', 'ko'),
+          f('You are winning the round, then walk into one perfect uppercut. Knockout!', 'ko'),
+          f('You get tagged by a wild overhand right. Lights out!', 'ko'),
+          f('You walk into a counter and cannot get up!', 'ko'),
+          f('You get overwhelmed by a sudden flurry against the run of play: stopped!', 'tko')
         ],
-        count3: f('Third standing count of the round: the referee stops the fight.', 'tko'),
-        count4of2: f('Two more counts in the round make four in the fight: stopped.', 'tko'),
-        count4: f('Your fourth standing count of the fight: the referee stops it.', 'tko')
+        count3: f('You take a third standing count in the round: the referee stops the fight.', 'tko'),
+        count4of2: f('You take two more counts in the round, four in the fight: stopped.', 'tko'),
+        count4: f('You take your fourth standing count of the fight: the referee stops it.', 'tko')
       },
       decision: {
-        win: (won, total) => `The judges score the boxing: you won ${won} of ${total} boxing rounds. Victory on points!`,
-        loss: (won, total) => `The judges score the boxing: your opponent won ${won} of ${total} boxing rounds. Defeat on points.`
+        win: (won, total) => `You won ${won} of ${total} boxing rounds on the judges' cards. Victory on points!`,
+        loss: (won, total) => `You lost ${won} of ${total} boxing rounds on the judges' cards. Defeat on points.`
       }
     }
   },
@@ -348,103 +338,103 @@ export const COMMENTARY = {
     chess: {
       open: {
         even: [
-          'Ouverture calme, chacun reste solide.',
-          'Les deux joueurs récitent leur préparation.',
-          'Ouverture symétrique, personne ne veut prendre de risque.',
-          'Grande ligne théorique, les deux la connaissent bien.',
-          'Début tranquille, chacun développe ses pièces.',
-          'Ouverture originale, les deux réfléchissent longuement.',
-          'Structures de pions solides des deux côtés.',
-          'Personne n\'a encore roqué, premier round prudent.'
+          'Vous jouez une ouverture calme et solide.',
+          'Vous récitez votre préparation, votre adversaire aussi.',
+          'Vous jouez une ouverture symétrique, sans prendre de risque.',
+          'Vous suivez la grande ligne théorique. Rien de nouveau.',
+          'Vous développez vos pièces tranquillement. Égalité.',
+          'Vous affrontez une ouverture originale et réfléchissez longuement.',
+          'Vous installez une structure de pions solide. Égalité.',
+          'Vous gardez votre roi au centre pour l\'instant. Premier round prudent.'
         ],
         you: [
           'Votre préparation fait mouche : vous obtenez la meilleure position.',
-          'Vous prenez de l\'espace tôt, votre adversaire semble passif.',
-          'Votre adversaire consomme beaucoup de temps dans l\'ouverture.',
+          'Vous prenez de l\'espace tôt ; votre adversaire semble passif.',
+          'Vous jouez vite pendant que votre adversaire réfléchit dans l\'ouverture.',
           'Vous sortez de l\'ouverture avec l\'initiative.',
-          'Votre adversaire rate son ouverture. Léger avantage pour vous.',
-          'Meilleur développement pour vous après l\'ouverture.'
+          'Vous punissez un coup faible dans l\'ouverture. Léger avantage.',
+          'Vous finissez votre développement le premier. Léger avantage.'
         ],
         them: [
-          'Vous tombez dans sa préparation.',
-          'Votre adversaire prend de l\'espace tôt, vous êtes un peu passif.',
+          'Vous tombez dans la préparation de votre adversaire.',
+          'Vous laissez votre adversaire prendre de l\'espace ; vous êtes passif.',
           'Vous consommez beaucoup de temps dans l\'ouverture.',
-          'Votre adversaire sort de l\'ouverture avec l\'initiative.',
-          'Vous ratez votre ouverture. Léger avantage pour lui.',
-          'Meilleur développement pour votre adversaire après l\'ouverture.'
+          'Vous sortez de l\'ouverture sur la défensive.',
+          'Vous ratez votre ouverture. Léger avantage pour votre adversaire.',
+          'Vous prenez du retard de développement.'
         ]
       },
       mid: {
         a0: {
           calm: [
-            'Les pièces s\'échangent, toujours égal.',
-            'Partie de manœuvres lente, rien ne change.',
-            'Personne ne trouve de faille, la position reste équilibrée.',
-            'Les mains tremblent encore du ring, chacun joue prudemment.',
-            'Matériel égal, chances égales.',
-            'Un échange de dames propre garde l\'équilibre.',
-            'Les deux camps se regroupent. Toujours équilibré.',
-            'Position sèche et égale.'
+            'Vous échangez des pièces. Toujours égal.',
+            'Vous manœuvrez lentement. Rien ne change.',
+            'Vous ne trouvez pas de faille. La position reste équilibrée.',
+            'Vos mains tremblent encore du ring ; vous jouez prudemment.',
+            'Vous gardez matériel et chances égaux.',
+            'Vous échangez les dames. Toujours égal.',
+            'Vous regroupez vos pièces. Toujours équilibré.',
+            'Vous arrivez dans une position sèche et égale.'
           ],
           hot: [
-            'Les deux rois sont exposés, une erreur décidera de tout.',
-            'Tactiques folles des deux côtés, le round s\'arrête en pleine combinaison.',
-            'Sacrifice et contre-sacrifice : personne ne sait qui gagne.',
-            'Course effrénée de poussées de pions.',
-            'Les deux ratent un mat en deux. Le gong sauve tout le monde.',
-            'Roques opposés, attaque totale des deux côtés.',
-            'Les deux drapeaux sont bas.',
-            'Zeitnot mutuel, des pièces en prise partout.'
+            'Votre roi est exposé, le sien aussi. Une erreur décidera de tout.',
+            'Vous vous rendez coup pour coup ; le round s\'arrête en pleine combinaison.',
+            'Vous sacrifiez, il sacrifie en retour. Personne ne sait qui gagne.',
+            'Vous lancez votre attaque de pions contre la sienne.',
+            'Vous ratez un mat en deux, lui aussi. Le gong vous sauve tous les deux.',
+            'Vous roquez du côté opposé et attaquez à outrance.',
+            'Votre drapeau est bas, le sien aussi.',
+            'Vous êtes tous les deux en zeitnot, des pièces en prise partout.'
           ]
         },
         a1: [
           'Vous gagnez un pion et serrez la vis.',
-          'Votre adversaire consomme beaucoup de temps.',
+          'Vous faites consommer beaucoup de temps à votre adversaire.',
           'Vous obtenez la meilleure structure et un cavalier monstrueux.',
-          'Un pion de plus et le roi le plus sûr. Ça se passe bien.',
-          'Technique propre : votre avantage grandit lentement.',
-          'Vous contrôlez la colonne ouverte.'
+          'Vous avez un pion de plus et le roi le plus sûr. Ça se passe bien.',
+          'Vous faites grandir votre avantage avec une technique propre.',
+          'Vous prenez le contrôle de la colonne ouverte.'
         ],
         a2: {
           calm: [
             'Vous gagnez une pièce. Ça se passe très bien.',
-            'Une tour de plus. Ce n\'est qu\'une question de temps.',
-            'Vous gagnez la qualité et son roi est à nu.',
-            'Fourchette roi-dame : vous ramassez la dame.',
-            'Deux pions de plus en finale. Gagnant sur l\'échiquier.',
+            'Vous avez une tour de plus. Ce n\'est qu\'une question de temps.',
+            'Vous gagnez la qualité et mettez son roi à nu.',
+            'Vous faites une fourchette roi-dame et ramassez la dame.',
+            'Vous avez deux pions de plus en finale. Gagnant sur l\'échiquier.',
             'Vous êtes totalement gagnant sur l\'échiquier.'
           ],
           hot: [
-            'Une pièce de plus et vous traquez le roi, mais le gong sonne.',
-            'Mat en trois sur l\'échiquier. Le round finit un coup trop tôt.',
-            'Votre attaque passe ; il survit de justesse au round.',
-            'Échecs de partout : il trouve les seuls coups pour survivre.',
-            'Son drapeau ne tient qu\'à un fil.',
-            'Votre adversaire n\'a plus que quelques secondes.'
+            'Vous avez une pièce de plus et traquez le roi, mais le gong sonne.',
+            'Vous avez un mat en trois. Le round finit un coup trop tôt.',
+            'Vous enfoncez sa défense ; votre adversaire survit de justesse.',
+            'Vous donnez échec sur échec ; il trouve les seuls coups.',
+            'Vous voyez son drapeau ne tenir qu\'à un fil.',
+            'Vous laissez votre adversaire à quelques secondes.'
           ]
         },
         m1: [
-          'Votre adversaire gagne un pion et serre la vis.',
+          'Vous perdez un pion et subissez la pression.',
           'Vous consommez beaucoup de temps.',
-          'Votre position devient étriquée.',
-          'Pièces passives et structure plus faible.',
-          'Votre adversaire prend la colonne ouverte.',
-          'Légèrement moins bien, mais vous tenez.'
+          'Vous êtes à l\'étroit.',
+          'Vous vous retrouvez avec des pièces passives et une structure faible.',
+          'Vous cédez la colonne ouverte.',
+          'Vous êtes légèrement moins bien, mais vous tenez.'
         ],
         m2: {
           calm: [
             'Vous perdez une pièce. Ça sent mauvais sur l\'échiquier.',
-            'Une tour de moins. Il vous faut le ring, et vite.',
+            'Vous avez une tour de moins. Il vous faut le ring, et vite.',
             'Vous perdez la qualité et votre roi est exposé.',
-            'Une fourchette vous coûte la dame.',
-            'Deux pions de moins en finale. Perdu sur l\'échiquier.',
-            'Perdu sur l\'échiquier. Il est temps de penser au K.-O.'
+            'Vous tombez dans une fourchette et perdez la dame.',
+            'Vous avez deux pions de moins en finale. Perdu sur l\'échiquier.',
+            'Vous êtes perdu sur l\'échiquier. Pensez au K.-O.'
           ],
           hot: [
-            'Une pièce de moins et votre roi sous le feu. Sauvé par le gong.',
-            'Le mat arrive. Le gong sonne juste à temps.',
-            'Son attaque passe ; vous survivez de justesse au round.',
-            'Seuls coups pour survivre à ce round.',
+            'Vous avez une pièce de moins et votre roi sous le feu. Sauvé par le gong.',
+            'Vous voyez le mat arriver. Le gong sonne juste à temps.',
+            'Vous survivez de justesse à l\'attaque sur votre roi.',
+            'Vous trouvez les seuls coups pour survivre à ce round.',
             'Votre drapeau vacille : quelques secondes à la pendule.',
             'Vous n\'avez plus que quelques secondes.'
           ]
@@ -452,59 +442,59 @@ export const COMMENTARY = {
       },
       draw: {
         a0: [
-          'Nulle par répétition. Les points de boxe décideront.',
-          'Rois dépouillés : la partie est nulle.',
-          'Nulle d\'un commun accord dans une finale morte.'
+          'Vous répétez les coups : nulle. Les points de boxe décideront.',
+          'Vous échangez jusqu\'aux rois seuls : la partie est nulle.',
+          'Vous acceptez la nulle dans une finale morte.'
         ],
         a1: [
-          'Votre pion de plus ne suffit pas : la finale est nulle.',
-          'Fous de couleurs opposées. Nulle malgré votre avantage.'
+          'Vous n\'arrivez pas à convertir le pion de plus : finale nulle.',
+          'Vous arrivez à des fous de couleurs opposées. Nulle malgré votre avantage.'
         ],
         a2: [
-          'Pat ! Vous laissez filer une partie gagnée.',
-          'Il construit une forteresse et tient la nulle.'
+          'Vous laissez un pat ! Une partie gagnée s\'envole.',
+          'Vous ne percez pas sa forteresse. Nulle.'
         ],
         m1: [
           'Vous tenez la nulle dans une finale un peu moins bonne.',
-          'Les fous de couleurs opposées vous sauvent : nulle.'
+          'Vous arrivez à des fous de couleurs opposées et sauvez la nulle.'
         ],
         m2: [
-          'Piège du pat ! Vous sauvez une partie perdue.',
+          'Vous tendez un piège de pat et sauvez une partie perdue !',
           'Vous construisez une forteresse et tenez la nulle.'
         ]
       },
       win: {
         winning: [
           f('Vous donnez un mat propre.', 'mate'),
-          f('Votre attaque se termine par un mat.', 'mate'),
+          f('Vous concluez votre attaque par un mat.', 'mate'),
           f('Vous convertissez le matériel de plus et matez.', 'mate'),
-          f('Mat avec la batterie dame-tour.', 'mate'),
-          f('Votre adversaire abandonne, la position est désespérée.', 'resign'),
-          f('Votre adversaire arrête la pendule et vous serre la main.', 'resign'),
-          f('Votre adversaire abandonne plutôt que de subir le mat.', 'resign'),
-          f('Son drapeau tombe dans une position perdue : victoire au temps.', 'time'),
-          f('Sa pendule tombe pendant qu\'il cherche une défense.', 'time')
+          f('Vous matez avec la batterie dame-tour.', 'mate'),
+          f('Vous ne laissez aucun espoir : votre adversaire abandonne.', 'resign'),
+          f('Vous voyez votre adversaire arrêter la pendule et tendre la main.', 'resign'),
+          f('Vous menacez mat et votre adversaire abandonne.', 'resign'),
+          f('Vous voyez son drapeau tomber en position perdue : victoire au temps.', 'time'),
+          f('Vous maintenez la pression jusqu\'à ce que sa pendule tombe.', 'time')
         ],
         balanced: [
-          f('La position tendue bascule de votre côté : mat !', 'mate'),
-          f('Il rate votre tactique et se fait mater.', 'mate'),
-          f('Égal sur l\'échiquier, mais son drapeau tombe en premier.', 'time')
+          f('Vous faites basculer une position tendue : mat !', 'mate'),
+          f('Vous trouvez une tactique qu\'il ne voit pas : mat.', 'mate'),
+          f('Vous êtes à égalité, mais son drapeau tombe en premier.', 'time')
         ],
         swindle: [
-          f('Arnaque ! Votre adversaire gaffe et se fait mater en position gagnante.', 'mate'),
-          f('Surgi de nulle part : un sacrifice de dame et mat !', 'mate'),
-          f('Un piège désespéré fonctionne : il tombe dans le mat.', 'mate'),
-          f('Son drapeau tombe dans une position totalement gagnante !', 'time'),
-          f('Il perd au temps avec du matériel en plus !', 'time'),
-          f('Une gaffe incroyable et votre adversaire abandonne.', 'resign')
+          f('Vous arnaquez un adversaire gagnant : gaffe et mat !', 'mate'),
+          f('Vous trouvez un sacrifice de dame surgi de nulle part : mat !', 'mate'),
+          f('Vous tendez un piège désespéré et il tombe dans le mat.', 'mate'),
+          f('Vous êtes perdu, mais son drapeau tombe en premier !', 'time'),
+          f('Vous avez moins de matériel, mais il perd au temps !', 'time'),
+          f('Vous provoquez une gaffe incroyable et votre adversaire abandonne.', 'resign')
         ]
       },
       loss: {
         winning: [
           f('Vous êtes mat.', 'mate'),
-          f('Votre roi tombe sous une attaque de mat.', 'mate'),
-          f('Il convertit le matériel de plus et vous mate.', 'mate'),
-          f('Sa dame et sa tour matent votre roi.', 'mate'),
+          f('Vous ne pouvez pas arrêter l\'attaque de mat.', 'mate'),
+          f('Vous ne tenez pas face au matériel en moins : mat.', 'mate'),
+          f('Vous êtes maté par la dame et la tour.', 'mate'),
           f('Vous abandonnez, la position est désespérée.', 'resign'),
           f('Vous arrêtez la pendule et serrez la main.', 'resign'),
           f('Vous abandonnez plutôt que de subir le mat.', 'resign'),
@@ -512,147 +502,147 @@ export const COMMENTARY = {
           f('Votre pendule tombe pendant que vous cherchez une défense.', 'time')
         ],
         balanced: [
-          f('La position tendue bascule de son côté : mat.', 'mate'),
-          f('Vous ratez sa tactique et vous faites mater.', 'mate'),
-          f('Égal sur l\'échiquier, mais votre drapeau tombe en premier.', 'time')
+          f('Vous perdez le fil dans une position tendue : mat.', 'mate'),
+          f('Vous ratez une tactique et êtes maté.', 'mate'),
+          f('Vous êtes à égalité, mais votre drapeau tombe en premier.', 'time')
         ],
         swindle: [
-          f('Catastrophe ! Vous gaffez et vous faites mater en position gagnante.', 'mate'),
-          f('Surgi de nulle part : il sacrifie la dame et vous mate.', 'mate'),
-          f('Son piège désespéré fonctionne : vous tombez dans le mat.', 'mate'),
-          f('Votre drapeau tombe dans une position totalement gagnante !', 'time'),
-          f('Vous perdez au temps avec du matériel en plus !', 'time'),
-          f('Une gaffe incroyable et vous abandonnez.', 'resign')
+          f('Catastrophe ! Vous gaffez et êtes maté en position gagnante.', 'mate'),
+          f('Vous ratez un sacrifice de dame et êtes maté.', 'mate'),
+          f('Vous tombez dans un piège désespéré et êtes maté.', 'mate'),
+          f('Vous êtes gagnant, mais votre drapeau tombe en premier !', 'time'),
+          f('Vous avez plus de matériel, mais vous perdez au temps !', 'time'),
+          f('Vous faites une gaffe incroyable et abandonnez.', 'resign')
         ]
       }
     },
     box: {
       calm: {
         even: [
-          'Échange de jabs, personne n\'est touché.',
-          'Round prudent, beaucoup de feintes.',
-          'Échanges brouillons au centre du ring.',
-          'Les deux boxeurs gardent des forces pour l\'échiquier.',
-          'Round tactique : distance, jab, on recommence.',
-          'Beaucoup d\'accrochages. L\'arbitre les sépare deux fois.',
-          'Coups au corps des deux côtés, rien de décisif.',
-          'Round propre et technique. Difficile à départager.'
+          'Vous échangez des jabs ; personne n\'est touché.',
+          'Vous feintez beaucoup dans un round prudent.',
+          'Vous vous lancez dans des échanges brouillons au centre du ring.',
+          'Vous gardez des forces pour l\'échiquier.',
+          'Vous travaillez la distance : jab, on recommence.',
+          'Vous accrochez beaucoup ; l\'arbitre vous sépare deux fois.',
+          'Vous échangez des coups au corps. Rien de décisif.',
+          'Vous boxez un round propre et technique. Difficile à départager.'
         ],
         you: [
           'Vous placez un enchaînement propre.',
-          'Vous le poussez dans les cordes.',
-          'Votre jab contrôle le round.',
+          'Vous poussez votre adversaire dans les cordes.',
+          'Vous contrôlez le round avec votre jab.',
           'Vous gagnez nettement le round aux points.',
-          'Vos coups au corps le ralentissent.',
+          'Vous le ralentissez avec vos coups au corps.',
           'Vous esquivez et contrez.',
           'Vous imposez le rythme. Ça se passe bien.',
-          'Votre jeu de jambes le fait rater.'
+          'Vous le faites rater grâce à votre jeu de jambes.'
         ],
         them: [
-          'Il place un gros direct du droit.',
+          'Vous encaissez un gros direct du droit.',
           'Vous êtes bloqué dans les cordes.',
-          'Son jab vous renvoie la tête en arrière.',
+          'Vous prenez son jab encore et encore.',
           'Vous perdez nettement le round aux points.',
-          'Ses coups au corps vous coupent le souffle.',
+          'Vous encaissez des coups au corps qui vous coupent le souffle.',
           'Vous peinez à trouver la distance.',
-          'Il impose le rythme.',
+          'Vous n\'arrivez pas à imposer votre rythme ; toujours un temps de retard.',
           'Vous ratez beaucoup et vous le payez.'
         ]
       },
       hot: {
         even: [
-          c('Un knockdown chacun ! Round fou.', 1, 1),
-          c('Les deux boxeurs prennent un compte debout.', 1, 1),
-          c('Guerre de tranchées ! Les deux vacillent, sans compte.', 0, 0),
-          c('Les deux placent des bombes. La salle est debout.', 0, 0),
-          c('Pugilat : plus personne ne défend.', 0, 0)
+          c('Vous allez au tapis, votre adversaire aussi ! Round fou.', 1, 1),
+          c('Vous prenez tous les deux un compte debout.', 1, 1),
+          c('Vous restez pied à pied ; vous vacillez tous les deux, sans compte.', 0, 0),
+          c('Vous échangez des bombes. La salle est debout.', 0, 0),
+          c('Vous arrêtez de défendre et cognez.', 0, 0)
         ],
         you: [
-          c('Gros direct du droit ! Il prend un compte debout.', 0, 1),
-          c('Vous l\'envoyez au tapis, il se relève avant dix.', 0, 1),
-          c('Deux comptes debout contre lui dans le round. Sauvé par le gong.', 0, 2),
-          c('Un énorme uppercut l\'envoie au tapis. Il se relève à huit.', 0, 1),
-          c('Il vacille dans les cordes quand le gong sonne.', 0, 0),
-          c('Ses jambes ne suivent plus. Sauvé par le gong.', 0, 0),
-          c('L\'arbitre le surveille de près. Un coup de plus suffirait.', 0, 0),
-          c('Deux knockdowns dans le round, il survit aux deux.', 0, 2)
+          c('Vous placez un gros droit : compte debout pour votre adversaire.', 0, 1),
+          c('Vous l\'envoyez au tapis ; il se relève avant dix.', 0, 1),
+          c('Vous lui infligez deux comptes debout dans le round. Le gong le sauve.', 0, 2),
+          c('Vous l\'envoyez au tapis d\'un énorme uppercut. Il se relève à huit.', 0, 1),
+          c('Vous le faites vaciller dans les cordes quand le gong sonne.', 0, 0),
+          c('Vous lui coupez les jambes. Il est sauvé par le gong.', 0, 0),
+          c('Vous êtes à un coup de finir ; l\'arbitre le surveille de près.', 0, 0),
+          c('Vous le mettez deux fois au tapis dans le round ; il survit aux deux.', 0, 2)
         ],
         them: [
-          c('Gros direct du droit ! Vous prenez un compte debout.', 1, 0),
+          c('Vous encaissez un gros droit et prenez un compte debout.', 1, 0),
           c('Vous allez au tapis, mais vous vous relevez à temps.', 1, 0),
-          c('Deux comptes debout contre vous dans le round. Sauvé par le gong !', 2, 0),
-          c('Un énorme uppercut vous envoie au tapis. Vous vous relevez à huit.', 1, 0),
+          c('Vous prenez deux comptes debout dans le round. Sauvé par le gong !', 2, 0),
+          c('Vous allez au tapis sur un énorme uppercut. Vous vous relevez à huit.', 1, 0),
           c('Vous vacillez dans les cordes quand le gong sonne.', 0, 0),
           c('Vos jambes ne suivent plus. Le gong sonne juste à temps.', 0, 0),
-          c('L\'arbitre vous surveille de près.', 0, 0),
-          c('Deux knockdowns dans le round, vous survivez aux deux.', 2, 0)
+          c('Vous sentez l\'arbitre vous surveiller de près.', 0, 0),
+          c('Vous allez deux fois au tapis dans le round et survivez aux deux.', 2, 0)
         ]
       },
       cut: {
         you: 'Vous lui ouvrez l\'arcade ; le médecin jette un œil.',
-        them: 'Votre arcade s\'ouvre ; le médecin jette un œil.'
+        them: 'Vous êtes ouvert à l\'arcade ; le médecin jette un œil.'
       },
       win: {
         ko: [
-          f('K.-O. ! L\'arbitre arrête tout.', 'ko'),
-          f('K.-O. net sur un direct du droit.', 'ko'),
-          f('Un coup au corps le laisse au tapis pour le compte.', 'ko'),
-          f('Un crochet du gauche met fin au combat.', 'ko'),
-          f('Il ne se relève pas avant dix.', 'ko')
+          f('Vous le mettez K.-O. L\'arbitre arrête tout.', 'ko'),
+          f('Vous placez un direct du droit propre : K.-O.', 'ko'),
+          f('Vous l\'envoyez au tapis d\'un coup au corps pour le compte.', 'ko'),
+          f('Vous finissez le combat d\'un crochet du gauche.', 'ko'),
+          f('Vous le regardez ne pas se relever avant dix.', 'ko')
         ],
         stop: [
-          f('Un enchaînement écrasant et l\'arbitre intervient.', 'tko'),
-          f('Son coin jette l\'éponge.', 'tko'),
-          f('Bloqué dans les cordes sans répondre : l\'arbitre arrête tout.', 'tko')
+          f('Vous lâchez un enchaînement écrasant et l\'arbitre intervient.', 'tko'),
+          f('Vous le martelez jusqu\'à ce que son coin jette l\'éponge.', 'tko'),
+          f('Vous le bloquez dans les cordes ; il ne répond plus et l\'arbitre arrête.', 'tko')
         ],
         doctor: [
-          f('Son arcade se rouvre. Le médecin arrête le combat.', 'tko'),
-          f('Le médecin revoit la coupure et arrête tout.', 'tko')
+          f('Vous rouvrez son arcade. Le médecin arrête le combat.', 'tko'),
+          f('Vous frappez encore la coupure ; le médecin arrête tout.', 'tko')
         ],
         surprise: [
-          f('Coup surprise ! Un contre sorti de nulle part le met K.-O. !', 'ko'),
-          f('Coup de chance : un crochet et il est au tapis pour de bon !', 'ko'),
-          f('Alors que vous perdiez le round, un uppercut parfait. K.-O. !', 'ko'),
-          f('Un droit désespéré par-dessus arrive plein pot. Rideau !', 'ko'),
-          f('Il s\'avance dans votre contre et ne se relève pas !', 'ko'),
-          f('Contre le cours du combat, une rafale soudaine et l\'arbitre arrête tout !', 'tko')
+          f('Vous placez un contre surprise sorti de nulle part. K.-O. !', 'ko'),
+          f('Vous lancez un crochet chanceux et il est au tapis pour de bon !', 'ko'),
+          f('Vous perdez le round, puis un uppercut parfait. K.-O. !', 'ko'),
+          f('Vous lancez un droit désespéré par-dessus, plein pot. Rideau !', 'ko'),
+          f('Vous le cueillez en contre. Il ne se relève pas !', 'ko'),
+          f('Vous explosez avec une rafale soudaine contre le cours du combat : arrêt !', 'tko')
         ],
-        count3: f('Troisième compte debout du round : l\'arbitre arrête le combat.', 'tko'),
-        count4of2: f('Deux comptes de plus dans le round, quatre dans le combat : arrêt.', 'tko'),
-        count4: f('Son quatrième compte debout du combat : l\'arbitre arrête tout.', 'tko')
+        count3: f('Vous lui infligez un troisième compte debout dans le round : l\'arbitre arrête le combat.', 'tko'),
+        count4of2: f('Vous lui infligez deux comptes de plus dans le round, quatre dans le combat : arrêt.', 'tko'),
+        count4: f('Vous lui infligez son quatrième compte debout du combat : l\'arbitre arrête tout.', 'tko')
       },
       loss: {
         ko: [
           f('Vous êtes mis K.-O. L\'arbitre arrête tout.', 'ko'),
-          f('Un direct du droit vous éteint.', 'ko'),
-          f('Un coup au corps vous laisse au tapis pour le compte.', 'ko'),
-          f('Un crochet du gauche met fin à votre soirée.', 'ko'),
+          f('Vous êtes éteint par un direct du droit.', 'ko'),
+          f('Vous allez au tapis sur un coup au corps et ne vous relevez pas à temps.', 'ko'),
+          f('Vous prenez un crochet du gauche qui met fin à votre soirée.', 'ko'),
           f('Vous ne vous relevez pas avant dix.', 'ko')
         ],
         stop: [
-          f('Un enchaînement écrasant et l\'arbitre intervient.', 'tko'),
-          f('Votre coin jette l\'éponge.', 'tko'),
-          f('Bloqué dans les cordes sans répondre : l\'arbitre arrête tout.', 'tko')
+          f('Vous encaissez un enchaînement écrasant et l\'arbitre intervient.', 'tko'),
+          f('Vous encaissez trop ; votre coin jette l\'éponge.', 'tko'),
+          f('Vous êtes bloqué dans les cordes sans répondre : l\'arbitre arrête tout.', 'tko')
         ],
         doctor: [
           f('Votre arcade se rouvre. Le médecin arrête le combat.', 'tko'),
-          f('Le médecin revoit votre coupure et arrête tout.', 'tko')
+          f('Vous saignez à nouveau ; le médecin arrête tout.', 'tko')
         ],
         surprise: [
-          f('Coup surprise ! Un contre sorti de nulle part vous met K.-O. !', 'ko'),
-          f('Coup de chance : un crochet et vous êtes au tapis pour de bon !', 'ko'),
-          f('Alors que vous gagniez le round, un uppercut parfait. K.-O. !', 'ko'),
-          f('Un droit fou par-dessus arrive plein pot. Rideau !', 'ko'),
-          f('Vous vous avancez dans son contre et ne vous relevez pas !', 'ko'),
-          f('Contre le cours du combat, une rafale soudaine et l\'arbitre arrête tout !', 'tko')
+          f('Vous êtes cueilli par un contre sorti de nulle part. K.-O. !', 'ko'),
+          f('Vous prenez un crochet chanceux et vous êtes au tapis pour de bon !', 'ko'),
+          f('Vous gagnez le round, puis vous prenez un uppercut parfait. K.-O. !', 'ko'),
+          f('Vous êtes touché par un droit fou par-dessus. Rideau !', 'ko'),
+          f('Vous vous avancez dans un contre et ne vous relevez pas !', 'ko'),
+          f('Vous êtes submergé par une rafale soudaine contre le cours du combat : arrêt !', 'tko')
         ],
-        count3: f('Troisième compte debout du round : l\'arbitre arrête le combat.', 'tko'),
-        count4of2: f('Deux comptes de plus dans le round, quatre dans le combat : arrêt.', 'tko'),
-        count4: f('Votre quatrième compte debout du combat : l\'arbitre arrête tout.', 'tko')
+        count3: f('Vous prenez un troisième compte debout dans le round : l\'arbitre arrête le combat.', 'tko'),
+        count4of2: f('Vous prenez deux comptes de plus dans le round, quatre dans le combat : arrêt.', 'tko'),
+        count4: f('Vous prenez votre quatrième compte debout du combat : l\'arbitre arrête tout.', 'tko')
       },
       decision: {
-        win: (won, total) => `Les juges notent la boxe : vous avez gagné ${won} des ${total} rounds de boxe. Victoire aux points !`,
-        loss: (won, total) => `Les juges notent la boxe : votre adversaire a gagné ${won} des ${total} rounds de boxe. Défaite aux points.`
+        win: (won, total) => `Vous avez gagné ${won} des ${total} rounds de boxe sur les cartes des juges. Victoire aux points !`,
+        loss: (won, total) => `Vous avez perdu ${won} des ${total} rounds de boxe sur les cartes des juges. Défaite aux points.`
       }
     }
   }
