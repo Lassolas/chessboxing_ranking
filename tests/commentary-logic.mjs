@@ -89,6 +89,13 @@ for (const lang of ['en', 'fr']) {
   }
 }
 
+// No resigning in chessboxing: every chess finish is mate or time.
+for (const lang of ['en', 'fr']) {
+  const ch = COMMENTARY[lang].chess;
+  [ch.win, ch.loss].flatMap(o => Object.values(o).flat()).filter(x => !['mate', 'time'].includes(x.how))
+    .forEach(x => errors.push(`${lang}: chess finish that is not mate or time: ${x.t}`));
+}
+
 // Every line speaks to you, the fighter.
 for (const lang of ['en', 'fr']) {
   const all = [];

@@ -8,7 +8,8 @@
 //        (−2 lost … 0 equal … +2 winning). Opening lines only appear in the
 //        first chess round. A fight that reaches the decision had a drawn
 //        chess game, described in the last chess round. How a game is won
-//        (mate, resignation, time, swindle) follows the advantage, and time
+//        (mate, time, swindle; there is no resigning in chessboxing) follows
+//        the advantage, and time
 //        losses only happen once a clock can have run out.
 // Boxing Standing counts follow the amateur rule: three in a round or four
 //        in the fight end it, so a round that goes on never reaches that. A
@@ -156,9 +157,9 @@ export const COMMENTARY = {
           f('You finish your attack with checkmate.', 'mate'),
           f('You convert the extra material and mate.', 'mate'),
           f('You mate with a queen and rook battery.', 'mate'),
-          f('You leave your opponent no hope: they resign.', 'resign'),
-          f('You see your opponent stop the clock and offer a handshake.', 'resign'),
-          f('You threaten mate and your opponent resigns.', 'resign'),
+          f('You play it out for the crowd, no resigning here, and deliver mate.', 'mate'),
+          f('You march your king-hunt across the board and mate in front of a roaring crowd.', 'mate'),
+          f('You finish with a showy mate. The crowd is on its feet.', 'mate'),
           f('You watch their flag fall in a lost position: you win on time.', 'time'),
           f('You keep up the pressure until their clock runs out.', 'time')
         ],
@@ -173,7 +174,7 @@ export const COMMENTARY = {
           f('You set a desperate trap and they walk into mate.', 'mate'),
           f('You are lost, but their flag falls first!', 'time'),
           f('You are down material, but they lose on time!', 'time'),
-          f('You provoke a shocking blunder and your opponent resigns.', 'resign')
+          f('You provoke a shocking blunder and mate on the spot.', 'mate')
         ]
       },
       loss: {
@@ -182,9 +183,9 @@ export const COMMENTARY = {
           f('You cannot stop the mating attack.', 'mate'),
           f('You cannot hold the extra material: you get mated.', 'mate'),
           f('You get mated by queen and rook.', 'mate'),
-          f('You resign, the position is hopeless.', 'resign'),
-          f('You stop the clock and shake hands.', 'resign'),
-          f('You resign rather than face mate.', 'resign'),
+          f('You fight on for the crowd, no resigning here, until mate comes.', 'mate'),
+          f('You run your king around the board, but the mate lands. The crowd roars.', 'mate'),
+          f('You play every last move for the crowd, then get mated.', 'mate'),
           f('Your flag falls in a lost position: you lose on time.', 'time'),
           f('Your clock runs out while you look for a defence.', 'time')
         ],
@@ -199,7 +200,7 @@ export const COMMENTARY = {
           f('You fall for a desperate trap and get mated.', 'mate'),
           f('You are winning, but your flag falls first!', 'time'),
           f('You are up material, but you lose on time!', 'time'),
-          f('You make a shocking blunder and resign.', 'resign')
+          f('You make a shocking blunder and get mated on the spot.', 'mate')
         ]
       }
     },
@@ -469,9 +470,9 @@ export const COMMENTARY = {
           f('Vous concluez votre attaque par un mat.', 'mate'),
           f('Vous convertissez le matériel de plus et matez.', 'mate'),
           f('Vous matez avec la batterie dame-tour.', 'mate'),
-          f('Vous ne laissez aucun espoir : votre adversaire abandonne.', 'resign'),
-          f('Vous voyez votre adversaire arrêter la pendule et tendre la main.', 'resign'),
-          f('Vous menacez mat et votre adversaire abandonne.', 'resign'),
+          f('Vous jouez jusqu\'au bout pour le public, pas d\'abandon ici, et matez.', 'mate'),
+          f('Vous chassez le roi à travers l\'échiquier et matez devant une salle en délire.', 'mate'),
+          f('Vous finissez par un mat spectaculaire. La salle est debout.', 'mate'),
           f('Vous voyez son drapeau tomber en position perdue : victoire au temps.', 'time'),
           f('Vous maintenez la pression jusqu\'à ce que sa pendule tombe.', 'time')
         ],
@@ -486,7 +487,7 @@ export const COMMENTARY = {
           f('Vous tendez un piège désespéré et il tombe dans le mat.', 'mate'),
           f('Vous êtes perdu, mais son drapeau tombe en premier !', 'time'),
           f('Vous avez moins de matériel, mais il perd au temps !', 'time'),
-          f('Vous provoquez une gaffe incroyable et votre adversaire abandonne.', 'resign')
+          f('Vous provoquez une gaffe incroyable et matez sur-le-champ.', 'mate')
         ]
       },
       loss: {
@@ -495,9 +496,9 @@ export const COMMENTARY = {
           f('Vous ne pouvez pas arrêter l\'attaque de mat.', 'mate'),
           f('Vous ne tenez pas face au matériel en moins : mat.', 'mate'),
           f('Vous êtes maté par la dame et la tour.', 'mate'),
-          f('Vous abandonnez, la position est désespérée.', 'resign'),
-          f('Vous arrêtez la pendule et serrez la main.', 'resign'),
-          f('Vous abandonnez plutôt que de subir le mat.', 'resign'),
+          f('Vous vous battez pour le public, pas d\'abandon ici, jusqu\'au mat.', 'mate'),
+          f('Vous promenez votre roi sur tout l\'échiquier, mais le mat tombe. La salle rugit.', 'mate'),
+          f('Vous jouez chaque coup jusqu\'au bout pour le public, puis êtes maté.', 'mate'),
           f('Votre drapeau tombe dans une position perdue : défaite au temps.', 'time'),
           f('Votre pendule tombe pendant que vous cherchez une défense.', 'time')
         ],
@@ -512,7 +513,7 @@ export const COMMENTARY = {
           f('Vous tombez dans un piège désespéré et êtes maté.', 'mate'),
           f('Vous êtes gagnant, mais votre drapeau tombe en premier !', 'time'),
           f('Vous avez plus de matériel, mais vous perdez au temps !', 'time'),
-          f('Vous faites une gaffe incroyable et abandonnez.', 'resign')
+          f('Vous faites une gaffe incroyable et êtes maté sur-le-champ.', 'mate')
         ]
       }
     },

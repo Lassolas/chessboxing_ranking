@@ -82,7 +82,6 @@ export const i18n = {
     sim_by_time: "on time",
     sim_by_ko: "by knockout",
     sim_by_tko: "by referee stoppage",
-    sim_by_resign: "by resignation",
     board_word: "chess",
     ring_word: "boxing",
 
@@ -108,7 +107,7 @@ export const i18n = {
 <h3>1. Two ratings on an even scale</h3>
 <p>Chess uses ELO: one chess level is 229 ELO (800 to 2400). Boxing uses levels 0 to 5 (Novice to Professional). Both scales are even: each step multiplies your odds by the same amount, whatever level you start from.</p>
 <h3>2. Every round has three outcomes</h3>
-<p>You win the round (at the board: mate, time or resignation; in the ring: stoppage), your opponent wins it, or the fight goes on. Their chances are in the ratio:</p>
+<p>You win the round (at the board: mate or time, there is no resigning; in the ring: stoppage), your opponent wins it, or the fight goes on. Their chances are in the ratio:</p>
 <span class="formula">you win : they win : fight goes on = e^(+s) : e^(−s) : k
 s = a × (your level − their level)
     chess levels in chess rounds, boxing levels in boxing rounds</span>
@@ -257,7 +256,6 @@ white edge:    s + w for white, s − w for black
     sim_by_time: "au temps",
     sim_by_ko: "par K.-O.",
     sim_by_tko: "par arrêt de l'arbitre",
-    sim_by_resign: "par abandon",
     board_word: "échecs",
     ring_word: "boxe",
 
@@ -282,7 +280,7 @@ white edge:    s + w for white, s − w for black
 <h3>1. Deux classements sur une échelle régulière</h3>
 <p>Les échecs utilisent l'ELO : un niveau d'échecs vaut 229 ELO (800 à 2400). La boxe utilise des niveaux de 0 à 5 (Novice à Professionnel). Les deux échelles sont régulières : chaque palier multiplie vos chances par le même facteur, quel que soit votre niveau de départ.</p>
 <h3>2. Chaque round a trois issues</h3>
-<p>Vous gagnez le round (sur l'échiquier : mat, temps ou abandon ; sur le ring : arrêt), votre adversaire le gagne, ou le combat continue. Leurs chances sont dans le rapport :</p>
+<p>Vous gagnez le round (sur l'échiquier : mat ou temps, pas d'abandon ; sur le ring : arrêt), votre adversaire le gagne, ou le combat continue. Leurs chances sont dans le rapport :</p>
 <span class="formula">vous gagnez : il gagne : le combat continue = e^(+s) : e^(−s) : k
 s = a × (votre niveau − son niveau)
     niveau d'échecs aux rounds d'échecs, de boxe aux rounds de boxe</span>

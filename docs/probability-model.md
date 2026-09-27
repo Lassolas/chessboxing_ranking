@@ -431,7 +431,8 @@ with it:
 - **Chess:** an advantage level carries over between chess rounds (lost,
   worse, equal, better, winning), moved each round by who had the upper hand
   (drawn from that round's chances). Opening lines only appear in the first
-  chess round. How a game is won follows the advantage: mate or resignation
+  chess round. There is no resigning in chessboxing, so games are played out
+  to mate (or a flag). How a game is won follows the advantage: a clean mate
   when ahead, a swindle when behind. When the fight reaches the decision, the
   last chess round describes the drawn game.
 - **Clock:** a win or loss on time, and lines about a falling flag or seconds
