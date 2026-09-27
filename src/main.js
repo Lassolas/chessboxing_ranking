@@ -14,6 +14,7 @@ let myBox = 2.0;
 let oppChess = 3.0; // ≈1500 ELO (1486)
 let oppBox = 2.0;
 let strictMatchmaking = false;
+let showEarlyStoppageZone = true;
 let currentOppIdx = null;
 
 const canvas = document.getElementById('grid');
@@ -123,13 +124,13 @@ function showFightCard(idx, updateDrums = true) {
   renderRoundChart(myChess - oc, myBox - ob);
 
   document.getElementById('opponent-setup').classList.add('visible');
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 }
 
 function dismissFightCard() {
   document.getElementById('opponent-setup').classList.remove('visible');
   currentOppIdx = null;
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 }
 
 document.getElementById('fc-close-btn').addEventListener('click', dismissFightCard);
@@ -224,11 +225,11 @@ window.addEventListener('keydown', e => {
 
 const myChessSliderObj = setupSlider(
   'my-chess-slider', 'my-chess-val', getChessDrumLevels, myChess,
-  val => { myChess = val; updateMine(); draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx); pulseCard(); }
+  val => { myChess = val; updateMine(); draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone); pulseCard(); }
 );
 const myBoxSliderObj = setupSlider(
   'my-box-slider', 'my-box-val', getBoxingDrumLevels, myBox,
-  val => { myBox = val; updateMine(); draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx); pulseCard(); }
+  val => { myBox = val; updateMine(); draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone); pulseCard(); }
 );
 
 const oppChessSliderObj = setupSlider(
@@ -264,7 +265,7 @@ function updateRulesDisplay() {
   const minRnds = getActiveConfig().minExpectedRounds;
   const rules = [];
   if (strictMatchmaking) rules.push(t.rule_strict(minRnds));
-  rules.push(t.rule_early_stoppage(minRnds));
+  if (showEarlyStoppageZone) rules.push(t.rule_early_stoppage(minRnds));
   const el = document.getElementById('active-rules-container');
   el.innerHTML = rules.join('&ensp;·&ensp;');
   el.style.display = rules.length ? 'block' : 'none';
@@ -273,7 +274,14 @@ function updateRulesDisplay() {
 document.getElementById('strict-matchmaking-toggle').addEventListener('change', e => {
   strictMatchmaking = e.target.checked;
   updateRulesDisplay();
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
+});
+
+document.getElementById('early-stoppage-toggle').addEventListener('change', e => {
+  showEarlyStoppageZone = e.target.checked;
+  updateRulesDisplay();
+  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
+  document.getElementById('early-stoppage-legend').style.display = showEarlyStoppageZone ? 'flex' : 'none';
 });
 
 function setLang(lang) {
@@ -294,7 +302,7 @@ function setLang(lang) {
 
   updateMine();
   updateRulesDisplay();
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx);
+  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
 }
 
 document.getElementById('lang-switch').addEventListener('change', e => setLang(e.target.value));
@@ -307,7 +315,7 @@ document.querySelectorAll('.round-selector__btn').forEach(btn => {
     invalidateGrid();
     updateMine();
     updateRulesDisplay();
-    draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx);
+    draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
     if (currentOppIdx && document.getElementById('opponent-setup').classList.contains('visible')) {
       showFightCard(currentOppIdx, false);
     }

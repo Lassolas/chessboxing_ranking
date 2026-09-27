@@ -100,7 +100,7 @@ export function strokeLine(ctx, pts, col, width, dash) {
   ctx.restore();
 }
 
-export function draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx) {
+export function draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone) {
   const t = i18n[currentLang];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -112,8 +112,8 @@ export function draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppI
     }
   }
 
-  // Early stoppage zone is always shown; the matchmaking filter dims bad
-  // matchups on top of it, so both read together.
+  // The matchmaking filter dims bad matchups on top of the early stoppage
+  // zone, so both read together.
   const minRnds = getActiveConfig().minExpectedRounds;
   for (let j = 0; j < NY; j++) {
     for (let i = 0; i < NX; i++) {
@@ -122,7 +122,7 @@ export function draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppI
       const winProb = chessWin + boxWin;
       const { x, y } = cell2px(i, j);
 
-      if (expectedRounds < minRnds) {
+      if (showEarlyStoppageZone && expectedRounds < minRnds) {
         ctx.fillStyle = winProb >= 0.5
           ? 'rgba(40, 200, 40, 0.4)'  // Domination
           : 'rgba(200, 40, 40, 0.4)'; // Danger
