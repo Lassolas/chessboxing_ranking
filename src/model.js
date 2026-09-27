@@ -119,19 +119,20 @@ export const ROUND_CONFIGS = {
   },
 };
 
-// ── White-piece advantage ───────────────────────────────────────────────────
-// The 7-round data table lists fighter A as white. At equal chess level its
-// chess rounds give white a small edge; w = ½·ln(P(white wins) / P(black wins))
-// at Δchess = 0: R1 0.04, R3 0.08, R5 0.005, R7 0.055. An equal 7-round fight
-// then gives white 51.0 % (the table itself says 51.4 %). Other formats have no
-// data: first chess round 0.04, last 0.055, the ones in between 0.04.
-const WHITE_EDGE_7 = [0.04, 0.08, 0.005, 0.055];
-for (const [key, cfg] of Object.entries(ROUND_CONFIGS)) {
-  const chess = cfg.params.filter(p => p.type === 'chess');
-  chess.forEach((p, n) => {
-    p.w = key === '7' ? WHITE_EDGE_7[n] : n === chess.length - 1 ? 0.055 : 0.04;
-  });
-}
+// ── Level-dependent settings ────────────────────────────────────────────────
+// The fitted round parameters describe a club-level fight (chess ≈ 1486 ELO,
+// boxing ≈ Amateur). These settings bend them with the fighters' average level
+// (m = average chess level 0–7, n = average boxing level 0–5):
+//   chessLength  chess round end rate k × e^(chessLength·(m − 3)):
+//                higher-level chess games last longer and go to decision more.
+//   boxStoppage  boxing round end rate k × e^(−boxStoppage·(n − 2)):
+//                higher-level boxers stop each other more often.
+//   whiteEdge    edge for white in each chess round at Expert level and up
+//                (m ≥ 5), shrinking to a fifth of it for total beginners.
+//                0.1 ≈ white wins 55 % of equal fights decided at the board.
+// With chessLength = boxStoppage = 0 the model is the fitted club-level one.
+export const DEFAULT_SETTINGS = { chessLength: 0.2, boxStoppage: 0.4, whiteEdge: 0.1 };
+export const settings = { ...DEFAULT_SETTINGS };
 
 let _activeKey = '7';
 // Your pieces: +1 white, -1 black, 0 not drawn yet (average of both).
@@ -148,12 +149,23 @@ export function setActiveConfig(key) {
   matchupProbCache.clear();
 }
 
-function matchupProbsForSide(params, dChess, dBox, side) {
+export function setSetting(name, value) {
+  settings[name] = value;
+  matchupProbCache.clear();
+}
+
+const whiteEdgeAt = m => settings.whiteEdge * Math.min(1, 0.2 + 0.8 * m / 5);
+
+function matchupProbsForSide(params, dChess, dBox, m, n, side) {
+  const w = side * whiteEdgeAt(m);
+  const kChess = Math.exp(settings.chessLength * (m - 3));
+  const kBox = Math.exp(-settings.boxStoppage * (n - 2));
   let cont = 1, cumA = 0, cumB = 0;
   const out = [];
-  for (const { type, a, k, w = 0 } of params) {
-    const x = type === 'chess' ? dChess : dBox;
-    const s = a * x + side * w;
+  for (const { type, a, k: k0 } of params) {
+    const chess = type === 'chess';
+    const s = chess ? a * dChess + w : a * dBox;
+    const k = k0 * (chess ? kChess : kBox);
     const eA = Math.exp(s), eB = Math.exp(-s);
     const Z = eA + eB + k;
     cumA += cont * eA / Z;
@@ -164,32 +176,34 @@ function matchupProbsForSide(params, dChess, dBox, side) {
   return out;
 }
 
-export function getMatchupProbs(dChess, dBox, side = _side) {
+// Cumulative per-round probabilities for fighter A (you) vs B (opponent).
+export function getMatchupProbs(myC, myB, oppC, oppB, side = _side) {
   const params = getActiveConfig().params;
-  const normChess = +dChess.toFixed(2);
-  const normBox = +dBox.toFixed(2);
-  const key = `${_activeKey}|${side}|${normChess}|${normBox}`;
+  const key = `${_activeKey}|${side}|${myC.toFixed(1)}|${myB.toFixed(1)}|${oppC.toFixed(1)}|${oppB.toFixed(1)}`;
   const cached = matchupProbCache.get(key);
   if (cached) return cached;
 
+  const dChess = +(myC - oppC).toFixed(2), dBox = +(myB - oppB).toFixed(2);
+  const m = (myC + oppC) / 2, n = (myB + oppB) / 2;
   let out;
   if (side) {
-    out = matchupProbsForSide(params, normChess, normBox, side);
+    out = matchupProbsForSide(params, dChess, dBox, m, n, side);
   } else {
-    const w = matchupProbsForSide(params, normChess, normBox, 1);
-    const b = matchupProbsForSide(params, normChess, normBox, -1);
+    const w = matchupProbsForSide(params, dChess, dBox, m, n, 1);
+    const b = matchupProbsForSide(params, dChess, dBox, m, n, -1);
     out = w.map((p, r) => ({
       pA: (p.pA + b[r].pA) / 2, pB: (p.pB + b[r].pB) / 2, pCont: (p.pCont + b[r].pCont) / 2
     }));
   }
 
+  if (matchupProbCache.size > 50000) matchupProbCache.clear();
   matchupProbCache.set(key, out);
   return out;
 }
 
-export function getWinBreakdown(dChess, dBox, side = _side) {
+export function getWinBreakdown(myC, myB, oppC, oppB, side = _side) {
   const params = getActiveConfig().params;
-  const probs = getMatchupProbs(dChess, dBox, side);
+  const probs = getMatchupProbs(myC, myB, oppC, oppB, side);
   let prevA = 0, prevB = 0;
   let chessWin = 0, boxWin = 0, chessLoss = 0, boxLoss = 0, expectedRounds = 0;
 
@@ -211,8 +225,18 @@ export function getWinBreakdown(dChess, dBox, side = _side) {
   return { chessWin, boxWin, chessLoss, boxLoss, expectedRounds, probs };
 }
 
+// Uncached win chance with colours not drawn yet, for bulk work (star ranking).
+export function pWinNeutral(myC, myB, oppC, oppB) {
+  const params = getActiveConfig().params;
+  const dChess = myC - oppC, dBox = myB - oppB;
+  const m = (myC + oppC) / 2, n = (myB + oppB) / 2;
+  const w = matchupProbsForSide(params, dChess, dBox, m, n, 1);
+  const b = matchupProbsForSide(params, dChess, dBox, m, n, -1);
+  return (w[w.length - 1].pA + b[b.length - 1].pA) / 2;
+}
+
 export function pWin(myC, myB, oppC, oppB, side = _side) {
-  const probs = getMatchupProbs(myC - oppC, myB - oppB, side);
+  const probs = getMatchupProbs(myC, myB, oppC, oppB, side);
   return probs[probs.length - 1].pA;
 }
 

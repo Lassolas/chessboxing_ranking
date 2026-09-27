@@ -1,6 +1,6 @@
 import './style.css';
 import { i18n, currentLang, setLangState } from './i18n.js';
-import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, settings, setSetting, DEFAULT_SETTINGS, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 import { chessLevels, boxLevels, starsOf, rankOf, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
 import {
   chessCategory, boxCategory, getChessDrumLevels, getBoxingDrumLevels,
@@ -89,9 +89,9 @@ function verdict(p) {
 }
 
 // Per-round chances that the fight ends in that round, for each side.
-function roundBreakdown(dChess, dBox) {
+function roundBreakdown() {
   const params = getActiveConfig().params;
-  const { probs } = getWinBreakdown(dChess, dBox);
+  const { probs } = getWinBreakdown(myChess, myBox, oppChess, oppBox);
   let prevA = 0, prevB = 0;
   return probs.map((p, r) => {
     const row = {
@@ -129,7 +129,7 @@ function renderFight() {
   $('color-compare').textContent = getSide() ? '' :
     tt.color_compare(pct(pWin(myChess, myBox, oppChess, oppBox, 1)), pct(pWin(myChess, myBox, oppChess, oppBox, -1)));
 
-  const { chessWin, boxWin, chessLoss, boxLoss, expectedRounds } = getWinBreakdown(dC, dB);
+  const { chessWin, boxWin, chessLoss, boxLoss, expectedRounds } = getWinBreakdown(myChess, myBox, oppChess, oppBox);
   const segs = [boxWin, chessWin, chessLoss, boxLoss];
   [...$('ends-bar').children].forEach((el, k) => { el.style.flexGrow = segs[k]; });
   $('p-win-ring').textContent = pct(boxWin);
@@ -148,7 +148,7 @@ function renderFight() {
   $('game-plan').innerHTML = youBy === themBy
     ? escapeHtml(tt.edge_same(youBy))
     : `${escapeHtml(tt.edge_you)} <b class="gold">${escapeHtml(youBy)}</b>. ${escapeHtml(tt.edge_opp)} <b class="blue">${escapeHtml(themBy)}</b>.`;
-  const rows = roundBreakdown(dC, dB);
+  const rows = roundBreakdown();
   const best = keyRounds(rows, 'win'), danger = keyRounds(rows, 'loss');
   $('plan-rounds').innerHTML =
     (best.length ? `<div><span class="muted">${escapeHtml(tt.best_rounds)}</span> ${best.map(r => `<span class="chip chip--gold">${r}</span>`).join('')}</div>` : '') +
@@ -356,6 +356,29 @@ function setLang(lang) {
 }
 
 $('lang-switch').addEventListener('change', e => setLang(e.target.value));
+
+// Model settings ("How the numbers work")
+const settingInputs = [...document.querySelectorAll('[data-setting]')];
+function showSettings() {
+  settingInputs.forEach(el => {
+    el.value = settings[el.dataset.setting];
+    $('out-' + el.dataset.setting).textContent = (+el.value).toFixed(2);
+  });
+}
+function applySettings() {
+  invalidateGrid();
+  renderAll();
+}
+settingInputs.forEach(el => {
+  el.addEventListener('input', () => { $('out-' + el.dataset.setting).textContent = (+el.value).toFixed(2); });
+  el.addEventListener('change', () => { setSetting(el.dataset.setting, +el.value); applySettings(); });
+});
+$('settings-reset').addEventListener('click', () => {
+  Object.entries(DEFAULT_SETTINGS).forEach(([k, v]) => setSetting(k, v));
+  showSettings();
+  applySettings();
+});
+showSettings();
 
 document.querySelectorAll('input[name="side"]').forEach(r => r.addEventListener('change', e => {
   setSide(+e.target.value);

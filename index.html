@@ -215,6 +215,24 @@
     <details class="card details" id="d-method">
       <summary data-i18n="details_method">How the numbers work</summary>
       <p class="muted small" data-i18n="method_text"></p>
+      <div class="settings" id="model-settings">
+        <div class="setting">
+          <div class="setting__head"><label for="set-chessLength" data-i18n="set_chess_length">Chess games last longer at higher level</label><output id="out-chessLength"></output></div>
+          <input type="range" class="modern-slider" id="set-chessLength" data-setting="chessLength" min="0" max="1" step="0.05">
+          <p class="muted small" data-i18n="set_chess_length_hint"></p>
+        </div>
+        <div class="setting">
+          <div class="setting__head"><label for="set-boxStoppage" data-i18n="set_box_stoppage">More stoppages at higher boxing level</label><output id="out-boxStoppage"></output></div>
+          <input type="range" class="modern-slider" id="set-boxStoppage" data-setting="boxStoppage" min="0" max="1" step="0.05">
+          <p class="muted small" data-i18n="set_box_stoppage_hint"></p>
+        </div>
+        <div class="setting">
+          <div class="setting__head"><label for="set-whiteEdge" data-i18n="set_white_edge">White edge for strong players</label><output id="out-whiteEdge"></output></div>
+          <input type="range" class="modern-slider" id="set-whiteEdge" data-setting="whiteEdge" min="0" max="0.2" step="0.01">
+          <p class="muted small" data-i18n="set_white_edge_hint"></p>
+        </div>
+        <button type="button" class="btn-ghost" id="settings-reset" data-i18n="set_reset">Reset to defaults</button>
+      </div>
     </details>
 
     <!-- ── KNOWN FIGHTERS ── -->

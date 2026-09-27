@@ -1,4 +1,4 @@
-import { pWin, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP, eloOf, getActiveConfig, getWinBreakdown, MATCHMAKING_CONSTRAINTS } from './model.js';
+import { pWin, pWinNeutral, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP, eloOf, getActiveConfig, getWinBreakdown, MATCHMAKING_CONSTRAINTS } from './model.js';
 import { getChessNamed, getBoxingNamed, i18n, currentLang } from './i18n.js';
 
 export function buildLevels(min, max, step) {
@@ -25,22 +25,24 @@ export function rankOf(i, j)  {
 // Domination (Copeland) rating: count how many profiles each profile beats
 // with > 50 % (colour not drawn yet), then rank profiles by that count (ties
 // share the average rank).
-// Being ahead by >= 0.8 stars (1.0 in the 5-round format) guarantees > 50 % to
-// win. An exact rule for any gap is impossible: the model has
-// rock-paper-scissors cycles.
+// With the default settings, being ahead by about 1.1 stars or more guarantees
+// > 50 % to win in every format. An exact rule for any gap is impossible: the
+// model has rock-paper-scissors cycles.
 let _rank = null;
 function ensureRank() {
   if (_rank) return;
   const N = NX * NY;
   const beats = new Float32Array(N);
-  for (let j = 0; j < NY; j++)
-    for (let i = 0; i < NX; i++) {
-      let n = 0;
-      for (let j2 = 0; j2 < NY; j2++)
-        for (let i2 = 0; i2 < NX; i2++)
-          if (pWin(chessLevels[i], boxLevels[j], chessLevels[i2], boxLevels[j2], 0) > 0.5) n++;
-      beats[j * NX + i] = n;
+  const lv = k => [chessLevels[k % NX], boxLevels[Math.floor(k / NX)]];
+  for (let a = 0; a < N; a++) {
+    const [c1, b1] = lv(a);
+    for (let b = a + 1; b < N; b++) {
+      const [c2, b2] = lv(b);
+      const p = pWinNeutral(c1, b1, c2, b2);
+      if (p > 0.5) beats[a]++;
+      else if (p < 0.5) beats[b]++;
     }
+  }
   const order = [...beats.keys()].sort((a, b) => beats[a] - beats[b]);
   _rank = new Float32Array(N);
   for (let s = 0; s < N; ) {
@@ -126,7 +128,7 @@ export function draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppI
   for (let j = 0; j < NY; j++) {
     for (let i = 0; i < NX; i++) {
       const boxDiff = Math.abs(myBox - boxLevels[j]);
-      const { expectedRounds, chessWin, boxWin } = getWinBreakdown(myChess - chessLevels[i], myBox - boxLevels[j]);
+      const { expectedRounds, chessWin, boxWin } = getWinBreakdown(myChess, myBox, chessLevels[i], boxLevels[j]);
       const winProb = chessWin + boxWin;
       const { x, y } = cell2px(i, j);
 
