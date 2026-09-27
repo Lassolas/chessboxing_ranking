@@ -14,8 +14,8 @@
 //        in the fight end it, so a round that goes on never reaches that. A
 //        stoppage names the count that ended it. The doctor only stops a
 //        fight after a cut. Each boxing round that goes on has a points
-//        winner, and a decision on points goes to the fighter who won more
-//        of those rounds.
+//        winner, and a decision on points goes to the fighter who won the
+//        majority of those rounds.
 
 const f = (t, how) => ({ t, how });
 const c = (t, you = 0, them = 0) => ({ t, you, them });
@@ -328,8 +328,8 @@ export const COMMENTARY = {
         count4: f('You take your fourth standing count of the fight: the referee stops it.', 'tko')
       },
       decision: {
-        win: (won, total) => `You won ${won} of ${total} boxing rounds on the judges' cards. Victory on points!`,
-        loss: (won, total) => `You lost ${won} of ${total} boxing rounds on the judges' cards. Defeat on points.`
+        win: (w, o, e) => `On the judges' cards you won ${w} boxing rounds to ${o}${e ? ` (${e} even)` : ''}. Victory on points!`,
+        loss: (w, o, e) => `On the judges' cards you lost ${w} boxing rounds to ${o}${e ? ` (${e} even)` : ''}. Defeat on points.`
       }
     }
   },
@@ -641,8 +641,8 @@ export const COMMENTARY = {
         count4: f('Vous prenez votre quatrième compte debout du combat : l\'arbitre arrête tout.', 'tko')
       },
       decision: {
-        win: (won, total) => `Vous avez gagné ${won} des ${total} rounds de boxe sur les cartes des juges. Victoire aux points !`,
-        loss: (won, total) => `Vous avez perdu ${won} des ${total} rounds de boxe sur les cartes des juges. Défaite aux points.`
+        win: (w, o, e) => `Sur les cartes des juges, vous gagnez ${w} rounds de boxe à ${o}${e ? ` (${e} nul${e > 1 ? 's' : ''})` : ''}. Victoire aux points !`,
+        loss: (w, o, e) => `Sur les cartes des juges, vous perdez ${w} rounds de boxe à ${o}${e ? ` (${e} nul${e > 1 ? 's' : ''})` : ''}. Défaite aux points.`
       }
     }
   }
@@ -682,12 +682,12 @@ export function narrate(lang, rounds) {
   const rows = [];
 
   // Points winner of each boxing round that went on. A decision must go to
-  // the fighter who won more of them, so redraw until it does.
+  // the fighter who won the majority of them, so redraw until it does.
   const boxOn = rounds.filter(r => r.type === 'box' && !r.result);
   let leans = boxOn.map(r => drawLean(r.pA, r.pB));
   if (last.decision && boxOn.length) {
     const other = winner === 'you' ? 'them' : 'you';
-    const ok = ls => ls.filter(l => l === winner).length > ls.filter(l => l === other).length;
+    const ok = ls => ls.filter(l => l === winner).length * 2 > ls.length;
     for (let i = 0; i < 200 && !ok(leans); i++) leans = boxOn.map(r => drawLean(r.pA, r.pB));
     for (let i = leans.length - 1; i >= 0 && !ok(leans); i--) leans[i] = winner;
   }
@@ -703,9 +703,9 @@ export function narrate(lang, rounds) {
     const hotChance = Math.min(0.9, (r.pA + r.pB) * 1.5);
 
     if (r.decision) {
-      const won = tally[winner];
-      const total = boxOn.length;
-      rows.push({ text: L.box.decision[winner === 'you' ? 'win' : 'loss'](won, total), result: winner });
+      const other = winner === 'you' ? 'them' : 'you';
+      const even = boxOn.length - tally.you - tally.them;
+      rows.push({ text: L.box.decision[winner === 'you' ? 'win' : 'loss'](tally[winner], tally[other], even), result: winner });
       how = 'points';
       return;
     }

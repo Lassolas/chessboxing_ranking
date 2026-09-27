@@ -447,9 +447,9 @@ with it:
   stoppage on counts names the count that ended it. The doctor only stops a
   fight after a cut. Surprise knockouts are used when the winner had under
   20 % to finish in that round or was behind on the cards.
-- **Decision:** each boxing round that goes on has a points winner. A decision
-  goes to the fighter who won more of those rounds, and the result says the
-  score ("you won 3 of 4 boxing rounds").
+- **Decision:** each boxing round that goes on has a points winner (or is
+  even). A decision goes to the fighter who won the majority of those rounds,
+  and the result gives the score ("you won 2 boxing rounds to 1").
 
 `tests/commentary-logic.mjs` (part of `npm test`) simulates 16,000 fights and
 checks all of these rules.

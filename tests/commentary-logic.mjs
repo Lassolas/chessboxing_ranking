@@ -75,7 +75,8 @@ for (const lang of ['en', 'fr']) {
           }
           if (rd.decision) {
             const w = row.result, o = w === 'you' ? 'them' : 'you';
-            if (won[w] <= won[o]) errors.push(`${where}: points to ${w} but boxing rounds ${won[w]}-${won[o]}`);
+            const total = won.you + won.them + won.even;
+            if (won[w] * 2 <= total) errors.push(`${where}: points to ${w} but only ${won[w]} of ${total} boxing rounds`);
             if (story.boxing.won !== won[w]) errors.push(`${where}: decision says ${story.boxing.won} rounds, story shows ${won[w]}`);
           }
         });
