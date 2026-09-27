@@ -14,34 +14,41 @@ export const NY = boxLevels.length;
 export const CELL = 16;
 export const MARGIN = { top: 50, right: 34, bottom: 94, left: 150 };
 
-// Lazy grid: recomputed whenever invalidateGrid() is called (i.e. on format change).
-let _avgP = null, _minAvg = 0, _maxAvg = 1;
-
-function ensureGrid() {
-  if (_avgP) return;
-  _avgP = new Float32Array(NX * NY);
-  _minAvg = Infinity; _maxAvg = -Infinity;
-  for (let j = 0; j < NY; j++) {
-    for (let i = 0; i < NX; i++) {
-      const c1 = chessLevels[i], b1 = boxLevels[j];
-      let sum = 0;
-      for (let j2 = 0; j2 < NY; j2++)
-        for (let i2 = 0; i2 < NX; i2++)
-          sum += pWin(c1, b1, chessLevels[i2], boxLevels[j2]);
-      _avgP[j * NX + i] = sum / (NX * NY);
-    }
-  }
-  for (let k = 0; k < _avgP.length; k++) {
-    if (_avgP[k] < _minAvg) _minAvg = _avgP[k];
-    if (_avgP[k] > _maxAvg) _maxAvg = _avgP[k];
-  }
-}
-
-export function invalidateGrid() { _avgP = null; }
+// Recomputed on format change.
+export function invalidateGrid() { _rank = null; }
 
 export function rankOf(i, j)  {
-  ensureGrid();
-  return (_avgP[j * NX + i] - _minAvg) / (_maxAvg - _minAvg);
+  ensureRank();
+  return _rank[j * NX + i];
+}
+
+// Domination (Copeland) rating: count how many profiles each profile beats
+// with > 50 %, then rank profiles by that count (ties share the average rank).
+// Being ahead by >= 0.8 stars (1.0 in the 5-round format) guarantees > 50 % to
+// win. An exact rule for any gap is impossible: the model has
+// rock-paper-scissors cycles.
+let _rank = null;
+function ensureRank() {
+  if (_rank) return;
+  const N = NX * NY;
+  const beats = new Float32Array(N);
+  for (let j = 0; j < NY; j++)
+    for (let i = 0; i < NX; i++) {
+      let n = 0;
+      for (let j2 = 0; j2 < NY; j2++)
+        for (let i2 = 0; i2 < NX; i2++)
+          if (pWin(chessLevels[i], boxLevels[j], chessLevels[i2], boxLevels[j2]) > 0.5) n++;
+      beats[j * NX + i] = n;
+    }
+  const order = [...beats.keys()].sort((a, b) => beats[a] - beats[b]);
+  _rank = new Float32Array(N);
+  for (let s = 0; s < N; ) {
+    let e = s;
+    while (e + 1 < N && beats[order[e + 1]] === beats[order[s]]) e++;
+    const r = (s + e) / 2 / (N - 1);
+    for (let k = s; k <= e; k++) _rank[order[k]] = r;
+    s = e + 1;
+  }
 }
 export function starsOf(i, j) { return rankOf(i, j) * 5; }
 

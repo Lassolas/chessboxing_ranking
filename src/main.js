@@ -14,7 +14,7 @@ let myBox = 2.0;
 let oppChess = 3.0; // ≈1500 ELO (1486)
 let oppBox = 2.0;
 let strictMatchmaking = false;
-let showEarlyStoppageZone = true;
+let showEarlyStoppageZone = false;
 let currentOppIdx = null;
 
 const canvas = document.getElementById('grid');
