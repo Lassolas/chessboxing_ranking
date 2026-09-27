@@ -175,12 +175,16 @@ white edge:    s + w for white, s − w for black
       { short: 'Elite / GM', sub: '2400 ELO' }
     ],
     boxing_names: [
-      { short: 'Never boxed', sub: 'No sparring' },
-      { short: 'Gym boxer', sub: 'Trains, light sparring' },
-      { short: 'Regular sparrer', sub: 'Hard sparring regularly' },
-      { short: 'Amateur fighter', sub: 'First official bouts' },
-      { short: 'Experienced amateur', sub: '10+ bouts, regional level' },
-      { short: 'Elite / Pro', sub: 'National level or pro' }
+      { value: 0, short: 'Never boxed', sub: 'No sparring' },
+      { value: 1, short: 'Gym boxer', sub: 'Trains, light sparring' },
+      { value: 1.5, short: 'Technical sparrer', sub: 'Controlled sparring' },
+      { value: 2, short: 'Regular sparrer', sub: 'Hard sparring regularly' },
+      { value: 2.5, short: 'Interclub boxer', sub: 'Interclub or unofficial bouts' },
+      { value: 3, short: 'Amateur fighter', sub: 'First official bouts' },
+      { value: 3.5, short: 'Active amateur', sub: '5–10 official bouts' },
+      { value: 4, short: 'Experienced amateur', sub: '10+ bouts, regional level' },
+      { value: 4.5, short: 'National amateur', sub: 'National level' },
+      { value: 5, short: 'Elite / Pro', sub: 'International or pro' }
     ]
   },
   fr: {
@@ -349,12 +353,16 @@ avantage blancs : s + w pour les blancs, s − w pour les noirs
       { short: 'Élite / GMI', sub: '2400 ELO' }
     ],
     boxing_names: [
-      { short: 'Jamais boxé', sub: 'Aucun sparring' },
-      { short: 'Boxeur de salle', sub: "S'entraîne, sparring léger" },
-      { short: 'Sparring régulier', sub: 'Sparring dur régulier' },
-      { short: 'Combattant amateur', sub: 'Premiers combats officiels' },
-      { short: 'Amateur confirmé', sub: '10+ combats, niveau régional' },
-      { short: 'Élite / Pro', sub: 'Niveau national ou pro' }
+      { value: 0, short: 'Jamais boxé', sub: 'Aucun sparring' },
+      { value: 1, short: 'Boxeur de salle', sub: "S'entraîne, sparring léger" },
+      { value: 1.5, short: 'Sparring technique', sub: 'Sparring contrôlé' },
+      { value: 2, short: 'Sparring régulier', sub: 'Sparring dur régulier' },
+      { value: 2.5, short: 'Boxeur interclub', sub: 'Interclubs ou combats non officiels' },
+      { value: 3, short: 'Combattant amateur', sub: 'Premiers combats officiels' },
+      { value: 3.5, short: 'Amateur actif', sub: '5 à 10 combats officiels' },
+      { value: 4, short: 'Amateur confirmé', sub: '10+ combats, niveau régional' },
+      { value: 4.5, short: 'Amateur national', sub: 'Niveau national' },
+      { value: 5, short: 'Élite / Pro', sub: 'International ou pro' }
     ]
   }
 };
@@ -362,7 +370,7 @@ avantage blancs : s + w pour les blancs, s − w pour les noirs
 export let currentLang = 'en';
 
 export function getChessNamed() { return i18n[currentLang].chess_names.map((n, i) => ({ value: i, ...n })); }
-export function getBoxingNamed() { return i18n[currentLang].boxing_names.map((n, i) => ({ value: i, ...n })); }
+export function getBoxingNamed() { return i18n[currentLang].boxing_names.map((n, i) => ({ value: i, ...n })); } // value set explicitly (half steps allowed)
 
 export function setLangState(lang) {
   currentLang = lang;

@@ -23,10 +23,12 @@ export function boxLabel(b) {
   return { short: boxCategory(b), sub: 'Lv ' + b.toFixed(1) };
 }
 
+// The highest named boxing level reached (like the chess categories).
 export function boxCategory(v) {
   const arr = getBoxingNamed();
-  const named = arr.find(n => n.value === v);
-  return named ? named.short : closestNamed(arr, v).short;
+  let best = arr[0];
+  for (const n of arr) if (v >= n.value - 1e-9) best = n;
+  return best.short;
 }
 
 export function escapeHtml(str) {
