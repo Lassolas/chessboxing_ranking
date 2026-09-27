@@ -104,14 +104,16 @@ P(you win the fight) = sum over all rounds</span>
 <h3>5. Adjusted to the fighters' level</h3>
 <p>The fitted values describe a club-level fight (about 1486 ELO, Amateur boxers). Other levels use the two fighters' average chess level <b>m</b> (0–7) and boxing level <b>n</b> (0–5):</p>
 <span class="formula">chess rounds:  k × e^(0.2 × (m − 3))    longer games between strong players
+               × e^(−0.5 × |chess gap|) from round 3: a big mismatch collapses fast
+                                        (not round 1: players stall in the opening)
 boxing rounds: k × e^(−0.4 × (n − 2))  more stoppages between strong boxers
 white edge:    s + w for white, s − w for black
                w = 0.1 × min(1, 0.2 + 0.8 × m / 5)</span>
-<p>In this fight: m = <b>${v.m}</b>, n = <b>${v.n}</b>, so chess k × <b>${v.kc}</b>, boxing k × <b>${v.kb}</b> and white edge w = <b>${v.w}</b>.</p>
+<p>In this fight: m = <b>${v.m}</b>, chess gap <b>${v.gap}</b> levels, n = <b>${v.n}</b>, so chess k × <b>${v.kc}</b> from round 3, boxing k × <b>${v.kb}</b> and white edge w = <b>${v.w}</b>.</p>
 <h3>6. Colours</h3>
 <p>With White or Black selected, the white edge goes to you or to your opponent. "Not drawn" averages both cases.</p>
 <h3>7. Stars</h3>
-<p>Every possible profile (36 chess × 26 boxing steps) fights every other one with colours not drawn. Profiles are ranked by how many others they beat with more than 50 %, and that rank becomes 0 to 5 stars. "More stars always wins" cannot hold for every pair because the model has rock-paper-scissors cycles, but being about 1.1 stars ahead or more always makes you the favourite.</p>
+<p>Every possible profile (36 chess × 26 boxing steps) fights every other one with colours not drawn. Profiles are ranked by how many others they beat with more than 50 %, and that rank becomes 0 to 5 stars. "More stars always wins" cannot hold for every pair because the model has rock-paper-scissors cycles, but being about 1.3 stars ahead or more always makes you the favourite.</p>
 <h3>8. This fight, round by round</h3>`,
     mt_round: "Round",
     mt_type: "Type",
@@ -254,14 +256,16 @@ P(vous gagnez le combat)  = somme sur tous les rounds</span>
 <h3>5. Ajusté au niveau des combattants</h3>
 <p>Les valeurs ajustées décrivent un combat de niveau club (environ 1486 ELO, boxeurs Amateur). Pour les autres niveaux, on utilise le niveau moyen d'échecs <b>m</b> (0–7) et de boxe <b>n</b> (0–5) des deux combattants :</p>
 <span class="formula">rounds d'échecs : k × e^(0,2 × (m − 3))    parties plus longues entre forts joueurs
+                  × e^(−0,5 × |écart échecs|) dès le round 3 : un gros écart finit vite
+                                             (pas au round 1 : on temporise dans l'ouverture)
 rounds de boxe :  k × e^(−0,4 × (n − 2))   plus d'arrêts entre forts boxeurs
 avantage blancs : s + w pour les blancs, s − w pour les noirs
                   w = 0,1 × min(1 ; 0,2 + 0,8 × m / 5)</span>
-<p>Dans ce combat : m = <b>${v.m}</b>, n = <b>${v.n}</b>, donc k échecs × <b>${v.kc}</b>, k boxe × <b>${v.kb}</b> et avantage blancs w = <b>${v.w}</b>.</p>
+<p>Dans ce combat : m = <b>${v.m}</b>, écart d'échecs <b>${v.gap}</b> niveaux, n = <b>${v.n}</b>, donc k échecs × <b>${v.kc}</b> dès le round 3, k boxe × <b>${v.kb}</b> et avantage blancs w = <b>${v.w}</b>.</p>
 <h3>6. Couleurs</h3>
 <p>Avec Blancs ou Noirs sélectionné, l'avantage des blancs va à vous ou à votre adversaire. « Pas tiré » fait la moyenne des deux cas.</p>
 <h3>7. Étoiles</h3>
-<p>Chaque profil possible (36 paliers d'échecs × 26 de boxe) affronte tous les autres, couleurs non tirées. Les profils sont classés selon le nombre d'autres profils qu'ils battent à plus de 50 %, et ce rang donne 0 à 5 étoiles. « Plus d'étoiles gagne toujours » ne peut pas être vrai pour chaque paire car le modèle a des cycles pierre-feuille-ciseaux, mais avec environ 1,1 étoile d'avance ou plus, vous êtes toujours favori.</p>
+<p>Chaque profil possible (36 paliers d'échecs × 26 de boxe) affronte tous les autres, couleurs non tirées. Les profils sont classés selon le nombre d'autres profils qu'ils battent à plus de 50 %, et ce rang donne 0 à 5 étoiles. « Plus d'étoiles gagne toujours » ne peut pas être vrai pour chaque paire car le modèle a des cycles pierre-feuille-ciseaux, mais avec environ 1,3 étoile d'avance ou plus, vous êtes toujours favori.</p>
 <h3>8. Ce combat, round par round</h3>`,
     mt_round: "Round",
     mt_type: "Type",

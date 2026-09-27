@@ -25,7 +25,7 @@ export function rankOf(i, j)  {
 // Domination (Copeland) rating: count how many profiles each profile beats
 // with > 50 % (colour not drawn yet), then rank profiles by that count (ties
 // share the average rank).
-// Being ahead by about 1.1 stars or more guarantees
+// Being ahead by about 1.3 stars or more guarantees
 // > 50 % to win in every format. An exact rule for any gap is impossible: the
 // model has rock-paper-scissors cycles.
 let _rank = null, _sortedBeats = null;

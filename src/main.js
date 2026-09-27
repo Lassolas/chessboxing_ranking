@@ -1,6 +1,6 @@
 import './style.css';
 import { i18n, currentLang, setLangState } from './i18n.js';
-import { eloOf, levelOfElo, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kBoxFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { eloOf, levelOfElo, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kGapFactor, kBoxFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 import { chessLevels, boxLevels, starsOf, starsAt, rankAt, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
 import {
   chessCategory, boxCategory, chessLabel, boxLabel,
@@ -168,10 +168,10 @@ function renderFight() {
 function renderMethod(rows) {
   const tt = t();
   const m = (myChess + oppChess) / 2, n = (myBox + oppBox) / 2;
-  const kc = kChessFactor(m), kb = kBoxFactor(n);
+  const kc = kChessFactor(m) * kGapFactor(myChess - oppChess), kb = kBoxFactor(n);
   const num = v => currentLang === 'fr' ? String(v).replace('.', ',') : String(v);
   $('method-body').innerHTML = tt.method_html({
-    m: num(m.toFixed(1)), n: num(n.toFixed(1)),
+    m: num(m.toFixed(1)), n: num(n.toFixed(1)), gap: num(Math.abs(myChess - oppChess).toFixed(2)),
     kc: num(kc.toFixed(2)), kb: num(kb.toFixed(2)), w: num(whiteEdgeAt(m).toFixed(3))
   });
   const params = getActiveConfig().params;
@@ -180,7 +180,7 @@ function renderMethod(rows) {
     `<thead><tr><th>${tt.mt_round}</th><th>${tt.mt_type}</th><th>${tt.mt_a}</th><th>${tt.mt_k}</th><th>${tt.mt_k_fight}</th><th>${tt.mt_win}</th><th>${tt.mt_loss}</th><th>${tt.mt_cont}</th></tr></thead><tbody>` +
     rows.map((r, i) => {
       const { type, a, k } = params[i];
-      const kHere = k * (type === 'chess' ? kc : kb);
+      const kHere = k * (type === 'chess' ? (i === 0 ? kChessFactor((myChess + oppChess) / 2) : kc) : kb);
       return `<tr${r.win + r.loss >= 0.15 ? ' class="hl"' : ''}><td>${r.label}</td><td>${type === 'chess' ? tt.mt_chess : tt.mt_box}</td>` +
         `<td>${num(a.toFixed(2))}</td><td>${num(fmtK(k))}</td><td>${num(fmtK(kHere))}</td>` +
         `<td>${num((r.win * 100).toFixed(1))}%</td><td>${num((r.loss * 100).toFixed(1))}%</td><td>${num((r.cont * 100).toFixed(1))}%</td></tr>`;
