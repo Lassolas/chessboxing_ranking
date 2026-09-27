@@ -8,6 +8,10 @@ This project is hosted on GitHub Pages. You can view the live page here:
 [https://Lassolas.github.io/chessboxing_ranking/](https://Lassolas.github.io/chessboxing_ranking/)
 
 
+## How the probabilities work
+
+See [docs/probability-model.md](docs/probability-model.md) for the fight model, the star rating, assumptions, limitations and future work.
+
 ## How to launch the page
 
 1. **Install dependencies** (if you haven't already):
