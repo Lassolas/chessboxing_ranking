@@ -63,7 +63,9 @@ export const ROUND_CONFIGS = {
       { type: 'box', a: 1.0689, k: 8.077 }, // R2
       { type: 'chess', a: 0.57, k: 60 }, // R3
       { type: 'box', a: 1.1695, k: 15.236 }, // R4
-      { type: 'chess', a: 0.81, k: 3.2103 }, // R5
+      { type: 'chess', a: 0.81, k: 9.63 }, // R5  key round: k was 3.21, ×3 so it only
+      //   finishes early when one player is clearly better (time win); close
+      //   club players rarely finish here
       { type: 'box', a: 1.3734, k: 38.332 }, // R6
       { type: 'chess', a: 1.17, k: 0.6419 }, // R7* last chess fighting round
       { type: 'box', a: 1.7, k: 0 }, // R8  boxing decision
