@@ -12,6 +12,10 @@ This project is hosted on GitHub Pages. You can view the live page here:
 
 See [docs/probability-model.md](docs/probability-model.md) for the fight model, the star rating, assumptions, limitations and future work.
 
+## Checking the model
+
+Run `npm test` to check the model against the expert test set in `tests/expert-cases.json`.
+
 ## How to launch the page
 
 1. **Install dependencies** (if you haven't already):

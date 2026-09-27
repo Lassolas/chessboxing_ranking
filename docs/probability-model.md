@@ -436,6 +436,11 @@ chessboxer before looking at the model: who is favourite, and how the fight
 usually ends. The boxing pace and gap rule (section 4) were tuned on it.
 "A wins" is the model's chance for fighter A after tuning.
 
+The cases and answers are stored in `tests/expert-cases.json`. Run `npm test` after
+any change to the model: it recomputes every case, prints the numbers, and fails
+if a case that used to match no longer does (cases marked `known_issue` are
+reported without failing).
+
 | # | Rounds | A (ELO / boxing) | B (ELO / boxing) | Expert | A wins | Main ending in the model |
 |---|---|---|---|---|---|---|
 | 1 | 5 | 1900 / 0.5 | 1200 / 3 | B, KO in the first boxing round | 19 % | B by KO in R2 |
