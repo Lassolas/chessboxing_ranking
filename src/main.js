@@ -7,6 +7,7 @@ import {
   buildStarSvg, setStars, setupSlider, pulse, miniStarsHTML, tooltipLineHTML, escapeHtml
 } from './ui.js';
 import { FIGHTERS as RAW_FIGHTERS } from './fighters.js';
+import { COMMENTARY } from './commentary.js';
 
 // Fighters list entries give ELO; the model works in chess levels (0–7).
 const FIGHTERS = RAW_FIGHTERS.map(f => ({ ...f, chess: f.elo != null ? levelOfElo(f.elo) : f.chess }));
@@ -207,60 +208,70 @@ function renderRounds(rows) {
 // ── Simulated fight (for fun) ────────────────────────────────────────────────
 // Walks the rounds with the model's conditional chances: in each round the fight
 // ends for you, for your opponent, or goes on. Colours are drawn first when
-// they are not set.
-// Picks a line not used yet in this fight when possible.
-const pick = (arr, used) => {
+// they are not set. The commentary line is picked from those same chances:
+// who had the upper hand, how close the round came to a finish, and whether a
+// finish was expected or a surprise (see src/commentary.js).
+function pickLine(arr, used) {
   const fresh = arr.filter(s => !used.has(s));
-  const s = (fresh.length ? fresh : arr)[Math.floor(Math.random() * (fresh.length || arr.length))];
+  const pool = fresh.length ? fresh : arr;
+  const s = pool[Math.floor(Math.random() * pool.length)];
   used.add(s);
   return s;
-};
+}
 
 function simulateFight() {
   const tt = t();
+  const lines = COMMENTARY[currentLang] || COMMENTARY.en;
   const params = getActiveConfig().params;
   const side = getSide() || (Math.random() < 0.5 ? 1 : -1);
   const probs = getMatchupProbs(myChess, myBox, oppChess, oppBox, side);
-  const lines = [];
-  if (!getSide()) lines.push(`<p class="sim__colors">${escapeHtml(tt.sim_colors(side === 1 ? tt.sim_white : tt.sim_black))}</p>`);
+  const rows = [];
+  if (!getSide()) rows.push(`<p class="sim__colors">${escapeHtml(tt.sim_colors(side === 1 ? tt.sim_white : tt.sim_black))}</p>`);
 
-  let prevA = 0, prevB = 0, prevCont = 1, final = '';
+  let prevA = 0, prevB = 0, prevCont = 1, final = '', won = false;
   const used = new Set();
   for (let r = 0; r < params.length; r++) {
-    const { type } = params[r];
+    const chess = params[r].type === 'chess';
     const decision = r === params.length - 1;
+    // Chances this round, given the fight is still on.
     const pA = (probs[r].pA - prevA) / prevCont, pB = (probs[r].pB - prevB) / prevCont;
     prevA = probs[r].pA; prevB = probs[r].pB; prevCont = probs[r].pCont;
+    const d = chess ? lines.chess : lines.box;
+
     const roll = Math.random();
-    const chess = type === 'chess';
-    // Late chess rounds and big clock gaps end on time more often than by mate.
-    const onTime = chess && Math.random() < (r >= params.length - 3 ? 0.6 : 0.3);
     let text, cls = '';
-    if (roll < pA) {
-      text = decision ? tt.sim_win_points : chess ? (onTime ? tt.sim_win_time : tt.sim_win_mate) : tt.sim_win_ko;
-      final = decision ? tt.sim_final_win_points : tt.sim_final_win(chess ? (onTime ? tt.sim_by_time : tt.sim_by_mate) : tt.sim_by_ko, r + 1);
-      cls = 'sim__row--win';
-    } else if (roll < pA + pB) {
-      text = decision ? tt.sim_loss_points : chess ? (onTime ? tt.sim_loss_time : tt.sim_loss_mate) : tt.sim_loss_ko;
-      final = decision ? tt.sim_final_loss_points : tt.sim_final_loss(chess ? (onTime ? tt.sim_by_time : tt.sim_by_mate) : tt.sim_by_ko, r + 1);
-      cls = 'sim__row--loss';
+    if (roll < pA + pB) {
+      won = roll < pA;
+      cls = won ? 'sim__row--win' : 'sim__row--loss';
+      if (decision) {
+        text = pickLine(won ? lines.draw.win : lines.draw.loss, used);
+        final = won ? tt.sim_final_win_points : tt.sim_final_loss_points;
+      } else {
+        // A finish is a surprise when the winner had little chance of it this round.
+        const surprise = (won ? pA : pB) < 0.2;
+        const line = pickLine((won ? d.win : d.loss)[surprise ? 'surprise' : 'expected'], used);
+        text = line.t;
+        const how = tt['sim_by_' + line.how];
+        final = won ? tt.sim_final_win(how, r + 1) : tt.sim_final_loss(how, r + 1);
+      }
     } else {
-      const lean = pA - pB;
-      const pool = chess
-        ? (lean > 0.03 ? tt.sim_chess_you_better : lean < -0.03 ? tt.sim_chess_they_better : tt.sim_chess_on)
-        : (lean > 0.03 ? tt.sim_box_you_better : lean < -0.03 ? tt.sim_box_they_better : tt.sim_box_on);
-      text = pick(Math.random() < 0.6 ? pool : (chess ? tt.sim_chess_on : tt.sim_box_on), used);
+      // Who had the upper hand: drawn around your share of this round's finishes.
+      const share = pA + pB > 1e-6 ? pA / (pA + pB) : 0.5;
+      const u = Math.random();
+      const lean = u < share - 0.15 ? 'you' : u > share + 0.15 ? 'them' : 'even';
+      // How close it came to a finish: more likely "hot" when the round was decisive.
+      const hot = Math.random() < Math.min(0.9, (pA + pB) * 1.5);
+      text = pickLine(d.on[`${lean}_${hot ? 'hot' : 'calm'}`], used);
     }
     const icon = chess ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
     const label = decision ? tt.sim_decision : tt.sim_round(r + 1);
-    lines.push(`<div class="sim__row ${cls}"><img src="${icon}" alt=""><span class="sim__label">${escapeHtml(label)}</span><span>${escapeHtml(text)}</span></div>`);
+    rows.push(`<div class="sim__row ${cls}"><img src="${icon}" alt=""><span class="sim__label">${escapeHtml(label)}</span><span>${escapeHtml(text)}</span></div>`);
     if (cls) break;
   }
 
-  const won = /sim__row--win/.test(lines[lines.length - 1]);
   const el = $('sim-result');
   el.innerHTML = `<div class="sim__head"><span class="sim__title">${escapeHtml(tt.sim_title)}</span></div>` +
-    lines.join('') +
+    rows.join('') +
     `<p class="sim__final ${won ? 'sim__final--win' : 'sim__final--loss'}">${escapeHtml(final)}</p>` +
     `<p class="sim__note">${escapeHtml(tt.sim_note)}</p>`;
   el.hidden = false;

@@ -424,9 +424,16 @@ Using chess level / 7 and boxing level / 5 (both 0–1):
 For fun, the page can play out one random fight. If colours are not drawn it
 first tosses a coin for them. Then, round by round, it draws "you win", "they
 win" or "fight goes on" with the model's chances for that round (given the fight
-is still on), and stops at the first finish. Chess finishes are shown as
-checkmate or a win on time (time more often in the last rounds); boxing
-finishes as a knockout; the decision as a chess draw settled on boxing points. Over many simulations
+is still on), and stops at the first finish. The commentary (`src/commentary.js`, 100 chess and 100 boxing lines per
+language) is picked from the same chances:
+
+- **Round goes on:** who had the upper hand is drawn around your share of that
+  round's finishing chance (you / even / them), and the round is "hot" (standing
+  counts, a piece up, flag hanging) more often when it was likely to end.
+- **Finish:** a surprise line (lucky punch, swindle) when the winner had under
+  20 % to finish in that round, an expected line otherwise. Each finish line
+  says how it ended: checkmate, time, resignation, knockout or referee stoppage.
+- **Decision:** a chess draw settled on boxing points. Over many simulations
 the share of wins matches the displayed win chance (checked: 28.9 % over 2000
 simulations for a 28 % matchup).
 
