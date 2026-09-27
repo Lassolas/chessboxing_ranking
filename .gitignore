@@ -9,3 +9,5 @@ assets/.DS_Store
 
 node_modules
 dist
+# Real fighter evaluations: local only, never pushed
+src/fighters.private.js

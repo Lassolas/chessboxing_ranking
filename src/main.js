@@ -6,7 +6,11 @@ import {
   chessCategory, boxCategory, chessLabel, boxLabel,
   buildStarSvg, setStars, setupSlider, pulse, miniStarsHTML, tooltipLineHTML, escapeHtml
 } from './ui.js';
-import { FIGHTERS as RAW_FIGHTERS } from './fighters.js';
+import { FIGHTERS as PUBLIC_FIGHTERS } from './fighters.js';
+// A local src/fighters.private.js (git-ignored, never deployed) replaces the
+// public list when it exists.
+const PRIVATE = Object.values(import.meta.glob('./fighters.private.js', { eager: true }))[0];
+const RAW_FIGHTERS = PRIVATE?.FIGHTERS ?? PUBLIC_FIGHTERS;
 import { narrate } from './commentary.js';
 
 // Fighters list entries give ELO; the model works in chess levels (0–7).
@@ -375,8 +379,18 @@ $('early-stoppage-toggle').addEventListener('change', e => {
 });
 
 // ── Known fighters ───────────────────────────────────────────────────────────
-// Weight categories used in the fighters list, in order of first appearance.
-const WEIGHTS = [...new Set(FIGHTERS.map(f => f.weight).filter(Boolean))];
+// Weight categories used in the fighters list, lightest first (grouped by
+// sex and age group when the label says, e.g. 'M -69 kg', 'W Junior -55 kg').
+const weightKey = w => {
+  const kg = /(\d+)\s*kg/i.exec(w);
+  const age = /junior/i.test(w) ? 1 : /senior/i.test(w) ? 2 : 0;
+  return [w.trim()[0], age, kg ? +kg[1] : /heavy|lourd/i.test(w) ? 999 : 500, w];
+};
+const WEIGHTS = [...new Set(FIGHTERS.map(f => f.weight).filter(Boolean))].sort((a, b) => {
+  const x = weightKey(a), y = weightKey(b);
+  for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1;
+  return 0;
+});
 
 function renderFighters() {
   if (!FIGHTERS.length) return;

@@ -1,5 +1,7 @@
-// Known fighters shown in the "Fighters" section and in the opponent picker.
-// The section stays hidden while this list is empty.
+// PUBLIC fighters list: committed and deployed on the website.
+// Real evaluations go in src/fighters.private.js (git-ignored), which the app
+// uses instead of this file when it exists on your computer.
+// The Fighters section stays hidden while the list is empty.
 //
 //   name:  display name
 //   elo:   chess ELO (800–2400)
