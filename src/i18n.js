@@ -155,6 +155,8 @@ white edge:    s + w for white, s − w for black
     fighters_title: "Fighters",
     fighters_hint: "Tap a fighter to set them as your opponent.",
     col_fighter: "Fighter",
+    weight_filter: "Weight",
+    all_weights: "All weights",
     col_rating: "Rating",
     col_you_win: "You win",
 
@@ -327,6 +329,8 @@ avantage blancs : s + w pour les blancs, s − w pour les noirs
     fighters_title: "Combattants",
     fighters_hint: "Touchez un combattant pour l'affronter.",
     col_fighter: "Combattant",
+    weight_filter: "Poids",
+    all_weights: "Tous les poids",
     col_rating: "Note",
     col_you_win: "Vous gagnez",
 

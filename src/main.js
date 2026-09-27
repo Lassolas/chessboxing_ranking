@@ -375,18 +375,32 @@ $('early-stoppage-toggle').addEventListener('change', e => {
 });
 
 // ── Known fighters ───────────────────────────────────────────────────────────
+// Weight categories used in the fighters list, in order of first appearance.
+const WEIGHTS = [...new Set(FIGHTERS.map(f => f.weight).filter(Boolean))];
+
 function renderFighters() {
   if (!FIGHTERS.length) return;
   const tt = t();
   $('fighters').hidden = false;
   $('fighter-pick-wrap').hidden = false;
 
-  const list = FIGHTERS.map((f, idx) => ({ ...f, idx, stars: starsAt(f.chess, f.box), p: pWin(myChess, myBox, f.chess, f.box) }));
+  // Weight filter (only when some fighters have a weight category).
+  const wf = $('weight-filter');
+  const weight = wf.value;
+  $('weight-filter-wrap').hidden = !WEIGHTS.length;
+  wf.innerHTML = `<option value="">${escapeHtml(tt.all_weights)}</option>` +
+    WEIGHTS.map(w => `<option value="${escapeHtml(w)}">${escapeHtml(w)}</option>`).join('');
+  wf.value = weight;
+  const shown = f => !weight || f.weight === weight;
+
+  const list = FIGHTERS.map((f, idx) => ({ ...f, idx, stars: starsAt(f.chess, f.box), p: pWin(myChess, myBox, f.chess, f.box) }))
+    .filter(shown);
   const rows = [...list, { name: tt.you, chess: myChess, box: myBox, stars: starsAt(myChess, myBox), me: true }]
     .sort((a, b) => b.stars - a.stars);
   $('fighter-rows').innerHTML = rows.map((f, k) => {
+    const meta = [`${eloOf(f.chess)} ELO`, boxCategory(f.box), f.weight].filter(Boolean).map(escapeHtml).join(' · ');
     const cells = `<span class="fr-rank">${k + 1}</span>
-      <span class="fr-name"><b>${escapeHtml(f.name)}</b><span class="muted">${eloOf(f.chess)} ELO · ${escapeHtml(boxCategory(f.box))}</span></span>
+      <span class="fr-name"><b>${escapeHtml(f.name)}</b><span class="muted">${meta}</span></span>
       <span class="fr-stars">${f.stars.toFixed(1)} ★</span>
       <span class="fr-odds">${f.me ? '—' : pct(f.p)}</span>`;
     return f.me
@@ -394,12 +408,16 @@ function renderFighters() {
       : `<button type="button" class="fighter-row" data-idx="${f.idx}">${cells}</button>`;
   }).join('');
 
+  // The picker follows the weight filter, but keeps the current pick.
   const pick = $('fighter-pick');
   const keep = pick.value;
-  pick.innerHTML = `<option value="">—</option>` + FIGHTERS.map((f, k) =>
-    `<option value="${k}">${escapeHtml(f.name)} · ${starsAt(f.chess, f.box).toFixed(1)} ★</option>`).join('');
+  pick.innerHTML = `<option value="">—</option>` + FIGHTERS.map((f, k) => ({ f, k }))
+    .filter(({ f, k }) => shown(f) || String(k) === keep)
+    .map(({ f, k }) => `<option value="${k}">${escapeHtml(f.name)}${f.weight ? ' · ' + escapeHtml(f.weight) : ''} · ${starsAt(f.chess, f.box).toFixed(1)} ★</option>`).join('');
   pick.value = keep;
 }
+
+$('weight-filter').addEventListener('change', renderFighters);
 
 $('fighter-rows').addEventListener('click', e => {
   const row = e.target.closest('button.fighter-row');
