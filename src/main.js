@@ -242,7 +242,10 @@ function simulateFight() {
     if (result) break;
   }
 
-  const story = narrate(currentLang, rounds);
+  // A known fighter picked as opponent is called by first name.
+  const picked = FIGHTERS[+$('fighter-pick').value];
+  const name = $('fighter-pick').value !== '' && picked ? picked.name.split(' ')[0] : null;
+  const story = narrate(currentLang, rounds, name);
   const out = [];
   if (!getSide()) out.push(`<p class="sim__colors">${escapeHtml(tt.sim_colors(side === 1 ? tt.sim_white : tt.sim_black))}</p>`);
   story.rows.forEach((row, i) => {
@@ -256,8 +259,8 @@ function simulateFight() {
   const won = story.winner === 'you';
   const n = rounds.length;
   const final = story.how === 'points'
-    ? (won ? tt.sim_final_win_points : tt.sim_final_loss_points)
-    : (won ? tt.sim_final_win : tt.sim_final_loss)(tt['sim_by_' + story.how], n);
+    ? (won ? tt.sim_final_win_points : tt.sim_final_loss_points)(name)
+    : (won ? tt.sim_final_win : tt.sim_final_loss)(tt['sim_by_' + story.how], n, name);
 
   const el = $('sim-result');
   el.innerHTML = `<div class="sim__head"><span class="sim__title">${escapeHtml(tt.sim_title)}</span></div>` +
@@ -378,7 +381,7 @@ function renderFighters() {
   $('fighters').hidden = false;
   $('fighter-pick-wrap').hidden = false;
 
-  const list = FIGHTERS.map(f => ({ ...f, stars: starsAt(f.chess, f.box), p: pWin(myChess, myBox, f.chess, f.box) }));
+  const list = FIGHTERS.map((f, idx) => ({ ...f, idx, stars: starsAt(f.chess, f.box), p: pWin(myChess, myBox, f.chess, f.box) }));
   const rows = [...list, { name: tt.you, chess: myChess, box: myBox, stars: starsAt(myChess, myBox), me: true }]
     .sort((a, b) => b.stars - a.stars);
   $('fighter-rows').innerHTML = rows.map((f, k) => {
@@ -388,7 +391,7 @@ function renderFighters() {
       <span class="fr-odds">${f.me ? '—' : pct(f.p)}</span>`;
     return f.me
       ? `<div class="fighter-row fighter-row--me">${cells}</div>`
-      : `<button type="button" class="fighter-row" data-chess="${f.chess}" data-box="${f.box}">${cells}</button>`;
+      : `<button type="button" class="fighter-row" data-idx="${f.idx}">${cells}</button>`;
   }).join('');
 
   const pick = $('fighter-pick');
@@ -401,7 +404,9 @@ function renderFighters() {
 $('fighter-rows').addEventListener('click', e => {
   const row = e.target.closest('button.fighter-row');
   if (!row) return;
-  setOpponent(+row.dataset.chess, +row.dataset.box);
+  const f = FIGHTERS[+row.dataset.idx];
+  setOpponent(f.chess, f.box, true);
+  $('fighter-pick').value = row.dataset.idx;
   $('opponent').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 $('fighter-pick').addEventListener('change', e => {

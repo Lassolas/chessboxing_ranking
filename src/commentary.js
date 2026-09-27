@@ -673,9 +673,10 @@ function drawLean(pA, pB) {
  * Builds the commentary for a simulated fight.
  * rounds: [{ type: 'chess'|'box', decision, pA, pB, clockOk, result: 'you'|'them'|null }]
  *   (conditional chances for that round; result is set on the last round only)
+ * oppName: first name of a known opponent, used instead of "your opponent".
  * Returns { rows: [{ text, result }], how, winner, boxing: { won, total } }.
  */
-export function narrate(lang, rounds) {
+export function narrate(lang, rounds, oppName = null) {
   const L = COMMENTARY[lang] || COMMENTARY.en;
   const used = new Set();
   const last = rounds[rounds.length - 1];
@@ -789,5 +790,10 @@ export function narrate(lang, rounds) {
     rows.push({ text: pick(L.box.calm[lean], used), result: null });
   });
 
+  // A known opponent is called by first name.
+  if (oppName) {
+    const re = /\b(your opponent|Your opponent|votre adversaire|Votre adversaire)\b/g;
+    rows.forEach(row => { row.text = row.text.replace(re, oppName); });
+  }
   return { rows, how, winner, boxing: { won: tally[winner], total: boxOn.length } };
 }
