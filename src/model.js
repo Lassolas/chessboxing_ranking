@@ -66,7 +66,7 @@ export const ROUND_CONFIGS = {
       { type: 'chess', a: 0.81, k: 9.63 }, // R5  key round: k was 3.21, ×3 so it only
       //   finishes early when one player is clearly better (time win); close
       //   club players rarely finish here
-      { type: 'box', a: 1.3734, k: 38.332 }, // R6
+      { type: 'box', a: 1.3734, k: 15 }, // R6  third boxing round: k was 38.3, made more decisive
       { type: 'chess', a: 1.17, k: 0.6419 }, // R7* last chess fighting round
       { type: 'box', a: 1.7, k: 0 }, // R8  boxing decision
     ],
@@ -91,7 +91,7 @@ export const ROUND_CONFIGS = {
       { type: 'chess', a: 0.36, k: 80 }, // R3  0.3974,  7.9  0.4, 50    → 0.40,  29
       { type: 'box', a: 1.1695, k: 15.236 }, // R4  1.1695, 15.2  1.4, 27    → 1.28,  21
       { type: 'chess', a: 0.51, k: 12.8 }, // R5  0.6434,  2.1  0.5, 30    → 0.57,  16
-      { type: 'box', a: 1.3734, k: 38.332 }, // R6  1.3734, 38.3  1.3734,38.3→ unchanged
+      { type: 'box', a: 1.3734, k: 15 }, // R6  same as 7R/11R (third boxing round, k was 38.3)
       { type: 'chess', a: 0.73, k: 2.56 }, // R7  0.3801,  0.4  0.6, 15    → 0.49,  7.7
       { type: 'box', a: 1.6, k: 45 }, // R8  1.8596,  0    1.5, 76    → 1.68,  38
       { type: 'chess', a: 1.04, k: 0.52 }, // R9* last-chess role: 7R-R7(0.38,0.42) ↔ 11R-R11(0.8,0.3) → 0.59, 0.36
@@ -110,7 +110,7 @@ export const ROUND_CONFIGS = {
       { type: 'chess', a: 0.29, k: 256 }, // R3
       { type: 'box', a: 1.1695, k: 15.236 }, // R4
       { type: 'chess', a: 0.5, k: 51.6 }, // R5
-      { type: 'box', a: 1.3734, k: 38.332 }, // R6
+      { type: 'box', a: 1.3734, k: 15 }, // R6  third boxing round: k was 38.3, made more decisive
       { type: 'chess', a: 0.58, k: 10 }, // R7
       { type: 'box', a: 1.6, k: 45 }, // R8
       { type: 'chess', a: .83, k: 2 }, // R9

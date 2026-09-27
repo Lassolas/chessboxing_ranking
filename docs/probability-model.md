@@ -115,7 +115,7 @@ Code: `matchupProbsForSide()` and `getWinBreakdown()` in `src/model.js`.
   chess gap −7…7, for 8 rounds). The fitting script
   (`computations/fit_round_model.py`) compares four model shapes; the app uses the
   simplest one, "SoftmaxLinear" (section 2). The boxing rounds keep their fitted
-  values. The chess rounds were then retuned by hand (see 3.2).
+  values, except round 6 (see 3.2). The chess rounds were then retuned by hand (see 3.2).
 - **11 rounds:** set by hand.
 - **9 rounds:** interpolated halfway between 7 and 11 rounds, per round role
   (for example "last chess round" and "decision" are matched by role, not by
@@ -141,6 +141,9 @@ better chess player can force a win on time, so the level gap matters more there
 In 7-round fights round 5 has k = 9.63 (3× the earlier 3.21): between close
 club players it rarely finishes, and it only becomes decisive through the chess
 gap rule (section 4) when one player is clearly better.
+
+The third boxing round (R6 in 7, 9 and 11-round fights) has k = 15 instead of
+the fitted 38.3, so a better boxer can still win a long fight in the ring.
 
 ### 3.3 Why more rounds favour the boxer
 
@@ -175,7 +178,7 @@ white edge) for other levels.
 | R3 | chess | 0.57 | 60 |
 | R4 | boxing | 1.1695 | 15.236 |
 | R5 | chess | 0.81 | 9.63 |
-| R6 | boxing | 1.3734 | 38.332 |
+| R6 | boxing | 1.3734 | 15 |
 | R7 | chess | 1.17 | 0.6419 |
 | Decision | boxing | 1.70 | 0 |
 
@@ -188,7 +191,7 @@ white edge) for other levels.
 | R3 | chess | 0.36 | 80 |
 | R4 | boxing | 1.1695 | 15.236 |
 | R5 | chess | 0.51 | 12.8 |
-| R6 | boxing | 1.3734 | 38.332 |
+| R6 | boxing | 1.3734 | 15 |
 | R7 | chess | 0.73 | 2.56 |
 | R8 | boxing | 1.60 | 45 |
 | R9 | chess | 1.04 | 0.52 |
@@ -203,7 +206,7 @@ white edge) for other levels.
 | R3 | chess | 0.29 | 256 |
 | R4 | boxing | 1.1695 | 15.236 |
 | R5 | chess | 0.50 | 51.6 |
-| R6 | boxing | 1.3734 | 38.332 |
+| R6 | boxing | 1.3734 | 15 |
 | R7 | chess | 0.58 | 10 |
 | R8 | boxing | 1.60 | 45 |
 | R9 | chess | 0.83 | 2 |
@@ -261,10 +264,10 @@ Effect on an equal 7-round fight:
 
 | Both fighters | Ends at the board | Ends by stoppage | Boxing decision | Expected length |
 |---|---|---|---|---|
-| Beginners (1028 ELO, Beginner) | 82 % | 6 % | 12 % | 6.1 |
-| Club (1486 ELO, Amateur) | 74 % | 9 % | 17 % | 6.2 |
-| Strong (1942 ELO, Semi-Pro) | 59 % | 20 % | 22 % | 6.1 |
-| Elite (2400 ELO, Pro) | 46 % | 28 % | 27 % | 5.9 |
+| Beginners (1028 ELO, Beginner) | 81 % | 7 % | 11 % | 6.1 |
+| Club (1486 ELO, Amateur) | 72 % | 11 % | 17 % | 6.2 |
+| Strong (1942 ELO, Semi-Pro) | 57 % | 22 % | 21 % | 6.0 |
+| Elite (2400 ELO, Pro) | 44 % | 31 % | 25 % | 5.9 |
 
 White against black in an equal 7-round fight:
 
@@ -272,7 +275,7 @@ White against black in an equal 7-round fight:
 |---|---|---|---|
 | Beginners | 51.5 % | 48.5 % | 51.8 % |
 | Club | 52.5 % | 47.5 % | 53.4 % |
-| Strong | 52.9 % | 47.1 % | 55.0 % |
+| Strong | 52.8 % | 47.2 % | 55.0 % |
 
 The data table itself lists fighter A as white and gives white 51.4 % in an equal
 fight.
@@ -309,12 +312,12 @@ You: 1500 ELO, boxing 2.0 (Amateur). Opponent: 1810 ELO, boxing 1.2 (Beginner).
 | R3 | chess | 1.0 % | 4.9 % | 78.9 % |
 | R4 | boxing | 5.3 % | 0.8 % | 72.8 % |
 | R5 | chess | 2.7 % | 24.3 % | 45.8 % |
-| R6 | boxing | 1.5 % | 0.2 % | 44.1 % |
-| R7 | chess | 1.7 % | 39.4 % | 3.1 % |
-| Decision | boxing | 2.9 % | 0.2 % | 0.0 % |
+| R6 | boxing | 3.7 % | 0.4 % | 41.7 % |
+| R7 | chess | 1.6 % | 37.3 % | 2.9 % |
+| Decision | boxing | 2.7 % | 0.2 % | 0.0 % |
 
-Result: you win **26.5 %** (27.6 % as white, 25.5 % as black). You win in the ring
-20.5 % and at the board 6.0 %; you lose at the board 70.3 % and in the ring 3.1 %.
+Result: you win **28.4 %** (29.5 % as white, 27.3 % as black). You win in the ring
+22.5 % and at the board 5.9 %; you lose at the board 68.2 % and in the ring 3.4 %.
 Expected length 5.3 rounds.
 
 The game plan on the page follows from this table: your best round is R2 and the
@@ -330,9 +333,9 @@ The ideal would be "a fighter with more stars always has more than 50 % to win".
 That is impossible with this model, because the relation "beats with more than
 50 %" has **rock-paper-scissors cycles**. Example, 7 rounds, colours not drawn:
 
-- 2000 ELO / boxing 0 beats 1600 ELO / boxing 0.5 with 71 %
-- 1600 ELO / boxing 0.5 beats 1000 ELO / boxing 1 with 74 %
-- 1000 ELO / boxing 1 beats 2000 ELO / boxing 0 with 72 %
+- 2100 ELO / boxing 0 beats 1600 ELO / boxing 0.5 with 72 %
+- 1600 ELO / boxing 0.5 beats 1100 ELO / boxing 1 with 70 %
+- 1100 ELO / boxing 1 beats 2100 ELO / boxing 0 with 72 %
 
 The cause is that the chess advantage flattens out: a small chess edge is worth
 about as much as a boxing level, but a huge chess edge is only worth about two
@@ -364,9 +367,9 @@ Code: `ensureRank()` and `rankAt()` in `src/grid.js`.
 - More chess or more boxing never lowers your stars (the model is monotonic in
   both).
 - Being **about 1.2 stars ahead or more always makes you the favourite** (checked
-  on all pairs of grid profiles, in every format: 1.16 in 5 rounds, 0.96 in 7,
-  0.92 in 9, 0.91 in 11). A sample of 700 random fine-grained profiles needed
-  0.90 stars in 7 rounds.
+  on all pairs of grid profiles, in every format: 1.16 in 5 rounds, 0.91 in 7,
+  0.86 in 9, 0.83 in 11). A sample of 700 random fine-grained profiles needed
+  0.91 stars in 7 rounds.
 - About 95 % of all pairs respect "more stars wins" even for smaller gaps.
 
 ---
@@ -456,24 +459,24 @@ reported without failing).
 |---|---|---|---|---|---|---|
 | 1 | 5 | 1900 / 0.5 | 1200 / 3 | B, KO in the first boxing round | 6 % | B by KO in R2 |
 | 2 | 11 | 1900 / 0.5 | 1200 / 3 | same as 1, KO in the second boxing round similar or lower | 1 % | B by KO in R2 |
-| 3 | 7 | 1600 / 2 | 1500 / 3 | B clear, long fight, KO around R6; a round-5 chess finish should be rare | 42 % | A at the board in R7, B by KO in R2 |
+| 3 | 7 | 1600 / 2 | 1500 / 3 | B clear, long fight, KO around R6; a round-5 chess finish should be rare | 40 % | A at the board in R7, B by KO in R2, B by KO in R6 (8 %) |
 | 4 | 7 | 2200 / 1 | 1300 / 2 | A, on time in R5 | 81 % | A at the board, R3/R5 |
-| 5 | 9 | 1400 / 4 | 2000 / 3 | B, tough, at the board in R5 or R7 | 45 % | B at the board R5/R7, A by KO R2 |
-| 6 | 7 | 1800 / 2 | 1800 / 2.5 | B clear, tough | 39 % | long, board in R7 or decision |
+| 5 | 9 | 1400 / 4 | 2000 / 3 | B, tough, at the board in R5 or R7 | 48 % | B at the board R5/R7, A by KO R2 |
+| 6 | 7 | 1800 / 2 | 1800 / 2.5 | B clear, tough | 38 % | long, board in R7 or decision |
 | 7 | 7 | 2400 / 0 | 1000 / 2 | B, KO in the first boxing round; levels below 1 penalized a lot | 15 % | B by KO in R2 (85 %) |
-| 8 | 11 | 1500 / 5 | 2100 / 4 | A in the ring | 60 % | A by KO |
+| 8 | 11 | 1500 / 5 | 2100 / 4 | A in the ring | 64 % | A by KO |
 | 9 | 5 | 1200 / 1 | 1000 / 1.5 | A clear | 80 % | A at the board |
-| 10 | 7 | 2000 / 4 | 2300 / 3 | no clear favourite | 51 % | balanced |
+| 10 | 7 | 2000 / 4 | 2300 / 3 | no clear favourite | 55 % | balanced |
 | 11 | 5 | 1700 / 3 | 1300 / 4 | A | 62 % | A at the board |
-| 12 | 11 | 1700 / 3 | 1300 / 4 | balanced, B small favourite | 47 % | balanced, long |
+| 12 | 11 | 1700 / 3 | 1300 / 4 | balanced, B small favourite | 42 % | balanced, long |
 
 Still off after tuning:
 
-- **Case 3:** B is only a slight favourite, not a clear one.
-- **Case 3, how it ends:** B should win by boxing late (around round 6). In the
-  model round 6 rarely ends a fight (k = 38), so the chess player finishes in
-  round 7 instead. Making round 6 more decisive gives B a clear edge here but
-  pushes case 10 to A 60 %+, so it is left open.
+- **Case 3:** B is favourite (60 %) but not a clear one.
+- **Case 3, how it ends:** B should win by boxing late (around round 6). Round 6
+  was made more decisive (k 38.3 → 15): B now wins 60 % and 8 % of fights end
+  with B's knockout in round 6, but the chess player still often finishes in
+  round 7. Going further pushes case 10 past 55 % for A, so it stops here.
 
 ## 11. Known limitations
 
