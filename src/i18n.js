@@ -177,7 +177,7 @@ white edge:    s + w for white, s − w for black
     boxing_names: [
       { short: 'Never boxed', sub: 'No sparring' },
       { short: 'Gym boxer', sub: 'Trains, light sparring' },
-      { short: 'Regular sparrer', sub: 'Hard sparring every week' },
+      { short: 'Regular sparrer', sub: 'Hard sparring regularly' },
       { short: 'Amateur fighter', sub: 'First official bouts' },
       { short: 'Experienced amateur', sub: '10+ bouts, regional level' },
       { short: 'Elite / Pro', sub: 'National level or pro' }
@@ -351,7 +351,7 @@ avantage blancs : s + w pour les blancs, s − w pour les noirs
     boxing_names: [
       { short: 'Jamais boxé', sub: 'Aucun sparring' },
       { short: 'Boxeur de salle', sub: "S'entraîne, sparring léger" },
-      { short: 'Sparring régulier', sub: 'Sparring dur chaque semaine' },
+      { short: 'Sparring régulier', sub: 'Sparring dur régulier' },
       { short: 'Combattant amateur', sub: 'Premiers combats officiels' },
       { short: 'Amateur confirmé', sub: '10+ combats, niveau régional' },
       { short: 'Élite / Pro', sub: 'Niveau national ou pro' }
