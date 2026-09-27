@@ -117,10 +117,17 @@
     <!-- ── THE FIGHT ── -->
     <section class="card" id="fight">
       <h2 class="card-title" data-i18n="matchup_title">The fight</h2>
+      <div class="color-pick" role="radiogroup" aria-labelledby="color-pick-label">
+        <span class="color-pick__label" id="color-pick-label" data-i18n="your_pieces">Your pieces</span>
+        <label class="color-pick__opt"><input type="radio" name="side" value="1"><span class="piece piece--white" aria-hidden="true"></span><span data-i18n="white">White</span></label>
+        <label class="color-pick__opt"><input type="radio" name="side" value="-1"><span class="piece piece--black" aria-hidden="true"></span><span data-i18n="black">Black</span></label>
+        <label class="color-pick__opt"><input type="radio" name="side" value="0" checked><span class="piece piece--both" aria-hidden="true"></span><span data-i18n="not_drawn">Not drawn</span></label>
+      </div>
       <div class="verdict">
         <div class="verdict__pct" id="win-pct">—</div>
         <div class="verdict__label" data-i18n="chance_win">chance you win</div>
         <div class="badge verdict__badge" id="verdict">—</div>
+        <div class="verdict__colors muted" id="color-compare"></div>
       </div>
 
       <div class="block">

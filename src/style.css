@@ -566,3 +566,27 @@ button.fighter-row:hover { border-color: #1f3a5c; }
 .fr-name b { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fr-stars { text-align: right; font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--gold-bright); }
 .fr-odds { text-align: right; font-size: 14px; font-weight: 600; }
+
+/* ── COLOUR PICKER ── */
+.color-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.color-pick__label { font-size: 13px; color: var(--text-secondary); margin-right: 4px; }
+.color-pick__opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel-alt);
+  font-size: 14px;
+  cursor: pointer;
+}
+.color-pick__opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.color-pick__opt:has(input:checked) { border-color: var(--gold-mid); background: var(--gold-soft); color: var(--gold-bright); }
+.color-pick__opt:has(input:focus-visible) { outline: 2px solid var(--gold-mid); outline-offset: 2px; }
+.piece { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #8a8aa0; }
+.piece--white { background: #f4f1e8; }
+.piece--black { background: #111; }
+.piece--both { background: linear-gradient(90deg, #f4f1e8 50%, #111 50%); }
+.verdict__colors { font-size: 13px; margin-top: 6px; min-height: 18px; }

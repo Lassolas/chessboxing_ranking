@@ -38,6 +38,11 @@ export const i18n = {
 
     // Matchup
     matchup_title: "The fight",
+    your_pieces: "Your pieces",
+    white: "White",
+    black: "Black",
+    not_drawn: "Not drawn",
+    color_compare: (w, b) => `With white ${w} · with black ${b}`,
     chance_win: "chance you win",
     v_fav_clear: "Clear favourite",
     v_fav: "Favourite",
@@ -81,7 +86,7 @@ export const i18n = {
     you: "You",
     even: "50 % (even)",
     details_method: "How the numbers work",
-    method_text: "Each round is modelled from the gap between the two fighters in that discipline. Parameters were fitted on real 7-round fights; the other formats are derived from them. Stars rank every fighter profile by how many others it beats with more than 50 %: being 0.8 stars or more ahead always makes you the favourite.",
+    method_text: "Each round is modelled from the gap between the two fighters in that discipline, plus a small edge for white in chess rounds. Parameters were fitted on the 7-round data table; the other formats are derived from them. When colours are not drawn yet, the chances average white and black. Stars rank every fighter profile by how many others it beats with more than 50 %: being 0.8 stars or more ahead always makes you the favourite.",
 
     // Fighters
     fighters_title: "Fighters",
@@ -144,6 +149,11 @@ export const i18n = {
     known_fighters: "Choisir un combattant connu",
 
     matchup_title: "Le combat",
+    your_pieces: "Vos pièces",
+    white: "Blancs",
+    black: "Noirs",
+    not_drawn: "Pas tiré",
+    color_compare: (w, b) => `Avec les blancs ${w} · avec les noirs ${b}`,
     chance_win: "de chances de gagner",
     v_fav_clear: "Grand favori",
     v_fav: "Favori",
@@ -186,7 +196,7 @@ export const i18n = {
     you: "Vous",
     even: "50 % (égal)",
     details_method: "Comment sont calculés les chiffres",
-    method_text: "Chaque round est modélisé à partir de l'écart entre les deux combattants dans cette discipline. Les paramètres ont été ajustés sur de vrais combats en 7 rounds ; les autres formats en sont dérivés. Les étoiles classent chaque profil selon le nombre d'autres profils qu'il bat à plus de 50 % : avec 0,8 étoile d'avance ou plus, vous êtes toujours favori.",
+    method_text: "Chaque round est modélisé à partir de l'écart entre les deux combattants dans cette discipline, plus un léger avantage aux blancs dans les rounds d'échecs. Les paramètres ont été ajustés sur la table de données en 7 rounds ; les autres formats en sont dérivés. Tant que les couleurs ne sont pas tirées, les chances font la moyenne blancs/noirs. Les étoiles classent chaque profil selon le nombre d'autres profils qu'il bat à plus de 50 % : avec 0,8 étoile d'avance ou plus, vous êtes toujours favori.",
 
     fighters_title: "Combattants",
     fighters_hint: "Touchez un combattant pour l'affronter.",

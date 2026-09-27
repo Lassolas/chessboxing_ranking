@@ -1,6 +1,6 @@
 import './style.css';
 import { i18n, currentLang, setLangState } from './i18n.js';
-import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 import { chessLevels, boxLevels, starsOf, rankOf, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
 import {
   chessCategory, boxCategory, getChessDrumLevels, getBoxingDrumLevels,
@@ -126,6 +126,8 @@ function renderFight() {
   const v = $('verdict');
   v.textContent = label;
   v.className = 'badge verdict__badge ' + cls;
+  $('color-compare').textContent = getSide() ? '' :
+    tt.color_compare(pct(pWin(myChess, myBox, oppChess, oppBox, 1)), pct(pWin(myChess, myBox, oppChess, oppBox, -1)));
 
   const { chessWin, boxWin, chessLoss, boxLoss, expectedRounds } = getWinBreakdown(dC, dB);
   const segs = [boxWin, chessWin, chessLoss, boxLoss];
@@ -354,6 +356,13 @@ function setLang(lang) {
 }
 
 $('lang-switch').addEventListener('change', e => setLang(e.target.value));
+
+document.querySelectorAll('input[name="side"]').forEach(r => r.addEventListener('change', e => {
+  setSide(+e.target.value);
+  renderFight();
+  renderFighters();
+  drawMap();
+}));
 
 document.querySelectorAll('.round-selector__btn').forEach(btn => {
   btn.addEventListener('click', () => {

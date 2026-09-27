@@ -119,44 +119,77 @@ export const ROUND_CONFIGS = {
   },
 };
 
+// ── White-piece advantage ───────────────────────────────────────────────────
+// The 7-round data table lists fighter A as white. At equal chess level its
+// chess rounds give white a small edge; w = ½·ln(P(white wins) / P(black wins))
+// at Δchess = 0: R1 0.04, R3 0.08, R5 0.005, R7 0.055. An equal 7-round fight
+// then gives white 51.0 % (the table itself says 51.4 %). Other formats have no
+// data: first chess round 0.04, last 0.055, the ones in between 0.04.
+const WHITE_EDGE_7 = [0.04, 0.08, 0.005, 0.055];
+for (const [key, cfg] of Object.entries(ROUND_CONFIGS)) {
+  const chess = cfg.params.filter(p => p.type === 'chess');
+  chess.forEach((p, n) => {
+    p.w = key === '7' ? WHITE_EDGE_7[n] : n === chess.length - 1 ? 0.055 : 0.04;
+  });
+}
+
 let _activeKey = '7';
+// Your pieces: +1 white, -1 black, 0 not drawn yet (average of both).
+let _side = 0;
 const matchupProbCache = new Map();
 
 export const getActiveConfig = () => ROUND_CONFIGS[_activeKey];
 export const getActiveKey = () => _activeKey;
+export const getSide = () => _side;
+export const setSide = side => { _side = side; };
 
 export function setActiveConfig(key) {
   _activeKey = key;
   matchupProbCache.clear();
 }
 
-export function getMatchupProbs(dChess, dBox) {
-  const params = getActiveConfig().params;
-  const normChess = +dChess.toFixed(2);
-  const normBox = +dBox.toFixed(2);
-  const key = `${_activeKey}|${normChess}|${normBox}`;
-  const cached = matchupProbCache.get(key);
-  if (cached) return cached;
-
+function matchupProbsForSide(params, dChess, dBox, side) {
   let cont = 1, cumA = 0, cumB = 0;
   const out = [];
-  for (const { type, a, k } of params) {
-    const x = type === 'chess' ? normChess : normBox;
-    const eA = Math.exp(a * x), eB = Math.exp(-a * x);
+  for (const { type, a, k, w = 0 } of params) {
+    const x = type === 'chess' ? dChess : dBox;
+    const s = a * x + side * w;
+    const eA = Math.exp(s), eB = Math.exp(-s);
     const Z = eA + eB + k;
     cumA += cont * eA / Z;
     cumB += cont * eB / Z;
     cont *= k / Z;
     out.push({ pA: cumA, pB: cumB, pCont: cont });
   }
+  return out;
+}
+
+export function getMatchupProbs(dChess, dBox, side = _side) {
+  const params = getActiveConfig().params;
+  const normChess = +dChess.toFixed(2);
+  const normBox = +dBox.toFixed(2);
+  const key = `${_activeKey}|${side}|${normChess}|${normBox}`;
+  const cached = matchupProbCache.get(key);
+  if (cached) return cached;
+
+  let out;
+  if (side) {
+    out = matchupProbsForSide(params, normChess, normBox, side);
+  } else {
+    const w = matchupProbsForSide(params, normChess, normBox, 1);
+    const b = matchupProbsForSide(params, normChess, normBox, -1);
+    out = w.map((p, r) => ({
+      pA: (p.pA + b[r].pA) / 2, pB: (p.pB + b[r].pB) / 2, pCont: (p.pCont + b[r].pCont) / 2
+    }));
+  }
 
   matchupProbCache.set(key, out);
   return out;
 }
 
-export function getWinBreakdown(dChess, dBox) {
+export function getWinBreakdown(dChess, dBox, side = _side) {
   const params = getActiveConfig().params;
-  const probs = getMatchupProbs(dChess, dBox);
+  const probs = getMatchupProbs(dChess, dBox, side);
   let prevA = 0, prevB = 0;
   let chessWin = 0, boxWin = 0, chessLoss = 0, boxLoss = 0, expectedRounds = 0;
 
@@ -178,8 +211,8 @@ export function getWinBreakdown(dChess, dBox) {
   return { chessWin, boxWin, chessLoss, boxLoss, expectedRounds, probs };
 }
 
-export function pWin(myC, myB, oppC, oppB) {
-  const probs = getMatchupProbs(myC - oppC, myB - oppB);
+export function pWin(myC, myB, oppC, oppB, side = _side) {
+  const probs = getMatchupProbs(myC - oppC, myB - oppB, side);
   return probs[probs.length - 1].pA;
 }
 

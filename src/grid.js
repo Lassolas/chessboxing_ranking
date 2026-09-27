@@ -23,7 +23,8 @@ export function rankOf(i, j)  {
 }
 
 // Domination (Copeland) rating: count how many profiles each profile beats
-// with > 50 %, then rank profiles by that count (ties share the average rank).
+// with > 50 % (colour not drawn yet), then rank profiles by that count (ties
+// share the average rank).
 // Being ahead by >= 0.8 stars (1.0 in the 5-round format) guarantees > 50 % to
 // win. An exact rule for any gap is impossible: the model has
 // rock-paper-scissors cycles.
@@ -37,7 +38,7 @@ function ensureRank() {
       let n = 0;
       for (let j2 = 0; j2 < NY; j2++)
         for (let i2 = 0; i2 < NX; i2++)
-          if (pWin(chessLevels[i], boxLevels[j], chessLevels[i2], boxLevels[j2]) > 0.5) n++;
+          if (pWin(chessLevels[i], boxLevels[j], chessLevels[i2], boxLevels[j2], 0) > 0.5) n++;
       beats[j * NX + i] = n;
     }
   const order = [...beats.keys()].sort((a, b) => beats[a] - beats[b]);
