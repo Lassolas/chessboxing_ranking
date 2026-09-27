@@ -220,13 +220,15 @@ function pickLine(arr, used) {
 }
 
 // A player can only lose on time once the chess time played can exceed their
-// clock. Each player's clock is taken as half the total chess time, so the
-// earliest time loss is in chess round ceil(chess rounds / 2): round 3 in 5 and
-// 7-round fights, round 5 in 9 and 11-round fights.
+// clock. Chess rounds last 3 minutes, each player's clock is half the total
+// chess time and there is no increment. After k chess rounds 3k minutes have
+// been played and the opponent must have used some of them, so a player can
+// only flag when 3k > half the total, i.e. from chess round floor(n / 2) + 1:
+// round 3 in 5-round fights, round 5 in 7 and 9, round 7 in 11.
 function timeLossPossible(params, r) {
   const chessRounds = params.filter(p => p.type === 'chess').length;
   const chessSoFar = params.slice(0, r + 1).filter(p => p.type === 'chess').length;
-  return chessSoFar >= Math.ceil(chessRounds / 2);
+  return chessSoFar >= Math.floor(chessRounds / 2) + 1;
 }
 
 function simulateFight() {
