@@ -32,7 +32,8 @@ Plus two fight settings:
 Like ELO, both scales are designed so that one step changes the odds by the same
 factor wherever you start: going from Novice to Beginner is worth as much as going
 from Semi-Pro to Professional. This is a deliberate design choice, not an
-approximation.
+approximation. The one exception is boxing below level 1 (never really sparred),
+which is penalized extra in the ring (section 4).
 
 For reference, in the model one boxing level shifts the odds of a decided boxing
 round by a factor e^(2a) with a ≈ 1.07–1.37, which is about as much as 370–480 ELO
@@ -146,7 +147,7 @@ gap rule (section 4) when one player is clearly better.
 More rounds mean more boxing rounds, and more chess time for the weaker chess
 player to stall. So a fight between a strong chess player and a strong boxer tilts
 towards the boxer as the format gets longer. This is intended. Example: a 2400 ELO
-novice boxer against an 800 ELO professional wins 15.8 % over 7 rounds and 0.4 %
+novice boxer against an 800 ELO professional wins 15.7 % over 7 rounds and 0.3 %
 over 11.
 
 ### 3.4 Current values
@@ -227,6 +228,7 @@ chess rounds:   k × e^(0.2 × (m − 3))     longer games between strong player
 boxing rounds:  k × e^(−0.4 × (n − 2))    more stoppages between strong boxers
                   × 4 × e^(−0.9 × |Δb|)   close boxers rarely stop each other
                                           early; a big mismatch is a quick KO
+boxing gap:     uses ring levels, b − 1.5 × (1 − b) below level 1
 white edge:     s + w for white, s − w for black, in chess rounds only
                 w = 0.1 × min(1, 0.2 + 0.8 × m / 5)
 ```
@@ -243,6 +245,12 @@ white edge:     s + w for white, s − w for black, in chess rounds only
   a big boxing mismatch ends in a quick knockout. The factor 4 and 0.9 were
   tuned on the expert test set (section 10): with a one-level gap the factor is
   1.6, with a two-level gap 0.66, with a three-level gap 0.27.
+- **Novice penalty.** A fighter below boxing level 1 has never really sparred
+  and is very easy to knock out, more than the even scale says. In the ring
+  their level counts as b − 1.5 × (1 − b): level 0 fights like −1.5, level 0.5
+  like −0.25. Example, 7 rounds: a 2400 ELO fighter with boxing 0 against a
+  1000 ELO Amateur now wins only 15 %, and the Amateur knocks them out in round 2
+  85 % of the time.
 - **Stoppage rate.** Novices rarely stop each other; semi-pros and pros often do.
   At n = 2 (Amateur) the factor is 1.
 - **White edge.** White has a first-move advantage that grows with chess level.
@@ -322,9 +330,9 @@ The ideal would be "a fighter with more stars always has more than 50 % to win".
 That is impossible with this model, because the relation "beats with more than
 50 %" has **rock-paper-scissors cycles**. Example, 7 rounds, colours not drawn:
 
-- 1500 ELO / boxing 2.5 beats 2300 ELO / boxing 0.5 with 68 %
-- 2300 ELO / boxing 0.5 beats 2000 ELO / boxing 1.5 with 68 %
-- 2000 ELO / boxing 1.5 beats 1500 ELO / boxing 2.5 with 71 %
+- 2000 ELO / boxing 0 beats 1600 ELO / boxing 0.5 with 71 %
+- 1600 ELO / boxing 0.5 beats 1000 ELO / boxing 1 with 74 %
+- 1000 ELO / boxing 1 beats 2000 ELO / boxing 0 with 72 %
 
 The cause is that the chess advantage flattens out: a small chess edge is worth
 about as much as a boxing level, but a huge chess edge is only worth about two
@@ -355,11 +363,11 @@ Code: `ensureRank()` and `rankAt()` in `src/grid.js`.
 
 - More chess or more boxing never lowers your stars (the model is monotonic in
   both).
-- Being **about 1.3 stars ahead or more always makes you the favourite** (checked
-  on all pairs of grid profiles, in every format: 1.32 in 5 rounds, 1.10 in 7,
-  1.07 in 9, 1.09 in 11). A sample of 700 random fine-grained profiles needed
-  1.00 star in 7 rounds.
-- About 94 % of all pairs respect "more stars wins" even for smaller gaps.
+- Being **about 1.2 stars ahead or more always makes you the favourite** (checked
+  on all pairs of grid profiles, in every format: 1.16 in 5 rounds, 0.96 in 7,
+  0.92 in 9, 0.91 in 11). A sample of 700 random fine-grained profiles needed
+  0.90 stars in 7 rounds.
+- About 95 % of all pairs respect "more stars wins" even for smaller gaps.
 
 ---
 
@@ -446,13 +454,13 @@ reported without failing).
 
 | # | Rounds | A (ELO / boxing) | B (ELO / boxing) | Expert | A wins | Main ending in the model |
 |---|---|---|---|---|---|---|
-| 1 | 5 | 1900 / 0.5 | 1200 / 3 | B, KO in the first boxing round | 19 % | B by KO in R2 |
-| 2 | 11 | 1900 / 0.5 | 1200 / 3 | same as 1, KO in the second boxing round similar or lower | 4 % | B by KO in R2 |
+| 1 | 5 | 1900 / 0.5 | 1200 / 3 | B, KO in the first boxing round | 6 % | B by KO in R2 |
+| 2 | 11 | 1900 / 0.5 | 1200 / 3 | same as 1, KO in the second boxing round similar or lower | 1 % | B by KO in R2 |
 | 3 | 7 | 1600 / 2 | 1500 / 3 | B clear, long fight, KO around R6; a round-5 chess finish should be rare | 42 % | A at the board in R7, B by KO in R2 |
 | 4 | 7 | 2200 / 1 | 1300 / 2 | A, on time in R5 | 81 % | A at the board, R3/R5 |
 | 5 | 9 | 1400 / 4 | 2000 / 3 | B, tough, at the board in R5 or R7 | 45 % | B at the board R5/R7, A by KO R2 |
 | 6 | 7 | 1800 / 2 | 1800 / 2.5 | B clear, tough | 39 % | long, board in R7 or decision |
-| 7 | 7 | 2400 / 0 | 1000 / 2 | B, KO in the first boxing round | 53 % | split: B KO in R2, A at the board R3 |
+| 7 | 7 | 2400 / 0 | 1000 / 2 | B, KO in the first boxing round; levels below 1 penalized a lot | 15 % | B by KO in R2 (85 %) |
 | 8 | 11 | 1500 / 5 | 2100 / 4 | A in the ring | 60 % | A by KO |
 | 9 | 5 | 1200 / 1 | 1000 / 1.5 | A clear | 80 % | A at the board |
 | 10 | 7 | 2000 / 4 | 2300 / 3 | no clear favourite | 51 % | balanced |
@@ -462,8 +470,6 @@ reported without failing).
 Still off after tuning:
 
 - **Case 3:** B is only a slight favourite, not a clear one.
-- **Case 7:** a boxing-0 fighter should lose to an easy knockout; the model still
-  gives the 2400 ELO fighter 53 %.
 - **Case 3, how it ends:** B should win by boxing late (around round 6). In the
   model round 6 rarely ends a fight (k = 38), so the chess player finishes in
   round 7 instead. Making round 6 more decisive gives B a clear edge here but
@@ -494,8 +500,8 @@ Still off after tuning:
    2400 ELO professionals, not to the real population of fighters. Most club
    fighters therefore sit between 1 and 3 stars.
 8. **Star guarantee is approximate.** "More stars always wins" only holds for gaps
-   of about 1.3 stars or more (section 7.3).
-9. **Level adjustments are estimates.** The 0.2 / 0.5 / 0.4 / 4 / 0.9 / 0.1 values were chosen to
+   of about 1.2 stars or more (section 7.3).
+9. **Level adjustments are estimates.** The 0.2 / 0.5 / 0.4 / 4 / 0.9 / 1.5 / 0.1 values were chosen to
    give plausible behaviour, not fitted.
 10. **The chances map is coarser** than the sliders (steps of ≈ 46 ELO and 0.2
     boxing level).

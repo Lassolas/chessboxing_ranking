@@ -140,7 +140,7 @@ export const ROUND_CONFIGS = {
 //                (m ≥ 5), shrinking to a fifth of it for total beginners.
 //                0.1 ≈ white wins 55 % of equal fights decided at the board.
 // With chessLength = boxStoppage = 0 the model is the fitted club-level one.
-export const LEVEL = { chessLength: 0.2, chessGap: 0.5, boxStoppage: 0.4, boxPace: 4, boxGap: 0.9, whiteEdge: 0.1 };
+export const LEVEL = { chessLength: 0.2, chessGap: 0.5, boxStoppage: 0.4, boxPace: 4, boxGap: 0.9, noviceGap: 1.5, whiteEdge: 0.1 };
 
 let _activeKey = '7';
 // Your pieces: +1 white, -1 black, 0 not drawn yet (average of both).
@@ -162,6 +162,10 @@ export const whiteEdgeAt = m => LEVEL.whiteEdge * Math.min(1, 0.2 + 0.8 * m / 5)
 // Multipliers on the fitted k for a fight with average levels m (chess), n (boxing).
 export const kChessFactor = m => Math.exp(LEVEL.chessLength * (m - 3));
 export const kGapFactor = dChess => Math.exp(-LEVEL.chessGap * Math.abs(dChess));
+// Below boxing level 1 (never really sparred) a fighter is much easier to
+// knock out than the even scale says: in the ring they count as
+// b − noviceGap × (1 − b), e.g. level 0 fights like −noviceGap.
+export const ringLevel = b => b < 1 ? b - LEVEL.noviceGap * (1 - b) : b;
 export const kBoxFactor = n => Math.exp(-LEVEL.boxStoppage * (n - 2));
 export const kBoxGapFactor = dBox => LEVEL.boxPace * Math.exp(-LEVEL.boxGap * Math.abs(dBox));
 
@@ -192,7 +196,7 @@ export function getMatchupProbs(myC, myB, oppC, oppB, side = _side) {
   const cached = matchupProbCache.get(key);
   if (cached) return cached;
 
-  const dChess = myC - oppC, dBox = myB - oppB;
+  const dChess = myC - oppC, dBox = ringLevel(myB) - ringLevel(oppB);
   const m = (myC + oppC) / 2, n = (myB + oppB) / 2;
   let out;
   if (side) {
@@ -237,7 +241,7 @@ export function getWinBreakdown(myC, myB, oppC, oppB, side = _side) {
 // Uncached win chance with colours not drawn yet, for bulk work (star ranking).
 export function pWinNeutral(myC, myB, oppC, oppB) {
   const params = getActiveConfig().params;
-  const dChess = myC - oppC, dBox = myB - oppB;
+  const dChess = myC - oppC, dBox = ringLevel(myB) - ringLevel(oppB);
   const m = (myC + oppC) / 2, n = (myB + oppB) / 2;
   const w = matchupProbsForSide(params, dChess, dBox, m, n, 1);
   const b = matchupProbsForSide(params, dChess, dBox, m, n, -1);
