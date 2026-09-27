@@ -105,7 +105,7 @@ export const i18n = {
     details_method: "How the numbers work",
     method_html: (v) => `
 <h3>1. Two ratings on an even scale</h3>
-<p>Chess uses ELO: one chess level is 229 ELO (800 to 2400). Boxing uses levels 0 to 5 (Novice to Professional). Both scales are even: each step multiplies your odds by the same amount, whatever level you start from.</p>
+<p>Chess uses ELO: one chess level is 229 ELO (800 to 2400). Boxing uses levels 0 to 5 (Never boxed to Elite / Pro). Both scales are even: each step multiplies your odds by the same amount, whatever level you start from.</p>
 <h3>2. Every round has three outcomes</h3>
 <p>You win the round (at the board: mate or time, there is no resigning; in the ring: stoppage), your opponent wins it, or the fight goes on. Their chances are in the ratio:</p>
 <span class="formula">you win : they win : fight goes on = e^(+s) : e^(−s) : k
@@ -119,7 +119,7 @@ P(you win the fight) = sum over all rounds</span>
 <h3>4. Where the round values come from</h3>
 <p>7 rounds: fitted on a table of per-round probabilities. 11 rounds: set by hand. 9 and 5 rounds: derived from those two. Some chess rounds carry an extra bias, such as round 3 in 5-round fights and round 5 in 7-round fights, where a stronger chess player can force a win on time. More rounds give the better boxer more chances in the ring and the weaker chess player more time to stall.</p>
 <h3>5. Adjusted to the fighters' level</h3>
-<p>The fitted values describe a club-level fight (about 1486 ELO, Amateur boxers). Other levels use the two fighters' average chess level <b>m</b> (0–7) and boxing level <b>n</b> (0–5):</p>
+<p>The fitted values describe a club-level fight (about 1486 ELO, regular sparrers at boxing level 2). Other levels use the two fighters' average chess level <b>m</b> (0–7) and boxing level <b>n</b> (0–5):</p>
 <span class="formula">chess rounds:  k × e^(0.2 × (m − 3))    longer games between strong players
                × e^(−0.5 × |chess gap|) from round 3: a big mismatch collapses fast
                                         (not round 1: players stall in the opening)
@@ -175,12 +175,12 @@ white edge:    s + w for white, s − w for black
       { short: 'Elite / GM', sub: '2400 ELO' }
     ],
     boxing_names: [
-      { short: 'Novice', sub: 'Never sparred' },
-      { short: 'Beginner', sub: 'Gym < 1 year' },
-      { short: 'Amateur', sub: '1–3 yrs training' },
-      { short: 'Regional', sub: 'First amateur bouts' },
-      { short: 'Semi-Pro', sub: '10+ fights' },
-      { short: 'Professional', sub: '40+ fights or pro' }
+      { short: 'Never boxed', sub: 'No sparring' },
+      { short: 'Gym boxer', sub: 'Trains, light sparring' },
+      { short: 'Regular sparrer', sub: 'Hard sparring every week' },
+      { short: 'Amateur fighter', sub: 'First official bouts' },
+      { short: 'Experienced amateur', sub: '10+ bouts, regional level' },
+      { short: 'Elite / Pro', sub: 'National level or pro' }
     ]
   },
   fr: {
@@ -280,7 +280,7 @@ white edge:    s + w for white, s − w for black
     details_method: "Comment sont calculés les chiffres",
     method_html: (v) => `
 <h3>1. Deux classements sur une échelle régulière</h3>
-<p>Les échecs utilisent l'ELO : un niveau d'échecs vaut 229 ELO (800 à 2400). La boxe utilise des niveaux de 0 à 5 (Novice à Professionnel). Les deux échelles sont régulières : chaque palier multiplie vos chances par le même facteur, quel que soit votre niveau de départ.</p>
+<p>Les échecs utilisent l'ELO : un niveau d'échecs vaut 229 ELO (800 à 2400). La boxe utilise des niveaux de 0 à 5 (Jamais boxé à Élite / Pro). Les deux échelles sont régulières : chaque palier multiplie vos chances par le même facteur, quel que soit votre niveau de départ.</p>
 <h3>2. Chaque round a trois issues</h3>
 <p>Vous gagnez le round (sur l'échiquier : mat ou temps, pas d'abandon ; sur le ring : arrêt), votre adversaire le gagne, ou le combat continue. Leurs chances sont dans le rapport :</p>
 <span class="formula">vous gagnez : il gagne : le combat continue = e^(+s) : e^(−s) : k
@@ -294,7 +294,7 @@ P(vous gagnez le combat)  = somme sur tous les rounds</span>
 <h3>4. D'où viennent les valeurs des rounds</h3>
 <p>7 rounds : ajustés sur une table de probabilités par round. 11 rounds : fixés à la main. 9 et 5 rounds : dérivés des deux. Certains rounds d'échecs ont un biais en plus, comme le round 3 en 5 rounds et le round 5 en 7 rounds, où un meilleur joueur d'échecs peut forcer la victoire au temps. Plus de rounds donnent plus d'occasions au meilleur boxeur et plus de temps au joueur d'échecs plus faible pour gagner du temps.</p>
 <h3>5. Ajusté au niveau des combattants</h3>
-<p>Les valeurs ajustées décrivent un combat de niveau club (environ 1486 ELO, boxeurs Amateur). Pour les autres niveaux, on utilise le niveau moyen d'échecs <b>m</b> (0–7) et de boxe <b>n</b> (0–5) des deux combattants :</p>
+<p>Les valeurs ajustées décrivent un combat de niveau club (environ 1486 ELO, niveau de boxe 2 : sparring régulier). Pour les autres niveaux, on utilise le niveau moyen d'échecs <b>m</b> (0–7) et de boxe <b>n</b> (0–5) des deux combattants :</p>
 <span class="formula">rounds d'échecs : k × e^(0,2 × (m − 3))    parties plus longues entre forts joueurs
                   × e^(−0,5 × |écart échecs|) dès le round 3 : un gros écart finit vite
                                              (pas au round 1 : on temporise dans l'ouverture)
@@ -349,12 +349,12 @@ avantage blancs : s + w pour les blancs, s − w pour les noirs
       { short: 'Élite / GMI', sub: '2400 ELO' }
     ],
     boxing_names: [
-      { short: 'Novice', sub: 'Jamais sparré' },
-      { short: 'Débutant', sub: 'Salle < 1 an' },
-      { short: 'Amateur', sub: '1–3 ans d\'entraînement' },
-      { short: 'Régional', sub: 'Premiers combats am.' },
-      { short: 'Semi-Pro', sub: '10+ combats' },
-      { short: 'Professionnel', sub: '40+ combats ou pro' }
+      { short: 'Jamais boxé', sub: 'Aucun sparring' },
+      { short: 'Boxeur de salle', sub: "S'entraîne, sparring léger" },
+      { short: 'Sparring régulier', sub: 'Sparring dur chaque semaine' },
+      { short: 'Combattant amateur', sub: 'Premiers combats officiels' },
+      { short: 'Amateur confirmé', sub: '10+ combats, niveau régional' },
+      { short: 'Élite / Pro', sub: 'Niveau national ou pro' }
     ]
   }
 };

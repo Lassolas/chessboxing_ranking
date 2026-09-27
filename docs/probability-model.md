@@ -19,7 +19,7 @@ Each fighter has two numbers.
 | Input | Range | Meaning |
 |---|---|---|
 | Chess | 800–2400 ELO, in steps of 10 | Standard chess rating. Internally converted to a chess level `c = (ELO − 800) × 7 / 1600`, so one level is ≈ 229 ELO and the scale runs 0–7. |
-| Boxing | 0–5, in steps of 0.1 | Boxing level: 0 Novice, 1 Beginner, 2 Amateur, 3 Regional, 4 Semi-Pro, 5 Professional. |
+| Boxing | 0–5, in steps of 0.1 | Boxing level: 0 Never boxed, 1 Gym boxer, 2 Regular sparrer, 3 Amateur fighter, 4 Experienced amateur, 5 Elite / Pro. |
 
 Plus two fight settings:
 
@@ -30,8 +30,8 @@ Plus two fight settings:
 ### 1.1 Both scales are even
 
 Like ELO, both scales are designed so that one step changes the odds by the same
-factor wherever you start: going from Novice to Beginner is worth as much as going
-from Semi-Pro to Professional. This is a deliberate design choice, not an
+factor wherever you start: going from Never boxed to Gym boxer is worth as much as
+going from Experienced amateur to Elite / Pro. This is a deliberate design choice, not an
 approximation. The one exception is boxing below level 1 (never really sparred),
 which is penalized extra in the ring (section 4).
 

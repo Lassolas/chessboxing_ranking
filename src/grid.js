@@ -12,7 +12,7 @@ export const boxLevels   = buildLevels(BOX_MIN,   BOX_MAX,   BOX_STEP);
 export const NX = chessLevels.length;
 export const NY = boxLevels.length;
 export const CELL = 16;
-export const MARGIN = { top: 50, right: 34, bottom: 94, left: 150 };
+export const MARGIN = { top: 50, right: 34, bottom: 94, left: 178 };
 
 // Recomputed on format change.
 export function invalidateGrid() { _rank = null; _sortedBeats = null; }

@@ -1,5 +1,5 @@
 {
-  "description": "Matchups judged by an experienced chessboxer (Val) before looking at the model, 2026-09-27. Colours not drawn. Boxing levels: 0 Novice, 1 Beginner, 2 Amateur, 3 Regional, 4 Semi-Pro, 5 Pro.",
+  "description": "Matchups judged by an experienced chessboxer (Val) before looking at the model, 2026-09-27. Colours not drawn. Boxing levels (named Novice … Pro at the time, since renamed): 0 Never boxed, 1 Gym boxer, 2 Regular sparrer, 3 Amateur fighter, 4 Experienced amateur, 5 Elite / Pro.",
   "legend": {
     "favourite": "A | B | even | even-B. 'clear' = lopsided, 'slight' = tough matchup, only just favourite.",
     "ending": "chess = the fight usually ends at the board, boxing = usually by stoppage, long = balanced / goes deep or to the decision",
