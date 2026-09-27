@@ -1,6 +1,6 @@
 import './style.css';
 import { i18n, currentLang, setLangState } from './i18n.js';
-import { eloOf, levelOfElo, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kGapFactor, kBoxFactor, kBoxGapFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { eloOf, levelOfElo, pWin, getMatchupProbs, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kGapFactor, kBoxFactor, kBoxGapFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 import { chessLevels, boxLevels, starsOf, starsAt, rankAt, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
 import {
   chessCategory, boxCategory, chessLabel, boxLabel,
@@ -121,6 +121,7 @@ function keyRounds(rows, key) {
 
 function renderFight() {
   const tt = t();
+  clearSimulation();
   const p = pWin(myChess, myBox, oppChess, oppBox);
   $('win-pct').textContent = pct(p);
   const [label, cls] = verdict(p);
@@ -201,6 +202,77 @@ function renderRounds(rows) {
       <span class="round-row__cont">${pct(r.cont)}</span>
     </div>`;
   }).join('');
+}
+
+// ── Simulated fight (for fun) ────────────────────────────────────────────────
+// Walks the rounds with the model's conditional chances: in each round the fight
+// ends for you, for your opponent, or goes on. Colours are drawn first when
+// they are not set.
+// Picks a line not used yet in this fight when possible.
+const pick = (arr, used) => {
+  const fresh = arr.filter(s => !used.has(s));
+  const s = (fresh.length ? fresh : arr)[Math.floor(Math.random() * (fresh.length || arr.length))];
+  used.add(s);
+  return s;
+};
+
+function simulateFight() {
+  const tt = t();
+  const params = getActiveConfig().params;
+  const side = getSide() || (Math.random() < 0.5 ? 1 : -1);
+  const probs = getMatchupProbs(myChess, myBox, oppChess, oppBox, side);
+  const lines = [];
+  if (!getSide()) lines.push(`<p class="sim__colors">${escapeHtml(tt.sim_colors(side === 1 ? tt.sim_white : tt.sim_black))}</p>`);
+
+  let prevA = 0, prevB = 0, prevCont = 1, final = '';
+  const used = new Set();
+  for (let r = 0; r < params.length; r++) {
+    const { type } = params[r];
+    const decision = r === params.length - 1;
+    const pA = (probs[r].pA - prevA) / prevCont, pB = (probs[r].pB - prevB) / prevCont;
+    prevA = probs[r].pA; prevB = probs[r].pB; prevCont = probs[r].pCont;
+    const roll = Math.random();
+    const chess = type === 'chess';
+    // Late chess rounds and big clock gaps end on time more often than by mate.
+    const onTime = chess && Math.random() < (r >= params.length - 3 ? 0.6 : 0.3);
+    let text, cls = '';
+    if (roll < pA) {
+      text = decision ? tt.sim_win_points : chess ? (onTime ? tt.sim_win_time : tt.sim_win_mate) : tt.sim_win_ko;
+      final = decision ? tt.sim_final_win_points : tt.sim_final_win(chess ? (onTime ? tt.sim_by_time : tt.sim_by_mate) : tt.sim_by_ko, r + 1);
+      cls = 'sim__row--win';
+    } else if (roll < pA + pB) {
+      text = decision ? tt.sim_loss_points : chess ? (onTime ? tt.sim_loss_time : tt.sim_loss_mate) : tt.sim_loss_ko;
+      final = decision ? tt.sim_final_loss_points : tt.sim_final_loss(chess ? (onTime ? tt.sim_by_time : tt.sim_by_mate) : tt.sim_by_ko, r + 1);
+      cls = 'sim__row--loss';
+    } else {
+      const lean = pA - pB;
+      const pool = chess
+        ? (lean > 0.03 ? tt.sim_chess_you_better : lean < -0.03 ? tt.sim_chess_they_better : tt.sim_chess_on)
+        : (lean > 0.03 ? tt.sim_box_you_better : lean < -0.03 ? tt.sim_box_they_better : tt.sim_box_on);
+      text = pick(Math.random() < 0.6 ? pool : (chess ? tt.sim_chess_on : tt.sim_box_on), used);
+    }
+    const icon = chess ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
+    const label = decision ? tt.sim_decision : tt.sim_round(r + 1);
+    lines.push(`<div class="sim__row ${cls}"><img src="${icon}" alt=""><span class="sim__label">${escapeHtml(label)}</span><span>${escapeHtml(text)}</span></div>`);
+    if (cls) break;
+  }
+
+  const won = /sim__row--win/.test(lines[lines.length - 1]);
+  const el = $('sim-result');
+  el.innerHTML = `<div class="sim__head"><span class="sim__title">${escapeHtml(tt.sim_title)}</span></div>` +
+    lines.join('') +
+    `<p class="sim__final ${won ? 'sim__final--win' : 'sim__final--loss'}">${escapeHtml(final)}</p>` +
+    `<p class="sim__note">${escapeHtml(tt.sim_note)}</p>`;
+  el.hidden = false;
+  $('simulate-btn').textContent = tt.simulate_again;
+}
+
+$('simulate-btn').addEventListener('click', simulateFight);
+
+// A new matchup makes the old simulation stale.
+function clearSimulation() {
+  $('sim-result').hidden = true;
+  $('simulate-btn').textContent = t().simulate;
 }
 
 // ── Chances map (canvas) ─────────────────────────────────────────────────────

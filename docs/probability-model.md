@@ -417,6 +417,17 @@ Using chess level / 7 and boxing level / 5 (both 0–1):
 - **Early Stoppage Zone:** colours opponents whose expected length is below that
   threshold, green when you are favoured and red when they are.
 
+### 8.6 Simulate fight
+
+For fun, the page can play out one random fight. If colours are not drawn it
+first tosses a coin for them. Then, round by round, it draws "you win", "they
+win" or "fight goes on" with the model's chances for that round (given the fight
+is still on), and stops at the first finish. Chess finishes are shown as
+checkmate or a win on time (time more often in the last rounds); boxing
+finishes as a knockout; the decision as a win on points. Over many simulations
+the share of wins matches the displayed win chance (checked: 28.9 % over 2000
+simulations for a 28 % matchup).
+
 ---
 
 ## 9. Assumptions

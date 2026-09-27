@@ -11,7 +11,7 @@
 
 export const FIGHTERS = [
   { name: 'Dogukan Cinar', elo: 1520, box: 3.8, note: 'Test' },
-  { name: 'Lucille Ballarini', elo: 1000, box: 3, note: 'Test' },
+  { name: 'Lucille Ballarini', elo: 1000, box: 3.4, note: 'Test' },
   { name: 'Paul Sergent', elo: 1950, box: 3.4, note: 'Test' },
   { name: 'Carl Strugnell', elo: 2200, box: 2.8, note: 'Test' },
 ];
