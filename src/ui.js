@@ -1,6 +1,5 @@
-import { i18n, currentLang, getChessNamed, getBoxingNamed } from './i18n.js';
-import { eloOf, pWin, getWinBreakdown, getActiveConfig, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
-import { chessLevels, boxLevels, starsOf, rankOf, draw, color } from './grid.js';
+import { getChessNamed, getBoxingNamed } from './i18n.js';
+import { eloOf, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 
 export function closestNamed(arr, v) {
   let best = arr[0], bd = Infinity;
@@ -21,9 +20,7 @@ export function getChessDrumLevels() {
   const levels = [];
   for (let k = 0; k <= Math.round((CHESS_MAX - CHESS_MIN) / CHESS_STEP); k++) {
     const v = +(CHESS_MIN + k * CHESS_STEP).toFixed(1);
-    const named = arr.find(n => n.value === v);
-    const category = chessCategory(v);
-    levels.push({ value: v, short: named ? named.short : category.short, sub: named ? named.sub : (eloOf(v) + ' ELO') });
+    levels.push({ value: v, short: chessCategory(v).short, sub: eloOf(v) + ' ELO' });
   }
   return levels;
 }
@@ -34,7 +31,7 @@ export function getBoxingDrumLevels() {
   for (let k = 0; k <= Math.round((BOX_MAX - BOX_MIN) / BOX_STEP); k++) {
     const v = +(BOX_MIN + k * BOX_STEP).toFixed(1);
     const named = arr.find(n => n.value === v);
-    levels.push({ value: v, short: named ? named.short : v.toFixed(1), sub: named ? named.sub : '' });
+    levels.push({ value: v, short: boxCategory(v), sub: named ? named.sub : 'Lv ' + v.toFixed(1) });
   }
   return levels;
 }
@@ -45,22 +42,6 @@ export function boxCategory(v) {
   return named ? named.short : closestNamed(arr, v).short;
 }
 
-export function boxMeta(v) {
-  return 'Lv ' + v.toFixed(1);
-}
-
-export function boxLabelHTML(v, levelClass = 'fighter-card__box', metaClass = 'fighter-card__box-sub') {
-  return `<b class="${levelClass}">${boxCategory(v)}</b><div class="${metaClass}">${boxMeta(v)}</div>`;
-}
-
-export function fightCardChessHTML(label) {
-  return escapeHtml(label);
-}
-
-export function fightCardBoxHTML(v) {
-  return boxLabelHTML(v, 'fc-comp-primary', 'fc-comp-secondary');
-}
-
 export function escapeHtml(str) {
   return String(str)
     .replaceAll('&', '&amp;')
@@ -68,21 +49,6 @@ export function escapeHtml(str) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
-}
-
-export function outcomeLabel(p) {
-  const t = i18n[currentLang];
-  if (p > 0.70) return t.dominate;
-  if (p > 0.55) return t.win;
-  if (p >= 0.45) return t.even_short;
-  if (p > 0.30) return t.tough;
-  return t.long_shot;
-}
-
-export function outcomeColor(p) {
-  if (p > 0.55) return '#39d353';
-  if (p >= 0.45) return '#4a9eff';
-  return '#e03c3c';
 }
 
 export function miniStarsHTML(rating) {
@@ -120,7 +86,7 @@ export function setupSlider(sliderId, valId, getLevelsFn, initialValue, onSelect
     const levels = getLevelsFn();
     const nearest = levels.reduce((best, item) =>
       Math.abs(item.value - val) < Math.abs(best.value - val) ? item : best, levels[0]);
-    valDisplay.innerHTML = `${nearest.short}<span class="slider-sub">${nearest.sub}</span>`;
+    valDisplay.innerHTML = `${escapeHtml(nearest.short)}<span class="slider-sub">${escapeHtml(nearest.sub)}</span>`;
   }
 
   slider.value = initialValue;
@@ -140,46 +106,9 @@ export function setupSlider(sliderId, valId, getLevelsFn, initialValue, onSelect
   };
 }
 
-export function pulseCard() {
-  const card = document.getElementById('my-fighter-card');
-  card.classList.remove('pulse');
-  void card.offsetWidth;
-  card.classList.add('pulse');
-  setTimeout(() => card.classList.remove('pulse'), 500);
-}
-
-export function renderRoundChart(dChess, dBox) {
-  const container = document.getElementById('fc-round-rows');
-  container.innerHTML = '';
-  const { probs } = getWinBreakdown(dChess, dBox);
-  const params = getActiveConfig().params;
-  const totalRounds = params.length;
-
-  for (let r = 1; r <= totalRounds; r++) {
-    const { pA, pB } = probs[r - 1];
-    const { type }   = params[r - 1];
-    const wA = Math.round(pA * 100);
-    const wB = Math.round(pB * 100);
-    const row = document.createElement('div');
-    row.className = 'fc-round-row';
-    const isDecision = r === totalRounds;
-    const icon    = type === 'chess' ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
-    const label   = isDecision ? i18n[currentLang].decision : `R${r}`;
-    const iconMarkup = !isDecision
-      ? `<img class="fc-round-icon" src="${icon}" alt="">`
-      : `<span class="fc-round-icon-spacer" aria-hidden="true"></span>`;
-    row.innerHTML =
-      iconMarkup +
-      `<span class="fc-round-label">${label}</span>` +
-      `<div class="fc-round-bar">` +
-        `<div class="fc-round-fill-a" style="width:${wA}%"></div>` +
-        `<div class="fc-round-fill-b" style="left:${wA}%;width:${wB}%"></div>` +
-      `</div>` +
-      `<span class="fc-round-detail">` +
-        `<span style="color:var(--gold-mid)">${wA}%</span>` +
-        ` · ` +
-        `<span style="color:var(--even-blue)">${wB}%</span>` +
-      `</span>`;
-    container.appendChild(row);
-  }
+export function pulse(el) {
+  el.classList.remove('pulse');
+  void el.offsetWidth;
+  el.classList.add('pulse');
+  setTimeout(() => el.classList.remove('pulse'), 500);
 }

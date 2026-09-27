@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Chessboxing Skill Evaluator</title>
-
+<title>Chessboxing Rating</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -15,198 +17,160 @@
     <img src="assets/icon-boxing.png" alt="">
   </div>
   <p class="site-tagline" data-i18n="tagline">Where do you stand in the ring?</p>
-  <select id="lang-switch" class="lang-switch">
-    <option value="en">EN</option>
-    <option value="fr">FR</option>
-  </select>
+  <div class="header-controls">
+    <div class="round-selector" role="group" aria-label="Round format">
+      <span class="round-selector__label" data-i18n="rounds">Rounds</span>
+      <button type="button" class="round-selector__btn" data-rounds="5">5</button>
+      <button type="button" class="round-selector__btn active" data-rounds="7">7</button>
+      <button type="button" class="round-selector__btn" data-rounds="9">9</button>
+      <button type="button" class="round-selector__btn" data-rounds="11">11</button>
+    </div>
+    <select id="lang-switch" class="lang-switch" aria-label="Language">
+      <option value="en">EN</option>
+      <option value="fr">FR</option>
+    </select>
+  </div>
 </header>
 
-<div id="main">
-  <div id="sidebar">
-  <!-- ── FIGHTER SETUP ── -->
-  <section id="fighter-setup">
-    <h2 class="section-title" data-i18n="your_profile">Your Profile</h2>
+<main id="app">
+  <div class="col">
 
-    <div class="sliders-row">
+    <!-- ── YOU ── -->
+    <section class="card card--you" id="you">
+      <h2 class="card-title" data-i18n="you_title">You</h2>
+
       <div class="slider-group">
         <div class="slider-header">
-          <div class="slider-label"><img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span></div>
+          <label class="slider-label" for="my-chess-slider"><img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span></label>
           <div class="slider-value" id="my-chess-val">—</div>
         </div>
-        <div class="slider-track-wrap">
-          <span class="slider-coord">0</span>
-          <div class="slider-container">
-            <div class="slider-ticks chess-ticks"><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div></div>
-            <input type="range" class="modern-slider" id="my-chess-slider" min="0" max="7" step="0.2" value="3.0">
-          </div>
-          <span class="slider-coord">7</span>
-        </div>
+        <input type="range" class="modern-slider" id="my-chess-slider" min="0" max="7" step="0.2" value="3.0">
       </div>
       <div class="slider-group">
         <div class="slider-header">
-          <div class="slider-label"><img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span></div>
+          <label class="slider-label" for="my-box-slider"><img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span></label>
           <div class="slider-value" id="my-box-val">—</div>
         </div>
-        <div class="slider-track-wrap">
-          <span class="slider-coord">0</span>
-          <div class="slider-container">
-            <div class="slider-ticks box-ticks"><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div></div>
-            <input type="range" class="modern-slider" id="my-box-slider" min="0" max="5" step="0.2" value="2.0">
-          </div>
-          <span class="slider-coord">5</span>
+        <input type="range" class="modern-slider" id="my-box-slider" min="0" max="5" step="0.2" value="2.0">
+      </div>
+
+      <div class="rating" id="my-rating-card">
+        <div class="rating__label" data-i18n="rating_title">Your chessboxing rating</div>
+        <div class="rating__value"><span id="my-stars-num">—</span><span class="rating__max">/ 5</span></div>
+        <svg class="stars-svg" id="myStars" width="170" height="34" viewBox="0 0 500 100" aria-hidden="true"></svg>
+        <div class="rating__meta">
+          <span class="badge badge--gold" id="my-type">—</span>
+          <span id="my-top">—</span>
         </div>
       </div>
-    </div>
 
-    <!-- Fighter summary card -->
-    <div class="fighter-card" id="my-fighter-card">
-      <div>
-        <div class="fighter-card__label" data-i18n="your_corner">Your Corner</div>
-        <div class="fighter-card__chess" id="myChessLabel">—</div>
-        <div class="fighter-card__chess-sub" id="myElo">—</div>
-        <div class="fighter-card__box" id="myBoxLabel">—</div>
+      <div class="subcard">
+        <div class="subcard__title" data-i18n="more_stars">Fastest way to more stars</div>
+        <div class="lever">
+          <span class="lever__label" data-i18n="plus_box">+1 boxing level</span>
+          <div class="lever__track"><div class="lever__fill" id="lever-box-fill"></div></div>
+          <span class="lever__val" id="lever-box-val">—</span>
+        </div>
+        <div class="lever">
+          <span class="lever__label" data-i18n="plus_chess">+230 ELO</span>
+          <div class="lever__track"><div class="lever__fill lever__fill--dim" id="lever-chess-fill"></div></div>
+          <span class="lever__val" id="lever-chess-val">—</span>
+        </div>
+        <p class="subcard__text" id="lever-text"></p>
       </div>
-      <div class="fighter-card__right">
-        <svg class="stars-svg" id="myStars" width="110" height="22" viewBox="0 0 500 100"></svg>
-        <div class="fighter-card__rank" id="myRating">—</div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── OPPONENT SETUP ── -->
-  <section id="opponent-setup">
-    <h2 class="section-title" data-i18n="opponent_profile">Opponent Profile</h2>
-    <div class="sliders-row">
+    <!-- ── OPPONENT ── -->
+    <section class="card card--opp" id="opponent">
+      <h2 class="card-title card-title--opp" data-i18n="opp_title">Opponent</h2>
+
+      <div class="fighter-pick" id="fighter-pick-wrap" hidden>
+        <label for="fighter-pick" data-i18n="known_fighters">Pick a known fighter</label>
+        <select id="fighter-pick"></select>
+      </div>
+
       <div class="slider-group">
         <div class="slider-header">
-          <div class="slider-label"><img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span></div>
+          <label class="slider-label" for="opp-chess-slider"><img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span></label>
           <div class="slider-value" id="opp-chess-val">—</div>
         </div>
-        <div class="slider-track-wrap">
-          <span class="slider-coord">0</span>
-          <div class="slider-container">
-            <div class="slider-ticks chess-ticks"><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div></div>
-            <input type="range" class="modern-slider opp-slider" id="opp-chess-slider" min="0" max="7" step="0.2" value="3.0">
-          </div>
-          <span class="slider-coord">7</span>
-        </div>
+        <input type="range" class="modern-slider opp-slider" id="opp-chess-slider" min="0" max="7" step="0.2" value="3.0">
       </div>
       <div class="slider-group">
         <div class="slider-header">
-          <div class="slider-label"><img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span></div>
+          <label class="slider-label" for="opp-box-slider"><img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span></label>
           <div class="slider-value" id="opp-box-val">—</div>
         </div>
-        <div class="slider-track-wrap">
-          <span class="slider-coord">0</span>
-          <div class="slider-container">
-            <div class="slider-ticks box-ticks"><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div></div>
-            <input type="range" class="modern-slider opp-slider" id="opp-box-slider" min="0" max="5" step="0.2" value="2.0">
-          </div>
-          <span class="slider-coord">5</span>
-        </div>
+        <input type="range" class="modern-slider opp-slider" id="opp-box-slider" min="0" max="5" step="0.2" value="2.0">
       </div>
-    </div>
 
-    <!-- Fight card: inline now -->
-    <div id="fight-card">
-      <div class="fc-handle"></div>
-      <div class="fc-header">
-        <span class="fc-title" data-i18n="fight_card">Fight Card</span>
-        <button class="fc-close" id="fc-close-btn" aria-label="Close">✕</button>
+      <div class="opp-summary">
+        <span class="opp-summary__stars" id="opp-stars-num">—</span>
+        <svg class="stars-svg" id="oppStars" width="110" height="22" viewBox="0 0 500 100" aria-hidden="true"></svg>
+        <span class="badge badge--blue" id="opp-type">—</span>
       </div>
-      <div class="fc-outcome" id="fc-outcome">
-        <div class="fc-outcome__prob"  id="hP">—</div>
-        <div class="fc-outcome__label" id="fc-outcome-label">vs</div>
-      </div>
-      <div class="fc-comparison">
-        <div class="fc-comp-row">
-          <div class="fc-comp-corner-empty"></div>
-          <div class="fc-comp-header fc-comp-header--you" data-i18n="your_corner">Your Corner</div>
-          <div class="fc-comp-header fc-comp-header--opp" data-i18n="opponent">Opponent</div>
-        </div>
-        <div class="fc-comp-row">
-          <div class="fc-comp-label">Rating</div>
-          <div class="fc-comp-val"><svg class="stars-svg" id="fc-my-stars" width="95" height="19" viewBox="0 0 500 100"></svg></div>
-          <div class="fc-comp-val"><svg class="stars-svg" id="oppStars" width="95" height="19" viewBox="0 0 500 100"></svg></div>
-        </div>
-        <div class="fc-comp-row">
-          <div class="fc-comp-label"><img src="assets/icon-chess.png" alt=""><span data-i18n="chess">Chess</span></div>
-          <div class="fc-comp-val fc-comp-val--you">
-            <div class="fc-comp-primary" id="fc-my-chess">—</div>
-            <div class="fc-comp-secondary" id="fc-my-elo">—</div>
-          </div>
-          <div class="fc-comp-val fc-comp-val--opp">
-            <div class="fc-comp-primary" id="hChess">—</div>
-            <div class="fc-comp-secondary" id="hElo">—</div>
-          </div>
-        </div>
-        <div class="fc-comp-row">
-          <div class="fc-comp-label"><img src="assets/icon-boxing.png" alt=""><span data-i18n="boxing">Boxing</span></div>
-          <div class="fc-comp-val fc-comp-val--you" id="fc-my-box">—</div>
-          <div class="fc-comp-val fc-comp-val--opp" id="hBox">—</div>
-        </div>
-      </div>
-      <div class="fc-bars">
-        <div class="fc-bars-title" data-i18n="prob_win">Probability to win by</div>
-        <div class="fc-bar-row">
-          <span data-i18n="chess">Chess</span>
-          <div class="fc-bar-stack">
-            <div class="fc-bar-prob">
-              <span class="fc-bar-prob-you" id="fc-chess-prob-you">—</span>
-              <span class="fc-bar-prob-opp" id="fc-chess-prob-opp">—</span>
-            </div>
-            <div class="fc-bar">
-              <div class="fc-bar__fill fc-bar__fill--you" id="fc-chess-bar-you" style="width:50%"></div>
-              <div class="fc-bar__fill fc-bar__fill--opp" id="fc-chess-bar-opp" style="left:50%;width:50%"></div>
-            </div>
-          </div>
-          <span class="fc-diff" id="fc-chess-diff">—</span>
-        </div>
-        <div class="fc-bar-row">
-          <span data-i18n="boxing">Boxing</span>
-          <div class="fc-bar-stack">
-            <div class="fc-bar-prob">
-              <span class="fc-bar-prob-you" id="fc-box-prob-you">—</span>
-              <span class="fc-bar-prob-opp" id="fc-box-prob-opp">—</span>
-            </div>
-            <div class="fc-bar">
-              <div class="fc-bar__fill fc-bar__fill--you" id="fc-box-bar-you" style="width:50%"></div>
-              <div class="fc-bar__fill fc-bar__fill--opp" id="fc-box-bar-opp" style="left:50%;width:50%"></div>
-            </div>
-          </div>
-          <span class="fc-diff" id="fc-box-diff">—</span>
-        </div>
-      </div>
-      <div class="fc-expected-box">
-        <span class="fc-expected-label" data-i18n="expected_length">Expected Length</span>
-        <span class="fc-expected-val" id="fc-expected-length">—</span>
-      </div>
-      <div class="fc-rounds" id="fc-rounds">
-        <div class="fc-rounds-title">
-          <span data-i18n="stoppage_odds">Stoppage odds</span>
-          <span class="fc-rounds-legend">
-            <span style="color:var(--gold-mid)">&#9644; <span data-i18n="you_win">you win</span></span>
-            <span style="color:var(--even-blue)">&#9644; <span data-i18n="opp_wins">opp wins</span></span>
-          </span>
-        </div>
-        <div id="fc-round-rows"></div>
-      </div>
-    </div>
-  </section>
-  </div><!-- #sidebar -->
+    </section>
+  </div>
 
-  <!-- ── EXPLORE GRID ── -->
-  <section id="explore-section">
-    <h2 class="section-title"><span data-i18n="explore_matchups">Explore Matchups</span> <span class="section-hint" data-i18n="tap_hint">tap a cell to see that fight</span></h2>
-    <div id="grid-wrap">
+  <div class="col">
+
+    <!-- ── THE FIGHT ── -->
+    <section class="card" id="fight">
+      <h2 class="card-title" data-i18n="matchup_title">The fight</h2>
+      <div class="verdict">
+        <div class="verdict__pct" id="win-pct">—</div>
+        <div class="verdict__label" data-i18n="chance_win">chance you win</div>
+        <div class="badge verdict__badge" id="verdict">—</div>
+      </div>
+
+      <div class="block">
+        <div class="block__title" data-i18n="how_ends">How the fight ends</div>
+        <div class="ends-bar" id="ends-bar">
+          <div class="ends-bar__seg seg-win-ring"></div>
+          <div class="ends-bar__seg seg-win-board"></div>
+          <div class="ends-bar__seg seg-lose-board"></div>
+          <div class="ends-bar__seg seg-lose-ring"></div>
+        </div>
+        <div class="ends-legend">
+          <div><span class="sw seg-win-ring"></span><span data-i18n="win_ring">You win in the ring</span><b id="p-win-ring">—</b></div>
+          <div><span class="sw seg-lose-board"></span><span data-i18n="lose_board">You lose at the board</span><b id="p-lose-board">—</b></div>
+          <div><span class="sw seg-win-board"></span><span data-i18n="win_board">You win at the board</span><b id="p-win-board">—</b></div>
+          <div><span class="sw seg-lose-ring"></span><span data-i18n="lose_ring">You lose in the ring</span><b id="p-lose-ring">—</b></div>
+        </div>
+        <div class="expected"><span data-i18n="expected_len">Expected length</span>: <b id="expected-len">—</b> <span class="muted" id="expected-hint"></span></div>
+      </div>
+
+      <div class="subcard">
+        <div class="subcard__title" data-i18n="game_plan">Game plan</div>
+        <p class="subcard__text subcard__text--main" id="game-plan"></p>
+        <div class="plan-rounds" id="plan-rounds"></div>
+        <div class="divider"></div>
+        <div class="subcard__title" data-i18n="train_title">To beat this opponent, train</div>
+        <div class="lever">
+          <span class="lever__label" data-i18n="plus_box">+1 boxing level</span>
+          <div class="lever__track"><div class="lever__fill" id="train-box-fill"></div></div>
+          <span class="lever__val lever__val--wide" id="train-box-val">—</span>
+        </div>
+        <div class="lever">
+          <span class="lever__label" data-i18n="plus_chess">+230 ELO</span>
+          <div class="lever__track"><div class="lever__fill lever__fill--dim" id="train-chess-fill"></div></div>
+          <span class="lever__val lever__val--wide" id="train-chess-val">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DETAILS ON DEMAND ── -->
+    <details class="card details" id="d-rounds">
+      <summary data-i18n="details_rounds">Round by round</summary>
+      <p class="muted small" data-i18n="details_rounds_hint"></p>
+      <div class="rounds-head"><span data-i18n="col_round">Round</span><span data-i18n="col_you_they">You win · They win</span><span data-i18n="col_still">Still on</span></div>
+      <div id="round-rows"></div>
+    </details>
+
+    <details class="card details" id="d-map">
+      <summary data-i18n="details_map">Chances map</summary>
+      <p class="muted small" data-i18n="details_map_hint"></p>
       <div class="grid-controls">
-        <div class="round-selector">
-          <span class="round-selector__label" data-i18n="round_format">Rounds</span>
-          <button class="round-selector__btn" data-rounds="5">5</button>
-          <button class="round-selector__btn active" data-rounds="7">7</button>
-          <button class="round-selector__btn" data-rounds="9">9</button>
-          <button class="round-selector__btn" data-rounds="11">11</button>
-        </div>
         <label class="toggle-switch">
           <input type="checkbox" id="strict-matchmaking-toggle">
           <span class="toggle-slider"></span>
@@ -218,9 +182,9 @@
           <span class="toggle-label" data-i18n="early_stoppage_zone">Early Stoppage Zone</span>
         </label>
       </div>
-      <div id="early-stoppage-legend" style="display: none; justify-content: center; gap: 16px; margin: 0 4px 12px; font-size: 12px; color: var(--text-secondary);">
-        <span style="display: flex; align-items: center;"><span class="swatch" style="background: rgba(40, 200, 40, 0.4); border: 1px solid rgba(40,200,40,0.8); margin-right: 6px;"></span><span data-i18n="early_win">Early Win (Domination)</span></span>
-        <span style="display: flex; align-items: center;"><span class="swatch" style="background: rgba(200, 40, 40, 0.4); border: 1px solid rgba(200,40,40,0.8); margin-right: 6px;"></span><span data-i18n="early_loss">Early Loss (Danger)</span></span>
+      <div class="es-legend" id="early-stoppage-legend" hidden>
+        <span><span class="swatch swatch--es-win"></span><span data-i18n="early_win">Early win</span></span>
+        <span><span class="swatch swatch--es-loss"></span><span data-i18n="early_loss">Early loss</span></span>
       </div>
       <div class="matchmaking-rules" id="active-rules-container"></div>
       <div id="grid-container">
@@ -239,10 +203,22 @@
         <span><span class="iso-band"></span>25/75 %</span>
         <span><span class="iso-band iso-band--outer"></span>10/90 %</span>
       </div>
-    </div>
-  </section>
+    </details>
 
-</div><!-- #main -->
+    <details class="card details" id="d-method">
+      <summary data-i18n="details_method">How the numbers work</summary>
+      <p class="muted small" data-i18n="method_text"></p>
+    </details>
+
+    <!-- ── KNOWN FIGHTERS ── -->
+    <section class="card" id="fighters" hidden>
+      <h2 class="card-title" data-i18n="fighters_title">Fighters</h2>
+      <p class="muted small" data-i18n="fighters_hint">Tap a fighter to set them as your opponent.</p>
+      <div class="fighters-head"><span>#</span><span data-i18n="col_fighter">Fighter</span><span data-i18n="col_rating">Rating</span><span data-i18n="col_you_win">You win</span></div>
+      <div id="fighter-rows"></div>
+    </section>
+  </div>
+</main>
 
 <script type="module" src="/src/main.js"></script>
 

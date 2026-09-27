@@ -1,13 +1,12 @@
 import './style.css';
-import { i18n, currentLang, setLangState, getChessNamed, getBoxingNamed } from './i18n.js';
+import { i18n, currentLang, setLangState } from './i18n.js';
 import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
 import { chessLevels, boxLevels, starsOf, rankOf, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
 import {
-  chessCategory, getChessDrumLevels, getBoxingDrumLevels, boxLabelHTML,
-  fightCardChessHTML, fightCardBoxHTML, outcomeLabel, outcomeColor,
-  buildStarSvg, setStars, setupSlider, pulseCard, renderRoundChart,
-  miniStarsHTML, tooltipLineHTML, escapeHtml, boxCategory
+  chessCategory, boxCategory, getChessDrumLevels, getBoxingDrumLevels,
+  buildStarSvg, setStars, setupSlider, pulse, miniStarsHTML, tooltipLineHTML, escapeHtml
 } from './ui.js';
+import { FIGHTERS } from './fighters.js';
 
 let myChess = 3.0;
 let myBox = 2.0;
@@ -15,244 +14,183 @@ let oppChess = 3.0; // ≈1500 ELO (1486)
 let oppBox = 2.0;
 let strictMatchmaking = false;
 let showEarlyStoppageZone = false;
-let currentOppIdx = null;
 
-const canvas = document.getElementById('grid');
+const $ = id => document.getElementById(id);
+const t = () => i18n[currentLang];
+const pct = p => Math.round(p * 100) + '%';
+
+const idxOf = (c, b) => ({
+  i: Math.max(0, Math.min(NX - 1, Math.round((c - CHESS_MIN) / CHESS_STEP))),
+  j: Math.max(0, Math.min(NY - 1, Math.round((b - BOX_MIN) / BOX_STEP)))
+});
+// One training step: +1 boxing level or +1 chess level (≈230 ELO), capped at the top.
+const upBox = b => Math.min(BOX_MAX, +(b + 1).toFixed(1));
+const upChess = c => Math.min(CHESS_MAX, +(c + 1).toFixed(1));
+const starsAt = (c, b) => { const { i, j } = idxOf(c, b); return starsOf(i, j); };
+
+function fighterType(c, b) {
+  const cn = c / CHESS_MAX, bn = b / BOX_MAX;
+  if (cn >= 0.7 && bn >= 0.7) return 'complete';
+  if (cn - bn > 0.15) return 'tactician';
+  if (bn - cn > 0.15) return 'brawler';
+  return 'balanced';
+}
+
+// ── Stars ────────────────────────────────────────────────────────────────────
+const myStarsClip = buildStarSvg($('myStars'));
+const oppStarsClip = buildStarSvg($('oppStars'));
+
+function renderYou() {
+  const tt = t();
+  const { i, j } = idxOf(myChess, myBox);
+  const s = starsOf(i, j);
+  $('my-stars-num').textContent = s.toFixed(1);
+  setStars(myStarsClip, s);
+  const type = fighterType(myChess, myBox);
+  $('my-type').textContent = tt['type_' + type];
+  $('my-type').title = tt['type_' + type + '_desc'];
+  $('my-top').textContent = `${tt.top} ${Math.max(1, Math.round((1 - rankOf(i, j)) * 100))}% ${tt.of_fighters}`;
+
+  const sBox = myBox < BOX_MAX ? starsAt(myChess, upBox(myBox)) : null;
+  const sChess = myChess < CHESS_MAX ? starsAt(upChess(myChess), myBox) : null;
+  setLever('lever-box', sBox, v => v / 5, v => v.toFixed(1) + ' ★');
+  setLever('lever-chess', sChess, v => v / 5, v => v.toFixed(1) + ' ★');
+
+  const dB = sBox === null ? null : sBox - s;
+  const dC = sChess === null ? null : sChess - s;
+  let text;
+  if (dB === null && dC === null) text = tt.more_stars_max;
+  else if (dC === null || (dB !== null && dB - dC >= 0.1)) text = tt.more_stars_box(dB.toFixed(1));
+  else if (dB === null || dC - dB >= 0.1) text = tt.more_stars_chess(dC.toFixed(1));
+  else text = tt.more_stars_even;
+  $('lever-text').textContent = text;
+}
+
+function setLever(prefix, value, toFrac, fmt, extra = '') {
+  $(prefix + '-fill').style.width = value === null ? '0%' : (toFrac(value) * 100).toFixed(1) + '%';
+  $(prefix + '-val').innerHTML = value === null ? t().maxed : fmt(value) + extra;
+}
+
+function renderOpp() {
+  const s = starsAt(oppChess, oppBox);
+  $('opp-stars-num').textContent = s.toFixed(1);
+  setStars(oppStarsClip, s);
+  $('opp-type').textContent = t()['type_' + fighterType(oppChess, oppBox)];
+}
+
+// ── The fight ────────────────────────────────────────────────────────────────
+function verdict(p) {
+  const tt = t();
+  if (p > 0.70) return [tt.v_fav_clear, 'badge--gold'];
+  if (p > 0.55) return [tt.v_fav, 'badge--gold'];
+  if (p >= 0.45) return [tt.v_even, 'badge--neutral'];
+  if (p > 0.30) return [tt.v_under, 'badge--blue'];
+  return [tt.v_long, 'badge--blue'];
+}
+
+// Per-round chances that the fight ends in that round, for each side.
+function roundBreakdown(dChess, dBox) {
+  const params = getActiveConfig().params;
+  const { probs } = getWinBreakdown(dChess, dBox);
+  let prevA = 0, prevB = 0;
+  return probs.map((p, r) => {
+    const row = {
+      label: r === params.length - 1 ? t().decision : 'R' + (r + 1),
+      type: params[r].type,
+      win: Math.max(0, p.pA - prevA),
+      loss: Math.max(0, p.pB - prevB),
+      cont: p.pCont
+    };
+    prevA = p.pA; prevB = p.pB;
+    return row;
+  });
+}
+
+// Rounds that carry at least a quarter of the total (max two), in fight order.
+function keyRounds(rows, key) {
+  const total = rows.reduce((s, r) => s + r[key], 0);
+  if (total < 0.02) return [];
+  return rows
+    .filter(r => r[key] >= total * 0.25)
+    .sort((a, b) => b[key] - a[key]).slice(0, 2)
+    .sort((a, b) => rows.indexOf(a) - rows.indexOf(b))
+    .map(r => r.label);
+}
+
+function renderFight() {
+  const tt = t();
+  const dC = myChess - oppChess, dB = myBox - oppBox;
+  const p = pWin(myChess, myBox, oppChess, oppBox);
+  $('win-pct').textContent = pct(p);
+  const [label, cls] = verdict(p);
+  const v = $('verdict');
+  v.textContent = label;
+  v.className = 'badge verdict__badge ' + cls;
+
+  const { chessWin, boxWin, chessLoss, boxLoss, expectedRounds } = getWinBreakdown(dC, dB);
+  const segs = [boxWin, chessWin, chessLoss, boxLoss];
+  [...$('ends-bar').children].forEach((el, k) => { el.style.flexGrow = segs[k]; });
+  $('p-win-ring').textContent = pct(boxWin);
+  $('p-win-board').textContent = pct(chessWin);
+  $('p-lose-board').textContent = pct(chessLoss);
+  $('p-lose-ring').textContent = pct(boxLoss);
+
+  const n = getActiveConfig().params.length - 1; // fighting rounds (last param = decision)
+  const e = Math.min(expectedRounds, n);
+  $('expected-len').textContent = tt.of_rounds(e.toFixed(1), n);
+  $('expected-hint').textContent = e < n * 0.5 ? `(${tt.early_hint})` : e > n * 0.85 ? `(${tt.distance_hint})` : '';
+
+  // Game plan
+  const youBy = boxWin >= chessWin ? tt.ring_word : tt.board_word;
+  const themBy = chessLoss >= boxLoss ? tt.board_word : tt.ring_word;
+  $('game-plan').innerHTML = youBy === themBy
+    ? escapeHtml(tt.edge_same(youBy))
+    : `${escapeHtml(tt.edge_you)} <b class="gold">${escapeHtml(youBy)}</b>. ${escapeHtml(tt.edge_opp)} <b class="blue">${escapeHtml(themBy)}</b>.`;
+  const rows = roundBreakdown(dC, dB);
+  const best = keyRounds(rows, 'win'), danger = keyRounds(rows, 'loss');
+  $('plan-rounds').innerHTML =
+    (best.length ? `<div><span class="muted">${escapeHtml(tt.best_rounds)}</span> ${best.map(r => `<span class="chip chip--gold">${r}</span>`).join('')}</div>` : '') +
+    (danger.length ? `<div><span class="muted">${escapeHtml(tt.danger_rounds)}</span> ${danger.map(r => `<span class="chip chip--blue">${r}</span>`).join('')}</div>` : '');
+
+  const pBox = myBox < BOX_MAX ? pWin(myChess, upBox(myBox), oppChess, oppBox) : null;
+  const pChess = myChess < CHESS_MAX ? pWin(upChess(myChess), myBox, oppChess, oppBox) : null;
+  const gain = v => ` <span class="muted">+${Math.round(v * 100) - Math.round(p * 100)}</span>`;
+  setLever('train-box', pBox, v => v, pct, pBox === null ? '' : gain(pBox));
+  setLever('train-chess', pChess, v => v, pct, pChess === null ? '' : gain(pChess));
+
+  renderRounds(rows);
+}
+
+function renderRounds(rows) {
+  $('round-rows').innerHTML = rows.map(r => {
+    const icon = r.type === 'chess' ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
+    return `<div class="round-row">
+      <span class="round-row__label"><img src="${icon}" alt="">${r.label}</span>
+      <span class="round-row__bars">
+        <span class="round-row__win" style="width:${(r.win * 100).toFixed(1)}%"></span><span class="round-row__loss" style="width:${(r.loss * 100).toFixed(1)}%"></span>
+        <span class="round-row__txt"><b class="gold">${pct(r.win)}</b> · <b class="blue">${pct(r.loss)}</b></span>
+      </span>
+      <span class="round-row__cont">${pct(r.cont)}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Chances map (canvas) ─────────────────────────────────────────────────────
+const canvas = $('grid');
 canvas.width = MARGIN.left + NX * CELL + MARGIN.right;
 canvas.height = MARGIN.top + NY * CELL + MARGIN.bottom;
 const ctx = canvas.getContext('2d');
+const tooltip = $('tooltip');
+const mapDetails = $('d-map');
 
-const myStarsClip = buildStarSvg(document.getElementById('myStars'));
-const fcMyStarsClip = buildStarSvg(document.getElementById('fc-my-stars'));
-const oppStarsClip = buildStarSvg(document.getElementById('oppStars'));
-
-const fightCard = document.getElementById('fight-card');
-const tooltip = document.getElementById('tooltip');
-
-function updateMine() {
-  const i = Math.round((myChess - CHESS_MIN) / CHESS_STEP);
-  const j = Math.round((myBox - BOX_MIN) / BOX_STEP);
-  const cn = chessCategory(myChess);
-  document.getElementById('myChessLabel').textContent = cn.short;
-  document.getElementById('myElo').textContent = 'ELO ' + eloOf(myChess);
-  document.getElementById('myBoxLabel').innerHTML = boxLabelHTML(myBox);
-  document.getElementById('myRating').textContent = i18n[currentLang].top + ' ' + Math.max(1, Math.round((1 - rankOf(i, j)) * 100)) + '%';
-  setStars(myStarsClip, starsOf(i, j));
-  setStars(fcMyStarsClip, starsOf(i, j));
-
-  document.getElementById('fc-my-chess').innerHTML = fightCardChessHTML(cn.short);
-  document.getElementById('fc-my-elo').textContent = 'ELO ' + eloOf(myChess);
-  document.getElementById('fc-my-box').innerHTML = fightCardBoxHTML(myBox);
-
-  if (currentOppIdx && document.getElementById('opponent-setup').classList.contains('visible')) {
-    showFightCard(currentOppIdx, false);
-  }
+function drawMap() {
+  if (!mapDetails.open) return;
+  draw(canvas, ctx, myChess, myBox, strictMatchmaking, idxOf(oppChess, oppBox), showEarlyStoppageZone);
 }
-
-function showFightCard(idx, updateDrums = true) {
-  if (!idx) return;
-  currentOppIdx = idx;
-  const t = i18n[currentLang];
-  const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
-
-  if (updateDrums && typeof oppChessSliderObj !== 'undefined') {
-    oppChess = oc;
-    oppBox = ob;
-    oppChessSliderObj.setValue(oc);
-    oppBoxSliderObj.setValue(ob);
-  }
-  const p = pWin(myChess, myBox, oc, ob);
-  const cn = chessCategory(oc);
-  const col = outcomeColor(p);
-
-  document.getElementById('hChess').innerHTML = fightCardChessHTML(cn.short);
-  document.getElementById('hElo').textContent = 'ELO ' + eloOf(oc);
-  document.getElementById('hBox').innerHTML = fightCardBoxHTML(ob);
-  document.getElementById('hP').textContent = Math.round(p * 100) + '%';
-  document.getElementById('hP').style.color = col;
-  document.getElementById('fc-outcome-label').textContent = outcomeLabel(p);
-  document.getElementById('fc-outcome').style.borderColor = col;
-
-  const { chessWin, boxWin, chessLoss, boxLoss, expectedRounds } = getWinBreakdown(myChess - oc, myBox - ob);
-  const chessBarYouEl = document.getElementById('fc-chess-bar-you');
-  const chessBarOppEl = document.getElementById('fc-chess-bar-opp');
-  const boxBarYouEl = document.getElementById('fc-box-bar-you');
-  const boxBarOppEl = document.getElementById('fc-box-bar-opp');
-  const chessProbYouEl = document.getElementById('fc-chess-prob-you');
-  const chessProbOppEl = document.getElementById('fc-chess-prob-opp');
-  const boxProbYouEl = document.getElementById('fc-box-prob-you');
-  const boxProbOppEl = document.getElementById('fc-box-prob-opp');
-
-  const chessYouPct = chessWin * 100;
-  const chessOppPct = chessLoss * 100;
-  const boxYouPct = boxWin * 100;
-  const boxOppPct = boxLoss * 100;
-
-  chessBarYouEl.style.width = chessYouPct.toFixed(1) + '%';
-  chessBarOppEl.style.left = chessYouPct.toFixed(1) + '%';
-  chessBarOppEl.style.width = chessOppPct.toFixed(1) + '%';
-  boxBarYouEl.style.width = boxYouPct.toFixed(1) + '%';
-  boxBarOppEl.style.left = boxYouPct.toFixed(1) + '%';
-  boxBarOppEl.style.width = boxOppPct.toFixed(1) + '%';
-
-  chessProbYouEl.textContent = `${t.you} ${Math.round(chessWin * 100)}%`;
-  chessProbOppEl.textContent = `${t.opp} ${Math.round(chessLoss * 100)}%`;
-  boxProbYouEl.textContent = `${t.you} ${Math.round(boxWin * 100)}%`;
-  boxProbOppEl.textContent = `${t.opp} ${Math.round(boxLoss * 100)}%`;
-  chessBarYouEl.title = `${t.prob_win} ${t.chess}: ${Math.round(chessWin * 100)}%`;
-  chessBarOppEl.title = `${t.opponent} ${t.prob_win.toLowerCase()} ${t.chess}: ${Math.round(chessLoss * 100)}%`;
-  boxBarYouEl.title = `${t.prob_win} ${t.boxing}: ${Math.round(boxWin * 100)}%`;
-  boxBarOppEl.title = `${t.opponent} ${t.prob_win.toLowerCase()} ${t.boxing}: ${Math.round(boxLoss * 100)}%`;
-
-  const eloDiff = eloOf(myChess) - eloOf(oc);
-  const boxDiff = +(myBox - ob).toFixed(1);
-  const signStr = v => v > 0 ? '+' : '';
-  const diffCol = v => v > 0 ? '#39d353' : v < 0 ? '#e03c3c' : '#9090a8';
-  const cdEl = document.getElementById('fc-chess-diff');
-  if (cdEl) { cdEl.textContent = signStr(eloDiff) + eloDiff + ' ELO'; cdEl.style.color = diffCol(eloDiff); }
-  const bdEl = document.getElementById('fc-box-diff');
-  if (bdEl) { bdEl.textContent = signStr(boxDiff) + boxDiff + ' ' + t.lvl; bdEl.style.color = diffCol(boxDiff); }
-
-  const totalR = getActiveConfig().params.length;
-  let pace = '';
-  if (expectedRounds < totalR * 0.5) pace = t.early_stoppage;
-  else if (expectedRounds > totalR * 0.82) pace = t.distance;
-
-  document.getElementById('fc-expected-length').innerHTML = `${expectedRounds.toFixed(1)} ${t.rnds} <span class="fc-expected-desc">${pace}</span>`;
-
-  setStars(oppStarsClip, starsOf(idx.i, idx.j));
-  renderRoundChart(myChess - oc, myBox - ob);
-
-  document.getElementById('opponent-setup').classList.add('visible');
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
-}
-
-function dismissFightCard() {
-  document.getElementById('opponent-setup').classList.remove('visible');
-  currentOppIdx = null;
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
-}
-
-document.getElementById('fc-close-btn').addEventListener('click', dismissFightCard);
-
-function showTooltip(idx, cssX, cssY) {
-  if (!idx) { tooltip.style.display = 'none'; return; }
-  const t = i18n[currentLang];
-  const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
-  const p = pWin(myChess, myBox, oc, ob);
-  const cn = chessCategory(oc);
-  tooltip.style.display = 'block';
-  tooltip.innerHTML =
-    tooltipLineHTML('assets/icon-chess.png', `<b>${escapeHtml(cn.short)}</b>`, `<span class="tt-elo">ELO ${eloOf(oc)}</span>`) + `<br>` +
-    tooltipLineHTML('assets/icon-boxing.png', `<b>${escapeHtml(boxCategory(ob))}</b>`, `<span class="tt-elo">${t.lvl} ${ob.toFixed(1)}</span>`) + `<br>` +
-    `<b style="color:${outcomeColor(p)}">${Math.round(p * 100)}%</b>` +
-    `<span class="tt-stars">${miniStarsHTML(starsOf(idx.i, idx.j))}</span>`;
-
-  const ttW = tooltip.offsetWidth || 150;
-  const ttH = tooltip.offsetHeight || 80;
-  let left = cssX;
-  let top = cssY - 14;
-
-  if (left - ttW / 2 < 10) left = ttW / 2 + 10;
-  if (left + ttW / 2 > canvas.width - 10) left = canvas.width - ttW / 2 - 10;
-
-  if (top - ttH < 10) {
-    top = cssY + 24;
-    tooltip.style.transform = 'translate(-50%, 0)';
-  } else {
-    tooltip.style.transform = 'translate(-50%, -100%)';
-  }
-
-  tooltip.style.left = left + 'px';
-  tooltip.style.top = top + 'px';
-}
-
-function eventCoords(e) {
-  const r = canvas.getBoundingClientRect();
-  const cssX = e.clientX - r.left, cssY = e.clientY - r.top;
-  return {
-    cssX, cssY,
-    canvasX: cssX * (canvas.width / r.width),
-    canvasY: cssY * (canvas.height / r.height)
-  };
-}
-
-let pdTime = 0, pdX = 0, pdY = 0, dragging = false;
-
-canvas.addEventListener('pointerdown', e => {
-  try { canvas.setPointerCapture(e.pointerId); } catch (_) { }
-  pdTime = Date.now(); pdX = e.clientX; pdY = e.clientY; dragging = false;
-  const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
-  showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
-});
-canvas.addEventListener('pointermove', e => {
-  const dx = e.clientX - pdX, dy = e.clientY - pdY;
-  if (Math.sqrt(dx * dx + dy * dy) > 6) dragging = true;
-  const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
-  showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
-});
-canvas.addEventListener('pointerup', e => {
-  const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
-  const idx = px2cell(canvasX, canvasY);
-  if (!dragging && Date.now() - pdTime < 400 && idx) {
-    tooltip.style.display = 'none';
-    showFightCard(idx);
-  } else {
-    tooltip.style.display = 'none';
-  }
-});
-canvas.addEventListener('pointerleave', () => { tooltip.style.display = 'none'; });
-canvas.addEventListener('pointercancel', () => { tooltip.style.display = 'none'; });
-canvas.addEventListener('mousemove', e => {
-  if (e.buttons !== 0) return;
-  const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
-  showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
-});
-
-window.addEventListener('keydown', e => {
-  if (!currentOppIdx || !document.getElementById('opponent-setup').classList.contains('visible')) return;
-  let changed = false;
-  let { i, j } = currentOppIdx;
-  if (e.key === 'ArrowUp') { j = Math.min(NY - 1, j + 1); changed = true; e.preventDefault(); }
-  else if (e.key === 'ArrowDown') { j = Math.max(0, j - 1); changed = true; e.preventDefault(); }
-  else if (e.key === 'ArrowLeft') { i = Math.max(0, i - 1); changed = true; e.preventDefault(); }
-  else if (e.key === 'ArrowRight') { i = Math.min(NX - 1, i + 1); changed = true; e.preventDefault(); }
-
-  if (changed && (i !== currentOppIdx.i || j !== currentOppIdx.j)) {
-    showFightCard({ i, j });
-  }
-});
-
-const myChessSliderObj = setupSlider(
-  'my-chess-slider', 'my-chess-val', getChessDrumLevels, myChess,
-  val => { myChess = val; updateMine(); draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone); pulseCard(); }
-);
-const myBoxSliderObj = setupSlider(
-  'my-box-slider', 'my-box-val', getBoxingDrumLevels, myBox,
-  val => { myBox = val; updateMine(); draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone); pulseCard(); }
-);
-
-const oppChessSliderObj = setupSlider(
-  'opp-chess-slider', 'opp-chess-val', getChessDrumLevels, oppChess,
-  val => {
-    oppChess = val;
-    const i = Math.round((oppChess - CHESS_MIN) / CHESS_STEP);
-    const j = Math.round((oppBox - BOX_MIN) / BOX_STEP);
-    showFightCard({ i, j }, false);
-  }
-);
-const oppBoxSliderObj = setupSlider(
-  'opp-box-slider', 'opp-box-val', getBoxingDrumLevels, oppBox,
-  val => {
-    oppBox = val;
-    const i = Math.round((oppChess - CHESS_MIN) / CHESS_STEP);
-    const j = Math.round((oppBox - BOX_MIN) / BOX_STEP);
-    showFightCard({ i, j }, false);
-  }
-);
+mapDetails.addEventListener('toggle', drawMap);
 
 (function () {
-  const lc = document.getElementById('legendBar');
+  const lc = $('legendBar');
   const lctx = lc.getContext('2d');
   for (let x = 0; x < lc.width; x++) {
     lctx.fillStyle = color(x / (lc.width - 1));
@@ -260,72 +198,171 @@ const oppBoxSliderObj = setupSlider(
   }
 })();
 
+function showTooltip(idx, cssX, cssY) {
+  if (!idx) { tooltip.style.display = 'none'; return; }
+  const tt = t();
+  const oc = chessLevels[idx.i], ob = boxLevels[idx.j];
+  const p = pWin(myChess, myBox, oc, ob);
+  tooltip.style.display = 'block';
+  tooltip.innerHTML =
+    tooltipLineHTML('assets/icon-chess.png', `<b>${escapeHtml(chessCategory(oc).short)}</b>`, `<span class="tt-elo">ELO ${eloOf(oc)}</span>`) + `<br>` +
+    tooltipLineHTML('assets/icon-boxing.png', `<b>${escapeHtml(boxCategory(ob))}</b>`, `<span class="tt-elo">${tt.lvl} ${ob.toFixed(1)}</span>`) + `<br>` +
+    `<b>${pct(p)}</b>` +
+    `<span class="tt-stars">${miniStarsHTML(starsOf(idx.i, idx.j))}</span>`;
+
+  const ttW = tooltip.offsetWidth || 150;
+  const ttH = tooltip.offsetHeight || 80;
+  const r = canvas.getBoundingClientRect();
+  let left = Math.max(ttW / 2 + 4, Math.min(r.width - ttW / 2 - 4, cssX));
+  let top = cssY - 14;
+  if (top - ttH < 4) { top = cssY + 24; tooltip.style.transform = 'translate(-50%, 0)'; }
+  else tooltip.style.transform = 'translate(-50%, -100%)';
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+function eventCoords(e) {
+  const r = canvas.getBoundingClientRect();
+  const cssX = e.clientX - r.left, cssY = e.clientY - r.top;
+  return { cssX, cssY, canvasX: cssX * (canvas.width / r.width), canvasY: cssY * (canvas.height / r.height) };
+}
+
+let pdTime = 0, pdX = 0, pdY = 0, dragging = false;
+canvas.addEventListener('pointerdown', e => {
+  pdTime = Date.now(); pdX = e.clientX; pdY = e.clientY; dragging = false;
+  const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
+  showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
+});
+canvas.addEventListener('pointermove', e => {
+  if (Math.hypot(e.clientX - pdX, e.clientY - pdY) > 6) dragging = true;
+  const { cssX, cssY, canvasX, canvasY } = eventCoords(e);
+  showTooltip(px2cell(canvasX, canvasY), cssX, cssY);
+});
+canvas.addEventListener('pointerup', e => {
+  const { canvasX, canvasY } = eventCoords(e);
+  const idx = px2cell(canvasX, canvasY);
+  tooltip.style.display = 'none';
+  if (!dragging && Date.now() - pdTime < 400 && idx) setOpponent(chessLevels[idx.i], boxLevels[idx.j]);
+});
+canvas.addEventListener('pointerleave', () => { tooltip.style.display = 'none'; });
+canvas.addEventListener('pointercancel', () => { tooltip.style.display = 'none'; });
+
 function updateRulesDisplay() {
-  const t = i18n[currentLang];
+  const tt = t();
   const minRnds = getActiveConfig().minExpectedRounds;
   const rules = [];
-  if (strictMatchmaking) rules.push(t.rule_strict(minRnds));
-  if (showEarlyStoppageZone) rules.push(t.rule_early_stoppage(minRnds));
-  const el = document.getElementById('active-rules-container');
+  if (strictMatchmaking) rules.push(tt.rule_strict(minRnds));
+  if (showEarlyStoppageZone) rules.push(tt.rule_early_stoppage(minRnds));
+  const el = $('active-rules-container');
   el.innerHTML = rules.join('&ensp;·&ensp;');
   el.style.display = rules.length ? 'block' : 'none';
 }
 
-document.getElementById('strict-matchmaking-toggle').addEventListener('change', e => {
+$('strict-matchmaking-toggle').addEventListener('change', e => {
   strictMatchmaking = e.target.checked;
   updateRulesDisplay();
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
+  drawMap();
+});
+$('early-stoppage-toggle').addEventListener('change', e => {
+  showEarlyStoppageZone = e.target.checked;
+  $('early-stoppage-legend').hidden = !showEarlyStoppageZone;
+  updateRulesDisplay();
+  drawMap();
 });
 
-document.getElementById('early-stoppage-toggle').addEventListener('change', e => {
-  showEarlyStoppageZone = e.target.checked;
-  updateRulesDisplay();
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
-  document.getElementById('early-stoppage-legend').style.display = showEarlyStoppageZone ? 'flex' : 'none';
+// ── Known fighters ───────────────────────────────────────────────────────────
+function renderFighters() {
+  if (!FIGHTERS.length) return;
+  const tt = t();
+  $('fighters').hidden = false;
+  $('fighter-pick-wrap').hidden = false;
+
+  const list = FIGHTERS.map(f => ({ ...f, stars: starsAt(f.chess, f.box), p: pWin(myChess, myBox, f.chess, f.box) }));
+  const rows = [...list, { name: tt.you, chess: myChess, box: myBox, stars: starsAt(myChess, myBox), me: true }]
+    .sort((a, b) => b.stars - a.stars);
+  $('fighter-rows').innerHTML = rows.map((f, k) => {
+    const cells = `<span class="fr-rank">${k + 1}</span>
+      <span class="fr-name"><b>${escapeHtml(f.name)}</b><span class="muted">${eloOf(f.chess)} ELO · ${escapeHtml(boxCategory(f.box))}</span></span>
+      <span class="fr-stars">${f.stars.toFixed(1)} ★</span>
+      <span class="fr-odds">${f.me ? '—' : pct(f.p)}</span>`;
+    return f.me
+      ? `<div class="fighter-row fighter-row--me">${cells}</div>`
+      : `<button type="button" class="fighter-row" data-chess="${f.chess}" data-box="${f.box}">${cells}</button>`;
+  }).join('');
+
+  const pick = $('fighter-pick');
+  const keep = pick.value;
+  pick.innerHTML = `<option value="">—</option>` + FIGHTERS.map((f, k) =>
+    `<option value="${k}">${escapeHtml(f.name)} · ${starsAt(f.chess, f.box).toFixed(1)} ★</option>`).join('');
+  pick.value = keep;
+}
+
+$('fighter-rows').addEventListener('click', e => {
+  const row = e.target.closest('button.fighter-row');
+  if (!row) return;
+  setOpponent(+row.dataset.chess, +row.dataset.box);
+  $('opponent').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
+$('fighter-pick').addEventListener('change', e => {
+  const f = FIGHTERS[+e.target.value];
+  if (f) setOpponent(f.chess, f.box, true);
+});
+
+// ── Wiring ───────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderYou();
+  renderOpp();
+  renderFight();
+  renderFighters();
+  drawMap();
+}
+
+function setOpponent(c, b, fromPicker = false) {
+  oppChess = c; oppBox = b;
+  oppChessSlider.setValue(c);
+  oppBoxSlider.setValue(b);
+  if (!fromPicker) $('fighter-pick').value = '';
+  renderOpp();
+  renderFight();
+  drawMap();
+  pulse($('fight'));
+}
+
+const myChessSlider = setupSlider('my-chess-slider', 'my-chess-val', getChessDrumLevels, myChess,
+  val => { myChess = val; renderAll(); pulse($('my-rating-card')); });
+const myBoxSlider = setupSlider('my-box-slider', 'my-box-val', getBoxingDrumLevels, myBox,
+  val => { myBox = val; renderAll(); pulse($('my-rating-card')); });
+const oppChessSlider = setupSlider('opp-chess-slider', 'opp-chess-val', getChessDrumLevels, oppChess,
+  val => { oppChess = val; $('fighter-pick').value = ''; renderOpp(); renderFight(); drawMap(); });
+const oppBoxSlider = setupSlider('opp-box-slider', 'opp-box-val', getBoxingDrumLevels, oppBox,
+  val => { oppBox = val; $('fighter-pick').value = ''; renderOpp(); renderFight(); drawMap(); });
 
 function setLang(lang) {
   setLangState(lang);
-  const t = i18n[lang];
-
+  document.documentElement.lang = lang;
+  const tt = t();
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (t[key]) el.innerHTML = t[key];
+    const v = tt[el.getAttribute('data-i18n')];
+    if (typeof v === 'string') el.textContent = v;
   });
-
-
-
-  myChessSliderObj.setValue(myChess);
-  myBoxSliderObj.setValue(myBox);
-  oppChessSliderObj.setValue(oppChess);
-  oppBoxSliderObj.setValue(oppBox);
-
-  updateMine();
+  myChessSlider.setValue(myChess);
+  myBoxSlider.setValue(myBox);
+  oppChessSlider.setValue(oppChess);
+  oppBoxSlider.setValue(oppBox);
   updateRulesDisplay();
-  draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
+  renderAll();
 }
 
-document.getElementById('lang-switch').addEventListener('change', e => setLang(e.target.value));
+$('lang-switch').addEventListener('change', e => setLang(e.target.value));
 
 document.querySelectorAll('.round-selector__btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.round-selector__btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    document.querySelectorAll('.round-selector__btn').forEach(b => b.classList.toggle('active', b === btn));
     setActiveConfig(btn.dataset.rounds);
     invalidateGrid();
-    updateMine();
     updateRulesDisplay();
-    draw(canvas, ctx, myChess, myBox, strictMatchmaking, currentOppIdx, showEarlyStoppageZone);
-    if (currentOppIdx && document.getElementById('opponent-setup').classList.contains('visible')) {
-      showFightCard(currentOppIdx, false);
-    }
+    renderAll();
   });
 });
 
 setLang(currentLang);
-updateMine();
-updateRulesDisplay();
-showFightCard({
-  i: Math.round((oppChess - CHESS_MIN) / CHESS_STEP),
-  j: Math.round((oppBox - BOX_MIN) / BOX_STEP)
-}, false);
