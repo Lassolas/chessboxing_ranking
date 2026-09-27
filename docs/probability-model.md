@@ -424,15 +424,16 @@ Using chess level / 7 and boxing level / 5 (both 0–1):
 For fun, the page can play out one random fight. If colours are not drawn it
 first tosses a coin for them. Then, round by round, it draws "you win", "they
 win" or "fight goes on" with the model's chances for that round (given the fight
-is still on), and stops at the first finish. The commentary (`src/commentary.js`, 100 chess and 100 boxing lines per
-language) is picked from the same chances:
+is still on), and stops at the first finish. The outcome is drawn first; the commentary (`src/commentary.js`, about 100
+chess and 100 boxing lines per language) is then written to stay consistent
+with it:
 
-- **Round goes on:** who had the upper hand is drawn around your share of that
-  round's finishing chance (you / even / them), and the round is "hot" (standing
-  counts, a piece up, flag hanging) more often when it was likely to end.
-- **Finish:** a surprise line (lucky punch, swindle) when the winner had under
-  20 % to finish in that round, an expected line otherwise. Each finish line
-  says how it ended: checkmate, time, resignation, knockout or referee stoppage.
+- **Chess:** an advantage level carries over between chess rounds (lost,
+  worse, equal, better, winning), moved each round by who had the upper hand
+  (drawn from that round's chances). Opening lines only appear in the first
+  chess round. How a game is won follows the advantage: mate or resignation
+  when ahead, a swindle when behind. When the fight reaches the decision, the
+  last chess round describes the drawn game.
 - **Clock:** a win or loss on time, and lines about a falling flag or seconds
   left, only appear once a player's clock can actually have run out. Chess
   rounds last 3 minutes, each player's clock is half the total chess time and
@@ -440,11 +441,18 @@ language) is picked from the same chances:
   the opponent must have made moves too, so a player can only flag when 3k is
   more than their clock, i.e. from chess round floor(chess rounds / 2) + 1:
   round 3 in 5-round fights (4.5 min each), round 5 in 7 and 9-round fights
-  (6 and 7.5 min), round 7 in 11-round fights (9 min). Before that, chess
-  finishes are checkmate or resignation.
-- **Decision:** a chess draw settled on boxing points. Over many simulations
-the share of wins matches the displayed win chance (checked: 28.9 % over 2000
-simulations for a 28 % matchup).
+  (6 and 7.5 min), round 7 in 11-round fights (9 min).
+- **Boxing:** standing counts follow the amateur rule: three in a round or four
+  in the fight end it, so a round that goes on never reaches that, and a
+  stoppage on counts names the count that ended it. The doctor only stops a
+  fight after a cut. Surprise knockouts are used when the winner had under
+  20 % to finish in that round or was behind on the cards.
+- **Decision:** each boxing round that goes on has a points winner. A decision
+  goes to the fighter who won more of those rounds, and the result says the
+  score ("you won 3 of 4 boxing rounds").
+
+`tests/commentary-logic.mjs` (part of `npm test`) simulates 16,000 fights and
+checks all of these rules.
 
 ---
 

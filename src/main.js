@@ -7,7 +7,7 @@ import {
   buildStarSvg, setStars, setupSlider, pulse, miniStarsHTML, tooltipLineHTML, escapeHtml
 } from './ui.js';
 import { FIGHTERS as RAW_FIGHTERS } from './fighters.js';
-import { COMMENTARY, CLOCK_LINE } from './commentary.js';
+import { narrate } from './commentary.js';
 
 // Fighters list entries give ELO; the model works in chess levels (0–7).
 const FIGHTERS = RAW_FIGHTERS.map(f => ({ ...f, chess: f.elo != null ? levelOfElo(f.elo) : f.chess }));
@@ -206,19 +206,10 @@ function renderRounds(rows) {
 }
 
 // ── Simulated fight (for fun) ────────────────────────────────────────────────
-// Walks the rounds with the model's conditional chances: in each round the fight
-// ends for you, for your opponent, or goes on. Colours are drawn first when
-// they are not set. The commentary line is picked from those same chances:
-// who had the upper hand, how close the round came to a finish, and whether a
-// finish was expected or a surprise (see src/commentary.js).
-function pickLine(arr, used) {
-  const fresh = arr.filter(s => !used.has(s));
-  const pool = fresh.length ? fresh : arr;
-  const s = pool[Math.floor(Math.random() * pool.length)];
-  used.add(s);
-  return s;
-}
-
+// The outcome is drawn from the model first: in each round the fight ends for
+// you, for your opponent, or goes on, with that round's chances given the fight
+// is still on. Colours are drawn first when they are not set. The commentary
+// is then written to fit what happened (src/commentary.js).
 // A player can only lose on time once the chess time played can exceed their
 // clock. Chess rounds last 3 minutes, each player's clock is half the total
 // chess time and there is no increment. After k chess rounds 3k minutes have
@@ -233,60 +224,44 @@ function timeLossPossible(params, r) {
 
 function simulateFight() {
   const tt = t();
-  const lines = COMMENTARY[currentLang] || COMMENTARY.en;
   const params = getActiveConfig().params;
   const side = getSide() || (Math.random() < 0.5 ? 1 : -1);
   const probs = getMatchupProbs(myChess, myBox, oppChess, oppBox, side);
-  const rows = [];
-  if (!getSide()) rows.push(`<p class="sim__colors">${escapeHtml(tt.sim_colors(side === 1 ? tt.sim_white : tt.sim_black))}</p>`);
 
-  let prevA = 0, prevB = 0, prevCont = 1, final = '', won = false;
-  const used = new Set();
+  const rounds = [];
+  let prevA = 0, prevB = 0, prevCont = 1;
   for (let r = 0; r < params.length; r++) {
-    const chess = params[r].type === 'chess';
-    const decision = r === params.length - 1;
-    // Chances this round, given the fight is still on.
     const pA = (probs[r].pA - prevA) / prevCont, pB = (probs[r].pB - prevB) / prevCont;
     prevA = probs[r].pA; prevB = probs[r].pB; prevCont = probs[r].pCont;
-    const d = chess ? lines.chess : lines.box;
-    const clockOk = chess && timeLossPossible(params, r);
-    const clockLine = CLOCK_LINE[currentLang] || CLOCK_LINE.en;
-    const noClock = arr => clockOk ? arr : arr.filter(x => !clockLine.test(x.t ?? x) && x.how !== 'time');
-
     const roll = Math.random();
-    let text, cls = '';
-    if (roll < pA + pB) {
-      won = roll < pA;
-      cls = won ? 'sim__row--win' : 'sim__row--loss';
-      if (decision) {
-        text = pickLine(won ? lines.draw.win : lines.draw.loss, used);
-        final = won ? tt.sim_final_win_points : tt.sim_final_loss_points;
-      } else {
-        // A finish is a surprise when the winner had little chance of it this round.
-        const surprise = (won ? pA : pB) < 0.2;
-        const line = pickLine(noClock((won ? d.win : d.loss)[surprise ? 'surprise' : 'expected']), used);
-        text = line.t;
-        const how = tt['sim_by_' + line.how];
-        final = won ? tt.sim_final_win(how, r + 1) : tt.sim_final_loss(how, r + 1);
-      }
-    } else {
-      // Who had the upper hand: drawn around your share of this round's finishes.
-      const share = pA + pB > 1e-6 ? pA / (pA + pB) : 0.5;
-      const u = Math.random();
-      const lean = u < share - 0.15 ? 'you' : u > share + 0.15 ? 'them' : 'even';
-      // How close it came to a finish: more likely "hot" when the round was decisive.
-      const hot = Math.random() < Math.min(0.9, (pA + pB) * 1.5);
-      text = pickLine(chess ? noClock(d.on[`${lean}_${hot ? 'hot' : 'calm'}`]) : d.on[`${lean}_${hot ? 'hot' : 'calm'}`], used);
-    }
-    const icon = chess ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
-    const label = decision ? tt.sim_decision : tt.sim_round(r + 1);
-    rows.push(`<div class="sim__row ${cls}"><img src="${icon}" alt=""><span class="sim__label">${escapeHtml(label)}</span><span>${escapeHtml(text)}</span></div>`);
-    if (cls) break;
+    const result = roll < pA ? 'you' : roll < pA + pB ? 'them' : null;
+    rounds.push({
+      type: params[r].type, decision: r === params.length - 1, pA, pB,
+      clockOk: params[r].type === 'chess' && timeLossPossible(params, r), result
+    });
+    if (result) break;
   }
+
+  const story = narrate(currentLang, rounds);
+  const out = [];
+  if (!getSide()) out.push(`<p class="sim__colors">${escapeHtml(tt.sim_colors(side === 1 ? tt.sim_white : tt.sim_black))}</p>`);
+  story.rows.forEach((row, i) => {
+    const rd = rounds[i];
+    const icon = rd.type === 'chess' ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
+    const label = rd.decision ? tt.sim_decision : tt.sim_round(i + 1);
+    const cls = row.result === 'you' ? 'sim__row--win' : row.result === 'them' ? 'sim__row--loss' : '';
+    out.push(`<div class="sim__row ${cls}"><img src="${icon}" alt=""><span class="sim__label">${escapeHtml(label)}</span><span>${escapeHtml(row.text)}</span></div>`);
+  });
+
+  const won = story.winner === 'you';
+  const n = rounds.length;
+  const final = story.how === 'points'
+    ? (won ? tt.sim_final_win_points : tt.sim_final_loss_points)
+    : (won ? tt.sim_final_win : tt.sim_final_loss)(tt['sim_by_' + story.how], n);
 
   const el = $('sim-result');
   el.innerHTML = `<div class="sim__head"><span class="sim__title">${escapeHtml(tt.sim_title)}</span></div>` +
-    rows.join('') +
+    out.join('') +
     `<p class="sim__final ${won ? 'sim__final--win' : 'sim__final--loss'}">${escapeHtml(final)}</p>` +
     `<p class="sim__note">${escapeHtml(tt.sim_note)}</p>`;
   el.hidden = false;

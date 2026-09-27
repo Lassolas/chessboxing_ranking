@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/run-expert-cases.mjs"
+    "test": "node tests/run-expert-cases.mjs && node tests/commentary-logic.mjs"
   },
   "repository": {
     "type": "git",
