@@ -12,7 +12,7 @@
 //   { name: 'Jane Doe', elo: 1520, box: 2.3, weight: 'Middleweight', note: 'Official evaluation 2026' },
 
 export const FIGHTERS = [
-  { name: 'Dogukan Cinar', elo: 1520, box: 4, note: 'Test' },
-  { name: 'Paul Sergent', elo: 1950, box: 3.4, note: 'Test' },
-  { name: 'Carl Strugnell', elo: 2200, box: 2.8, note: 'Test' },
+  { name: 'Dogukan Cinar', elo: 1520, box: 4, weight: '-85kg' ,note: 'Test' },
+  { name: 'Paul Sergent', elo: 1950, box: 3.4, weight: '-65kg' ,note: 'Test' },
+  { name: 'Carl Strugnell', elo: 2200, box: 2.8, weight: '-92kg', note: 'Test' },
 ];
