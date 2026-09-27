@@ -177,11 +177,11 @@ function matchupProbsForSide(params, dChess, dBox, m, n, side) {
 // Cumulative per-round probabilities for fighter A (you) vs B (opponent).
 export function getMatchupProbs(myC, myB, oppC, oppB, side = _side) {
   const params = getActiveConfig().params;
-  const key = `${_activeKey}|${side}|${myC.toFixed(1)}|${myB.toFixed(1)}|${oppC.toFixed(1)}|${oppB.toFixed(1)}`;
+  const key = `${_activeKey}|${side}|${myC.toFixed(4)}|${myB.toFixed(2)}|${oppC.toFixed(4)}|${oppB.toFixed(2)}`;
   const cached = matchupProbCache.get(key);
   if (cached) return cached;
 
-  const dChess = +(myC - oppC).toFixed(2), dBox = +(myB - oppB).toFixed(2);
+  const dChess = myC - oppC, dBox = myB - oppB;
   const m = (myC + oppC) / 2, n = (myB + oppB) / 2;
   let out;
   if (side) {
@@ -239,3 +239,4 @@ export function pWin(myC, myB, oppC, oppB, side = _side) {
 }
 
 export const eloOf = c => Math.round(800 + c * (1600 / 7));
+export const levelOfElo = elo => (elo - 800) * 7 / 1600;

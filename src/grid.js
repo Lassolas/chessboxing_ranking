@@ -15,7 +15,7 @@ export const CELL = 16;
 export const MARGIN = { top: 50, right: 34, bottom: 94, left: 150 };
 
 // Recomputed on format change.
-export function invalidateGrid() { _rank = null; }
+export function invalidateGrid() { _rank = null; _sortedBeats = null; }
 
 export function rankOf(i, j)  {
   ensureRank();
@@ -28,7 +28,7 @@ export function rankOf(i, j)  {
 // Being ahead by about 1.1 stars or more guarantees
 // > 50 % to win in every format. An exact rule for any gap is impossible: the
 // model has rock-paper-scissors cycles.
-let _rank = null;
+let _rank = null, _sortedBeats = null;
 function ensureRank() {
   if (_rank) return;
   const N = NX * NY;
@@ -44,6 +44,7 @@ function ensureRank() {
     }
   }
   const order = [...beats.keys()].sort((a, b) => beats[a] - beats[b]);
+  _sortedBeats = Float32Array.from(order, k => beats[k]);
   _rank = new Float32Array(N);
   for (let s = 0; s < N; ) {
     let e = s;
@@ -54,6 +55,26 @@ function ensureRank() {
   }
 }
 export function starsOf(i, j) { return rankOf(i, j) * 5; }
+
+// Rank of any profile (not only grid steps): count the grid profiles it beats
+// with > 50 %, then place that count among the grid profiles' own counts.
+export function rankAt(c, b) {
+  ensureRank();
+  let n = 0;
+  for (let j = 0; j < NY; j++)
+    for (let i = 0; i < NX; i++)
+      if (pWinNeutral(c, b, chessLevels[i], boxLevels[j]) > 0.5) n++;
+  const lo = lowerBound(_sortedBeats, n), hi = lowerBound(_sortedBeats, n + 1);
+  const pos = hi > lo ? (lo + hi - 1) / 2 : lo - 0.5;
+  return Math.max(0, Math.min(1, pos / (_sortedBeats.length - 1)));
+}
+export const starsAt = (c, b) => rankAt(c, b) * 5;
+
+function lowerBound(arr, v) {
+  let lo = 0, hi = arr.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (arr[mid] < v) lo = mid + 1; else hi = mid; }
+  return lo;
+}
 
 export function color(p) {
   const cLow  = [26,  10,  46];

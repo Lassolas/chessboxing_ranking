@@ -1,16 +1,19 @@
 import './style.css';
 import { i18n, currentLang, setLangState } from './i18n.js';
-import { eloOf, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kBoxFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
-import { chessLevels, boxLevels, starsOf, rankOf, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
+import { eloOf, levelOfElo, pWin, getWinBreakdown, getActiveConfig, setActiveConfig, getSide, setSide, whiteEdgeAt, kChessFactor, kBoxFactor, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { chessLevels, boxLevels, starsOf, starsAt, rankAt, draw, color, px2cell, CELL, MARGIN, NX, NY, invalidateGrid } from './grid.js';
 import {
-  chessCategory, boxCategory, getChessDrumLevels, getBoxingDrumLevels,
+  chessCategory, boxCategory, chessLabel, boxLabel,
   buildStarSvg, setStars, setupSlider, pulse, miniStarsHTML, tooltipLineHTML, escapeHtml
 } from './ui.js';
-import { FIGHTERS } from './fighters.js';
+import { FIGHTERS as RAW_FIGHTERS } from './fighters.js';
 
-let myChess = 3.0;
+// Fighters list entries give ELO; the model works in chess levels (0–7).
+const FIGHTERS = RAW_FIGHTERS.map(f => ({ ...f, chess: f.elo != null ? levelOfElo(f.elo) : f.chess }));
+
+let myChess = levelOfElo(1500);
 let myBox = 2.0;
-let oppChess = 3.0; // ≈1500 ELO (1486)
+let oppChess = levelOfElo(1500);
 let oppBox = 2.0;
 let strictMatchmaking = false;
 let showEarlyStoppageZone = false;
@@ -24,9 +27,8 @@ const idxOf = (c, b) => ({
   j: Math.max(0, Math.min(NY - 1, Math.round((b - BOX_MIN) / BOX_STEP)))
 });
 // One training step: +1 boxing level or +1 chess level (≈230 ELO), capped at the top.
-const upBox = b => Math.min(BOX_MAX, +(b + 1).toFixed(1));
-const upChess = c => Math.min(CHESS_MAX, +(c + 1).toFixed(1));
-const starsAt = (c, b) => { const { i, j } = idxOf(c, b); return starsOf(i, j); };
+const upBox = b => Math.min(BOX_MAX, b + 1);
+const upChess = c => Math.min(CHESS_MAX, c + 1);
 
 function fighterType(c, b) {
   const cn = c / CHESS_MAX, bn = b / BOX_MAX;
@@ -42,14 +44,14 @@ const oppStarsClip = buildStarSvg($('oppStars'));
 
 function renderYou() {
   const tt = t();
-  const { i, j } = idxOf(myChess, myBox);
-  const s = starsOf(i, j);
+  const rank = rankAt(myChess, myBox);
+  const s = rank * 5;
   $('my-stars-num').textContent = s.toFixed(1);
   setStars(myStarsClip, s);
   const type = fighterType(myChess, myBox);
   $('my-type').textContent = tt['type_' + type];
   $('my-type').title = tt['type_' + type + '_desc'];
-  $('my-top').textContent = `${tt.top} ${Math.max(1, Math.round((1 - rankOf(i, j)) * 100))}% ${tt.of_fighters}`;
+  $('my-top').textContent = `${tt.top} ${Math.max(1, Math.round((1 - rank) * 100))}% ${tt.of_fighters}`;
 
   const sBox = myBox < BOX_MAX ? starsAt(myChess, upBox(myBox)) : null;
   const sChess = myChess < CHESS_MAX ? starsAt(upChess(myChess), myBox) : null;
@@ -354,13 +356,14 @@ function setOpponent(c, b, fromPicker = false) {
   pulse($('fight'));
 }
 
-const myChessSlider = setupSlider('my-chess-slider', 'my-chess-val', getChessDrumLevels, myChess,
-  val => { myChess = val; renderAll(); pulse($('my-rating-card')); });
-const myBoxSlider = setupSlider('my-box-slider', 'my-box-val', getBoxingDrumLevels, myBox,
+const eloIn = [c => eloOf(c), elo => levelOfElo(elo)];
+const myChessSlider = setupSlider('my-chess-slider', 'my-chess-val', chessLabel, myChess,
+  val => { myChess = val; renderAll(); pulse($('my-rating-card')); }, ...eloIn);
+const myBoxSlider = setupSlider('my-box-slider', 'my-box-val', boxLabel, myBox,
   val => { myBox = val; renderAll(); pulse($('my-rating-card')); });
-const oppChessSlider = setupSlider('opp-chess-slider', 'opp-chess-val', getChessDrumLevels, oppChess,
-  val => { oppChess = val; $('fighter-pick').value = ''; renderOpp(); renderFight(); drawMap(); });
-const oppBoxSlider = setupSlider('opp-box-slider', 'opp-box-val', getBoxingDrumLevels, oppBox,
+const oppChessSlider = setupSlider('opp-chess-slider', 'opp-chess-val', chessLabel, oppChess,
+  val => { oppChess = val; $('fighter-pick').value = ''; renderOpp(); renderFight(); drawMap(); }, ...eloIn);
+const oppBoxSlider = setupSlider('opp-box-slider', 'opp-box-val', boxLabel, oppBox,
   val => { oppBox = val; $('fighter-pick').value = ''; renderOpp(); renderFight(); drawMap(); });
 
 function setLang(lang) {

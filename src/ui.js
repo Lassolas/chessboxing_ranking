@@ -1,5 +1,5 @@
 import { getChessNamed, getBoxingNamed } from './i18n.js';
-import { eloOf, CHESS_MIN, CHESS_MAX, CHESS_STEP, BOX_MIN, BOX_MAX, BOX_STEP } from './model.js';
+import { eloOf } from './model.js';
 
 export function closestNamed(arr, v) {
   let best = arr[0], bd = Infinity;
@@ -15,25 +15,12 @@ export function chessCategory(v) {
   return arr[0];
 }
 
-export function getChessDrumLevels() {
-  const arr = getChessNamed();
-  const levels = [];
-  for (let k = 0; k <= Math.round((CHESS_MAX - CHESS_MIN) / CHESS_STEP); k++) {
-    const v = +(CHESS_MIN + k * CHESS_STEP).toFixed(1);
-    levels.push({ value: v, short: chessCategory(v).short, sub: eloOf(v) + ' ELO' });
-  }
-  return levels;
+// Slider labels: category name plus the exact value.
+export function chessLabel(c) {
+  return { short: chessCategory(c).short, sub: eloOf(c) + ' ELO' };
 }
-
-export function getBoxingDrumLevels() {
-  const arr = getBoxingNamed();
-  const levels = [];
-  for (let k = 0; k <= Math.round((BOX_MAX - BOX_MIN) / BOX_STEP); k++) {
-    const v = +(BOX_MIN + k * BOX_STEP).toFixed(1);
-    const named = arr.find(n => n.value === v);
-    levels.push({ value: v, short: boxCategory(v), sub: named ? named.sub : 'Lv ' + v.toFixed(1) });
-  }
-  return levels;
+export function boxLabel(b) {
+  return { short: boxCategory(b), sub: 'Lv ' + b.toFixed(1) };
 }
 
 export function boxCategory(v) {
@@ -78,29 +65,29 @@ export function buildStarSvg(svgEl) {
 
 export function setStars(r, v) { r.setAttribute('width', Math.max(0, Math.min(5, v)) * 100); }
 
-export function setupSlider(sliderId, valId, getLevelsFn, initialValue, onSelect) {
+// toSlider / fromSlider convert between model values and the input's units
+// (the chess slider works in ELO, 10 at a time).
+export function setupSlider(sliderId, valId, labelFn, initialValue, onSelect, toSlider = v => v, fromSlider = v => v) {
   const slider = document.getElementById(sliderId);
   const valDisplay = document.getElementById(valId);
 
   function updateDisplay(val) {
-    const levels = getLevelsFn();
-    const nearest = levels.reduce((best, item) =>
-      Math.abs(item.value - val) < Math.abs(best.value - val) ? item : best, levels[0]);
-    valDisplay.innerHTML = `${escapeHtml(nearest.short)}<span class="slider-sub">${escapeHtml(nearest.sub)}</span>`;
+    const { short, sub } = labelFn(val);
+    valDisplay.innerHTML = `${escapeHtml(short)}<span class="slider-sub">${escapeHtml(sub)}</span>`;
   }
 
-  slider.value = initialValue;
+  slider.value = toSlider(initialValue);
   updateDisplay(initialValue);
 
   slider.addEventListener('input', e => {
-    const val = parseFloat(e.target.value);
+    const val = fromSlider(parseFloat(e.target.value));
     updateDisplay(val);
     onSelect(val);
   });
 
   return {
     setValue: (val) => {
-      slider.value = val;
+      slider.value = toSlider(val);
       updateDisplay(val);
     }
   };
