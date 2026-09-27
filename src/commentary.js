@@ -10,6 +10,13 @@
 
 const f = (t, how) => ({ t, how });
 
+// Lines about a flag falling or seconds left: only possible once a player's
+// clock can actually have run out (see earliestTimeRound in main.js).
+export const CLOCK_LINE = {
+  en: /flag|seconds|time trouble/i,
+  fr: /drapeau|secondes|zeitnot/i
+};
+
 export const COMMENTARY = {
   en: {
     chess: {

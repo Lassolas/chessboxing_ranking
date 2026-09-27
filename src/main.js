@@ -7,7 +7,7 @@ import {
   buildStarSvg, setStars, setupSlider, pulse, miniStarsHTML, tooltipLineHTML, escapeHtml
 } from './ui.js';
 import { FIGHTERS as RAW_FIGHTERS } from './fighters.js';
-import { COMMENTARY } from './commentary.js';
+import { COMMENTARY, CLOCK_LINE } from './commentary.js';
 
 // Fighters list entries give ELO; the model works in chess levels (0–7).
 const FIGHTERS = RAW_FIGHTERS.map(f => ({ ...f, chess: f.elo != null ? levelOfElo(f.elo) : f.chess }));
@@ -219,6 +219,16 @@ function pickLine(arr, used) {
   return s;
 }
 
+// A player can only lose on time once the chess time played can exceed their
+// clock. Each player's clock is taken as half the total chess time, so the
+// earliest time loss is in chess round ceil(chess rounds / 2): round 3 in 5 and
+// 7-round fights, round 5 in 9 and 11-round fights.
+function timeLossPossible(params, r) {
+  const chessRounds = params.filter(p => p.type === 'chess').length;
+  const chessSoFar = params.slice(0, r + 1).filter(p => p.type === 'chess').length;
+  return chessSoFar >= Math.ceil(chessRounds / 2);
+}
+
 function simulateFight() {
   const tt = t();
   const lines = COMMENTARY[currentLang] || COMMENTARY.en;
@@ -237,6 +247,9 @@ function simulateFight() {
     const pA = (probs[r].pA - prevA) / prevCont, pB = (probs[r].pB - prevB) / prevCont;
     prevA = probs[r].pA; prevB = probs[r].pB; prevCont = probs[r].pCont;
     const d = chess ? lines.chess : lines.box;
+    const clockOk = chess && timeLossPossible(params, r);
+    const clockLine = CLOCK_LINE[currentLang] || CLOCK_LINE.en;
+    const noClock = arr => clockOk ? arr : arr.filter(x => !clockLine.test(x.t ?? x) && x.how !== 'time');
 
     const roll = Math.random();
     let text, cls = '';
@@ -249,7 +262,7 @@ function simulateFight() {
       } else {
         // A finish is a surprise when the winner had little chance of it this round.
         const surprise = (won ? pA : pB) < 0.2;
-        const line = pickLine((won ? d.win : d.loss)[surprise ? 'surprise' : 'expected'], used);
+        const line = pickLine(noClock((won ? d.win : d.loss)[surprise ? 'surprise' : 'expected']), used);
         text = line.t;
         const how = tt['sim_by_' + line.how];
         final = won ? tt.sim_final_win(how, r + 1) : tt.sim_final_loss(how, r + 1);
@@ -261,7 +274,7 @@ function simulateFight() {
       const lean = u < share - 0.15 ? 'you' : u > share + 0.15 ? 'them' : 'even';
       // How close it came to a finish: more likely "hot" when the round was decisive.
       const hot = Math.random() < Math.min(0.9, (pA + pB) * 1.5);
-      text = pickLine(d.on[`${lean}_${hot ? 'hot' : 'calm'}`], used);
+      text = pickLine(chess ? noClock(d.on[`${lean}_${hot ? 'hot' : 'calm'}`]) : d.on[`${lean}_${hot ? 'hot' : 'calm'}`], used);
     }
     const icon = chess ? 'assets/icon-chess.png' : 'assets/icon-boxing.png';
     const label = decision ? tt.sim_decision : tt.sim_round(r + 1);

@@ -433,6 +433,12 @@ language) is picked from the same chances:
 - **Finish:** a surprise line (lucky punch, swindle) when the winner had under
   20 % to finish in that round, an expected line otherwise. Each finish line
   says how it ended: checkmate, time, resignation, knockout or referee stoppage.
+- **Clock:** a win or loss on time, and lines about a falling flag or seconds
+  left, only appear once a player's clock can actually have run out. Each
+  player's clock is taken as half the total chess time, so the earliest time
+  loss is in chess round ceil(chess rounds / 2): round 3 in 5 and 7-round
+  fights, round 5 in 9 and 11-round fights. Before that, chess finishes are
+  checkmate or resignation.
 - **Decision:** a chess draw settled on boxing points. Over many simulations
 the share of wins matches the displayed win chance (checked: 28.9 % over 2000
 simulations for a 28 % matchup).
