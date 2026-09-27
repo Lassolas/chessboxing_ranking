@@ -66,6 +66,8 @@ P(fight continues)  = k    / (e^s + e^−s + k)
 - **k** is how hard it is to finish the fight in that round. Early chess rounds
   have a very large `k` because games rarely end in the first minutes. The final
   boxing decision has `k = 0`, so someone always wins it on points.
+  A fight reaches the decision when the chess game ends in a **draw**: the
+  boxing points then decide the winner.
 - With equal levels (`s = 0`) each fighter wins a decided round 50/50, and the
   round is decided with probability `2 / (2 + k)`.
 
@@ -424,7 +426,7 @@ first tosses a coin for them. Then, round by round, it draws "you win", "they
 win" or "fight goes on" with the model's chances for that round (given the fight
 is still on), and stops at the first finish. Chess finishes are shown as
 checkmate or a win on time (time more often in the last rounds); boxing
-finishes as a knockout; the decision as a win on points. Over many simulations
+finishes as a knockout; the decision as a chess draw settled on boxing points. Over many simulations
 the share of wins matches the displayed win chance (checked: 28.9 % over 2000
 simulations for a 28 % matchup).
 
@@ -443,7 +445,8 @@ simulations for a 28 % matchup).
    probabilities exactly.
 5. **Even scales:** one chess level (≈ 229 ELO) or one boxing level changes the
    odds by the same factor anywhere on the scale.
-6. **The decision is pure boxing:** if nobody has won after the last fighting
+6. **The decision is pure boxing:** when the chess game ends in a draw and nobody
+   has been stopped, i.e. nobody has won after the last fighting
    round, the boxing points decide, driven only by the boxing gap.
 7. **Club-level calibration:** the round values describe a club-level fight; other
    levels and gaps are reached through the level adjustments, whose strengths

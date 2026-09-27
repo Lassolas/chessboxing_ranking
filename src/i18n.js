@@ -73,7 +73,7 @@ export const i18n = {
     sim_white: "white",
     sim_black: "black",
     sim_round: (n) => `Round ${n}`,
-    sim_decision: "Judges' decision",
+    sim_decision: "Draw → points",
     sim_chess_on: ["Quiet opening, both keep it solid.", "Sharp position, nobody blinks.", "Pieces traded, the clocks keep ticking.", "A tense middlegame, still level-ish."],
     sim_chess_you_better: ["You grab the initiative on the board.", "Your opponent burns a lot of time.", "You win a pawn and squeeze."],
     sim_chess_they_better: ["You are under pressure on the board.", "You burn a lot of time on your clock.", "Your opponent wins a pawn and squeezes."],
@@ -83,15 +83,15 @@ export const i18n = {
     sim_win_mate: "You deliver checkmate!",
     sim_win_time: "Your opponent's flag falls: you win on time!",
     sim_win_ko: "Knockout! The referee stops the fight.",
-    sim_win_points: "The judges give you the fight on points.",
+    sim_win_points: "The chess game ends in a draw. The boxing points decide: you win!",
     sim_loss_mate: "You get checkmated.",
     sim_loss_time: "Your flag falls: you lose on time.",
     sim_loss_ko: "You are knocked out. The referee stops the fight.",
-    sim_loss_points: "The judges give the fight to your opponent.",
+    sim_loss_points: "The chess game ends in a draw. The boxing points go to your opponent.",
     sim_final_win: (how, r) => `You win ${how}, round ${r}.`,
     sim_final_loss: (how, r) => `You lose ${how}, round ${r}.`,
-    sim_final_win_points: "You win on points.",
-    sim_final_loss_points: "You lose on points.",
+    sim_final_win_points: "Chess draw: you win on boxing points.",
+    sim_final_loss_points: "Chess draw: you lose on boxing points.",
     sim_by_mate: "by checkmate",
     sim_by_time: "on time",
     sim_by_ko: "by knockout",
@@ -100,7 +100,7 @@ export const i18n = {
 
     // Details
     details_rounds: "Round by round",
-    details_rounds_hint: "Chance the fight ends in each round, and who wins it. The last row is the boxing decision if nobody has won yet.",
+    details_rounds_hint: "Chance the fight ends in each round, and who wins it. The last row is a chess draw, decided on boxing points.",
     col_round: "Round",
     col_you_they: "You win · They win",
     col_still: "Still on",
@@ -124,7 +124,7 @@ export const i18n = {
 <span class="formula">you win : they win : fight goes on = e^(+s) : e^(−s) : k
 s = a × (your level − their level)
     chess levels in chess rounds, boxing levels in boxing rounds</span>
-<p><b>a</b> is how much the level gap matters in that round. <b>k</b> is how hard it is to finish the fight in that round: early chess rounds have a large k because games rarely end there. The final boxing decision has k = 0, so someone always wins it on points.</p>
+<p><b>a</b> is how much the level gap matters in that round. <b>k</b> is how hard it is to finish the fight in that round: early chess rounds have a large k because games rarely end there. The final decision is reached when the chess game ends in a draw: it has k = 0, so someone always wins it on boxing points.</p>
 <h3>3. Rounds are chained</h3>
 <span class="formula">P(you win round r)   = P(still on before r) × e^s / (e^s + e^−s + k)
 P(still on after r)  = P(still on before r) × k / (e^s + e^−s + k)
@@ -260,7 +260,7 @@ white edge:    s + w for white, s − w for black
     sim_white: "blancs",
     sim_black: "noirs",
     sim_round: (n) => `Round ${n}`,
-    sim_decision: "Décision des juges",
+    sim_decision: "Nulle → points",
     sim_chess_on: ["Ouverture calme, chacun reste solide.", "Position tendue, personne ne cède.", "Échanges de pièces, les pendules tournent.", "Milieu de partie tendu, à peu près égal."],
     sim_chess_you_better: ["Vous prenez l'initiative sur l'échiquier.", "Votre adversaire consomme beaucoup de temps.", "Vous gagnez un pion et vous serrez la vis."],
     sim_chess_they_better: ["Vous êtes sous pression sur l'échiquier.", "Vous consommez beaucoup de temps.", "Votre adversaire gagne un pion et serre la vis."],
@@ -270,15 +270,15 @@ white edge:    s + w for white, s − w for black
     sim_win_mate: "Échec et mat !",
     sim_win_time: "Le drapeau de votre adversaire tombe : victoire au temps !",
     sim_win_ko: "K.-O. ! L'arbitre arrête le combat.",
-    sim_win_points: "Les juges vous donnent la victoire aux points.",
+    sim_win_points: "La partie d'échecs est nulle. Les points de boxe décident : vous gagnez !",
     sim_loss_mate: "Vous êtes mat.",
     sim_loss_time: "Votre drapeau tombe : défaite au temps.",
     sim_loss_ko: "Vous êtes mis K.-O. L'arbitre arrête le combat.",
-    sim_loss_points: "Les juges donnent la victoire à votre adversaire.",
+    sim_loss_points: "La partie d'échecs est nulle. Les points de boxe vont à votre adversaire.",
     sim_final_win: (how, r) => `Vous gagnez ${how}, round ${r}.`,
     sim_final_loss: (how, r) => `Vous perdez ${how}, round ${r}.`,
-    sim_final_win_points: "Vous gagnez aux points.",
-    sim_final_loss_points: "Vous perdez aux points.",
+    sim_final_win_points: "Nulle aux échecs : vous gagnez aux points de boxe.",
+    sim_final_loss_points: "Nulle aux échecs : vous perdez aux points de boxe.",
     sim_by_mate: "par mat",
     sim_by_time: "au temps",
     sim_by_ko: "par K.-O.",
@@ -286,7 +286,7 @@ white edge:    s + w for white, s − w for black
     ring_word: "boxe",
 
     details_rounds: "Round par round",
-    details_rounds_hint: "Chance que le combat se termine à chaque round, et qui le gagne. La dernière ligne est la décision aux points de boxe.",
+    details_rounds_hint: "Chance que le combat se termine à chaque round, et qui le gagne. La dernière ligne est une nulle aux échecs, départagée aux points de boxe.",
     col_round: "Round",
     col_you_they: "Vous · Adversaire",
     col_still: "En cours",
@@ -310,7 +310,7 @@ white edge:    s + w for white, s − w for black
 <span class="formula">vous gagnez : il gagne : le combat continue = e^(+s) : e^(−s) : k
 s = a × (votre niveau − son niveau)
     niveau d'échecs aux rounds d'échecs, de boxe aux rounds de boxe</span>
-<p><b>a</b> mesure l'importance de l'écart de niveau dans ce round. <b>k</b> mesure la difficulté de finir le combat dans ce round : les premiers rounds d'échecs ont un k élevé car les parties s'y terminent rarement. La décision finale de boxe a k = 0 : quelqu'un la gagne toujours aux points.</p>
+<p><b>a</b> mesure l'importance de l'écart de niveau dans ce round. <b>k</b> mesure la difficulté de finir le combat dans ce round : les premiers rounds d'échecs ont un k élevé car les parties s'y terminent rarement. La décision finale arrive quand la partie d'échecs est nulle : elle a k = 0, donc quelqu'un la gagne toujours aux points de boxe.</p>
 <h3>3. Les rounds s'enchaînent</h3>
 <span class="formula">P(vous gagnez au round r) = P(en cours avant r) × e^s / (e^s + e^−s + k)
 P(en cours après r)       = P(en cours avant r) × k / (e^s + e^−s + k)
