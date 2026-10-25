@@ -119,7 +119,6 @@ input[type=text], input:not([type]), input[type=number] {
 .dot.on { background: var(--red); border-color: var(--red); }
 .h-actions { display: flex; gap: 10px; margin-top: 6px; }
 .h-actions .btn { font-size: 16px; padding: 10px 14px; }
-.btn-count { background: var(--red-bg); border-color: var(--red); color: #fff; font-size: 26px !important; padding: 16px 28px !important; }
 
 /* Player whose clock is running */
 .phase-chess .half.active { background: var(--green-bg); box-shadow: inset 0 0 0 4px var(--green); }
@@ -162,7 +161,7 @@ input[type=text], input:not([type]), input[type=number] {
   touch-action: manipulation;
 }
 .bar-btn:active { transform: scale(.97); }
-.paused .bar-btn, .phase-ready .bar-btn { background: var(--green); color: #04140b; }
+.paused .bar-btn, .phase-ready .bar-btn, .bar-btn.go { background: var(--green); color: #04140b; }
 .phase-boxing .bar { background: #3a0a12; }
 .phase-boxing .bar-phase { color: #ff8a8a; }
 .phase-break .bar { background: #0c1830; }

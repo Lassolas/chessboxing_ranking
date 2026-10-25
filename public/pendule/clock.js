@@ -17,12 +17,12 @@ export function defaultConfig() {
     chessRoundMs: 3 * 60000,
     boxRoundMs: 3 * 60000,
     breakMs: 60000,
-    autoPause: false,       // end the chess round on its own after chessRoundMs
+    autoPause: false,       // end the chess round on its own, time breaks and boxing
     moveLimit: true,        // per-move thinking limit
     moveWarnMs: 20000,      // warning colour + sound
     moveCountdownMs: 30000, // countdown starts
     moveGraceMs: 10000,     // length of the countdown, then the game is lost
-    countsPerRound: 3,      // counts in one round that lose the fight
+    countsPerRound: 3,      // counts in one chess round that lose the fight
     countsTotal: 4,         // counts in the whole fight that lose it
   };
 }
@@ -43,7 +43,7 @@ export function newFight(cfg) {
     moveElapsed: 0,
     phaseRemaining: cfg.chessRoundMs,
     roundOver: false,      // chess round time is up but autoPause is off
-    counts: [],            // {player, round, illegal}
+    counts: [],            // {player, round, illegal}: move countdowns and illegal moves
     result: null,          // {winner, loser, method, prev}
     lastTick: null,
   };
@@ -90,7 +90,8 @@ function startPhase(s, round, events) {
     s.moveElapsed = 0;
   } else {
     s.phase = 'boxing';
-    s.phaseRemaining = s.cfg.boxRoundMs;
+    // Without autoPause the coach times boxing and breaks: no countdown here.
+    s.phaseRemaining = s.cfg.autoPause ? s.cfg.boxRoundMs : null;
   }
   events.push('roundStart');
 }
@@ -99,6 +100,16 @@ function endRound(s, events) {
   events.push('roundEnd');
   if (s.round >= s.cfg.rounds) {
     finish(s, null, 'decision', events);
+    return;
+  }
+  if (!s.cfg.autoPause) {
+    // No timed breaks: boxing is followed straight by the next chess round,
+    // and chess by an untimed boxing phase that covers boxing and breaks.
+    if (s.phase === 'boxing') { events.pop(); startPhase(s, s.round + 1, events); return; }
+    s.round += 1;
+    s.phase = 'boxing';
+    s.phaseRemaining = null;
+    s.roundOver = false;
     return;
   }
   s.phase = 'break';
@@ -133,7 +144,10 @@ export function tick(s, now) {
     const c = s.cfg;
     if (c.moveLimit) {
       if (m0 < c.moveWarnMs && s.moveElapsed >= c.moveWarnMs) events.push('moveWarn');
-      if (m0 < c.moveCountdownMs && s.moveElapsed >= c.moveCountdownMs) events.push('moveCountdown');
+      if (m0 < c.moveCountdownMs && s.moveElapsed >= c.moveCountdownMs) {
+        events.push('moveCountdown');
+        if (giveCount(s, p, false, events)) return events;
+      }
       const limit = c.moveCountdownMs + c.moveGraceMs;
       if (s.moveElapsed > c.moveCountdownMs && m0 < limit) {
         const sec = crossedSecond(limit - Math.max(m0, c.moveCountdownMs), limit - s.moveElapsed, 9);
@@ -152,6 +166,7 @@ export function tick(s, now) {
     return events;
   }
 
+  if (s.phaseRemaining === null) return events;
   const r0 = s.phaseRemaining;
   s.phaseRemaining = Math.max(0, r0 - dt);
   if (crossedSecond(r0, s.phaseRemaining, 10) === 10) events.push('phaseTen');
@@ -197,24 +212,30 @@ export function skipPhase(s, now) {
   return events;
 }
 
-// A boxing count (standing count / knockdown), or an illegal chess move,
-// both given against `player`.
-export function addCount(s, player, illegal, now) {
-  tick(s, now);
-  if (s.phase === 'ready' || s.phase === 'over') return [];
-  const round = s.phase === 'break' ? s.nextRound - 1 : s.round;
-  s.counts.push({ player, round, illegal });
-  const events = ['count'];
-  if (illegal && s.phase === 'chess' && s.turn !== player) {
-    // The offender takes the move back and plays again on their own clock.
-    s.turn = player;
-    s.moveElapsed = 0;
-  }
-  if (countsOf(s, player, round) >= s.cfg.countsPerRound) {
+// A count against `player`, in the current chess round. Returns true when
+// it loses the fight.
+function giveCount(s, player, illegal, events) {
+  s.counts.push({ player, round: s.round, illegal });
+  events.push('count');
+  if (countsOf(s, player, s.round) >= s.cfg.countsPerRound) {
     finish(s, player, `${s.cfg.countsPerRound} comptes dans le round`, events);
   } else if (countsOf(s, player) >= s.cfg.countsTotal) {
     finish(s, player, `${s.cfg.countsTotal} comptes au total`, events);
+  } else return false;
+  return true;
+}
+
+// An illegal move by `player`, claimed by the opponent: it counts as a count
+// and the offender takes the move back and plays again.
+export function illegalMove(s, player, now) {
+  tick(s, now);
+  if (s.phase !== 'chess') return [];
+  const events = [];
+  if (s.turn !== player) {
+    s.turn = player;
+    s.moveElapsed = 0;
   }
+  giveCount(s, player, true, events);
   return events;
 }
 

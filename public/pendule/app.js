@@ -1,6 +1,6 @@
 import {
   PRESETS, defaultConfig, newFight, tick, start, press, togglePause, skipPhase,
-  addCount, undoCount, reopen, endFight, adjustTime, moveStage, moveCountdownLeft,
+  illegalMove, undoCount, reopen, endFight, adjustTime, moveStage, moveCountdownLeft,
   countsOf, roundType, formatClock,
 } from './clock.js';
 import { unlockAudio, play } from './sound.js';
@@ -111,17 +111,11 @@ function buildHalves() {
       </div>
       <div class="h-actions">
         <button type="button" class="btn btn-illegal">Coup illégal adverse</button>
-        <button type="button" class="btn btn-count">+1 compte</button>
       </div>`;
     h.querySelector('.btn-illegal').addEventListener('pointerdown', e => {
       e.stopPropagation();
-      act(addCount(s, 1 - p, true, performance.now()));
+      act(illegalMove(s, 1 - p, performance.now()));
       showToast(`Coup illégal de ${s.cfg.names[1 - p]} : 1 compte`);
-    });
-    h.querySelector('.btn-count').addEventListener('pointerdown', e => {
-      e.stopPropagation();
-      act(addCount(s, p, false, performance.now()));
-      showToast(`1 compte pour ${s.cfg.names[p]}`);
     });
   });
 }
@@ -134,6 +128,7 @@ halves.forEach(h => h.addEventListener('pointerdown', e => {
 $('bar-btn').addEventListener('click', () => {
   unlockAudio();
   if (s.phase === 'ready') act(start(s, performance.now()));
+  else if (s.phase === 'boxing' && s.phaseRemaining === null) act(skipPhase(s, performance.now()));
   else act(togglePause(s, performance.now()));
 });
 
@@ -215,7 +210,9 @@ function render() {
   const shownRound = s.phase === 'break' ? s.nextRound : s.round;
   const stage = moveStage(s);
   const cd = moveCountdownLeft(s);
-  const roundForCounts = s.phase === 'break' ? s.nextRound - 1 : s.round;
+  const lastRound = s.phase === 'break' ? s.nextRound - 1 : s.round;
+  const roundForCounts = lastRound % 2 ? lastRound : lastRound - 1;
+  const untimed = s.phaseRemaining === null;
 
   halves.forEach(h => {
     const p = +h.dataset.p;
@@ -226,7 +223,7 @@ function render() {
     h.classList.toggle('low', s.remaining[p] < 10000);
     h.querySelector('.h-clock').textContent = formatClock(s.remaining[p]);
     const phaseEl = h.querySelector('.h-phase');
-    phaseEl.textContent = s.phase === 'boxing' ? `BOXE ${formatClock(s.phaseRemaining)}`
+    phaseEl.textContent = s.phase === 'boxing' ? (untimed ? 'BOXE' : `BOXE ${formatClock(s.phaseRemaining)}`)
       : s.phase === 'break' ? `PAUSE ${formatClock(s.phaseRemaining)}` : '';
     const move = h.querySelector('.h-move');
     if (active && cd !== null) move.textContent = cd;
@@ -235,16 +232,17 @@ function render() {
     h.querySelector('[data-k=round]').innerHTML = dots(countsOf(s, p, roundForCounts), s.cfg.countsPerRound);
     h.querySelector('[data-k=total]').innerHTML = dots(countsOf(s, p), s.cfg.countsTotal);
     h.querySelector('.btn-illegal').hidden = s.phase !== 'chess' || s.paused;
-    h.querySelector('.btn-count').hidden = s.phase !== 'boxing' || s.paused;
   });
 
   $('bar-round').textContent = `Round ${shownRound}/${s.cfg.rounds}`;
   $('bar-phase').textContent = s.phase === 'break'
     ? `Pause → ${roundType(s.nextRound) === 'chess' ? 'échecs' : 'boxe'}`
     : s.roundOver ? 'Temps du round !' : (s.paused ? 'En pause' : PHASE_LABEL[s.phase]);
-  $('bar-timer').textContent = s.phase === 'ready' ? formatClock(s.cfg.chessRoundMs) : formatClock(s.phaseRemaining);
+  $('bar-timer').textContent = s.phase === 'ready' ? formatClock(s.cfg.chessRoundMs) : untimed ? '' : formatClock(s.phaseRemaining);
   document.querySelector('.bar').classList.toggle('alert', s.roundOver && !s.paused);
-  $('bar-btn').textContent = s.phase === 'ready' ? '▶ GO' : s.paused ? '▶ REPRENDRE' : 'PAUSE';
+  $('bar-btn').textContent = s.phase === 'ready' ? '▶ GO' : s.paused ? '▶ REPRENDRE'
+    : untimed && s.phase === 'boxing' ? `▶ ROUND ${s.round + 1}` : 'PAUSE';
+  $('bar-btn').classList.toggle('go', untimed && s.phase === 'boxing' && !s.paused);
 
   $('pause-menu').hidden = !(s.paused && s.phase !== 'over') || !$('end-menu').hidden;
   if (!$('pause-menu').hidden) renderPauseMenu();
@@ -256,7 +254,8 @@ function renderPauseMenu() {
   const skip = $('pm-skip');
   if (s.phase === 'break') skip.textContent = `Lancer le round ${next} (${roundType(next) === 'chess' ? 'échecs' : 'boxe'})`;
   else if (s.round >= s.cfg.rounds) skip.textContent = 'Fin du dernier round';
-  else skip.textContent = `Terminer le round ${s.round} → pause`;
+  else if (s.phase === 'boxing' && !s.cfg.autoPause) skip.textContent = `Lancer le round ${s.round + 1} (échecs)`;
+  else skip.textContent = `Terminer le round ${s.round} → ${s.cfg.autoPause ? 'pause' : 'boxe'}`;
   $('pm-undo').hidden = !s.counts.length;
   $('pm-adjust').innerHTML = [0, 1].map(p => `
     <span>${escapeHtml(s.cfg.names[p])} <b>${formatClock(s.remaining[p])}</b></span>

@@ -3,7 +3,7 @@
 
 import {
   defaultConfig, newFight, tick, start, press, togglePause, skipPhase,
-  addCount, undoCount, reopen, moveStage, moveCountdownLeft, countsOf,
+  illegalMove, undoCount, reopen, moveStage, moveCountdownLeft, countsOf,
 } from '../public/pendule/clock.js';
 
 const errors = [];
@@ -52,6 +52,7 @@ for (const [r, min] of [[5, 4.5], [7, 6], [9, 7.5], [11, 9]]) {
   check(ev.includes('moveWarn') && moveStage(s) === 'warn', 'warning at 20 s');
   ev = run(s, 20000, 30000);
   check(ev.includes('moveCountdown') && moveCountdownLeft(s) === 10, 'countdown starts at 30 s');
+  check(countsOf(s, 0) === 1, 'a countdown is a count');
   ev = run(s, 30000, 39900);
   check(ev.filter(e => e === 'moveTick').length === 9, 'one tick per countdown second');
   ev = run(s, 39900, 40000);
@@ -71,13 +72,18 @@ for (const [r, min] of [[5, 4.5], [7, 6], [9, 7.5], [11, 9]]) {
   check(s.moveElapsed === 0 && moveStage(s) === 'ok', 'move timer resets after the move');
 }
 
-// Auto-pause off: round time up is signalled but clocks keep running
+// Auto-pause off: round time up is signalled but clocks keep running;
+// boxing is untimed and the coach starts the next chess round
 {
   const s = fight({ moveLimit: false });
   const ev = run(s, 0, 180000);
   check(ev.includes('roundTimeUp') && s.phase === 'chess' && s.roundOver, 'manual mode: alert at 3 min, no pause');
   skipPhase(s, 180000);
-  check(s.phase === 'break' && s.nextRound === 2, 'skip goes to the break before boxing');
+  check(s.phase === 'boxing' && s.round === 2 && s.phaseRemaining === null, 'manual mode: untimed boxing');
+  run(s, 180000, 900000);
+  check(s.phase === 'boxing', 'manual mode: boxing waits for the coach');
+  skipPhase(s, 900000);
+  check(s.phase === 'chess' && s.round === 3 && s.moveElapsed === 0, 'manual mode: next chess round, move timer at zero');
 }
 
 // Auto-pause on: chess -> break -> boxing -> break -> chess, clocks frozen outside chess
@@ -112,26 +118,32 @@ for (const [r, min] of [[5, 4.5], [7, 6], [9, 7.5], [11, 9]]) {
   check(s.phase === 'over' && s.result.loser === 0 && s.result.method === 'temps', 'lose on time when the clock reaches zero');
 }
 
-// Counts: 3 in a round or 4 in total lose; illegal moves count
+// Counts: each move countdown and each illegal move; 3 in a round or 4 in total lose
+{
+  const s = fight({ autoPause: true });
+  run(s, 0, 31000); press(s, 0, 31000);          // white: count 1
+  run(s, 31000, 62000); press(s, 1, 62000);      // black: count 1
+  run(s, 62000, 93000); press(s, 0, 93000);      // white: count 2
+  check(countsOf(s, 0, 1) === 2 && s.phase === 'chess', 'two counts are not a loss');
+  run(s, 93000, 103000);                          // black thinks 10 s
+  press(s, 1, 103000);
+  illegalMove(s, 0, 103000);                      // white's move was illegal... claimed late: white to play again
+  check(s.phase === 'over' && s.result.loser === 0 && s.result.method.includes('round'), '3 counts in a round lose');
+  undoCount(s, 103000);
+  check(s.phase === 'chess' && s.paused && countsOf(s, 0) === 2, 'undo the count reopens the fight, paused');
+}
 {
   const s = fight({ moveLimit: false, autoPause: true });
-  skipPhase(s, 0); skipPhase(s, 0); // into boxing round 2
-  addCount(s, 1, false, 0); addCount(s, 1, false, 0);
-  check(s.phase === 'boxing', 'two counts are not a loss');
-  addCount(s, 1, false, 0);
-  check(s.phase === 'over' && s.result.loser === 1 && s.result.method.includes('round'), '3 counts in a round lose');
-  undoCount(s, 0);
-  check(s.phase === 'boxing' && s.paused && countsOf(s, 1) === 2, 'undo the count reopens the fight, paused');
-  togglePause(s, 0);
-  skipPhase(s, 0); skipPhase(s, 0); // chess round 3
-  press(s, 0, 0); // white moved, black to play... white's move was illegal
-  check(s.turn === 1, 'black to move');
-  addCount(s, 0, true, 0);
+  press(s, 0, 0);
+  illegalMove(s, 0, 0);
   check(s.turn === 0 && countsOf(s, 0) === 1, 'illegal move: 1 count and the offender plays again');
-  addCount(s, 1, true, 0);
-  check(s.phase === 'chess' && countsOf(s, 1) === 3, 'three counts over two rounds are not a loss');
-  addCount(s, 1, true, 0);
-  check(s.phase === 'over' && s.result.loser === 1 && s.result.method.includes('total'), '4 counts in total lose');
+  illegalMove(s, 0, 0);
+  for (let i = 0; i < 4; i++) skipPhase(s, 0); // to chess round 3
+  check(s.round === 3 && s.phase === 'chess', 'reach round 3');
+  illegalMove(s, 0, 0);
+  check(s.phase === 'chess' && countsOf(s, 0) === 3, 'three counts over two rounds are not a loss');
+  illegalMove(s, 0, 0);
+  check(s.phase === 'over' && s.result.method.includes('total'), '4 counts in total lose');
 }
 
 if (errors.length) {
