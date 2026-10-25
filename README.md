@@ -10,7 +10,7 @@ This project is hosted on GitHub Pages. You can view the live page here:
 
 ## Chessboxing clock
 
-[`public/pendule/`](public/pendule/) is a chess clock for chessboxing bouts, installable on a phone (PWA, works offline): [https://Lassolas.github.io/chessboxing_ranking/pendule/](https://Lassolas.github.io/chessboxing_ranking/pendule/). Presets 5/7/9/11 rounds, optional auto-pause after each chess round, per-move thinking limit, boxing counts and illegal moves. The logic lives in `public/pendule/clock.js` and is checked by `tests/pendule-clock.mjs`.
+The chess clock for bouts now lives in its own repository: [Lassolas/chessboxing_pendule](https://github.com/Lassolas/chessboxing_pendule) ([live](https://lassolas.github.io/chessboxing_pendule/)). `/pendule/` here only redirects there.
 
 ## How the probabilities work
 
