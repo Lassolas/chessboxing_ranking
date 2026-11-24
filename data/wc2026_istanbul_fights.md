@@ -13,9 +13,13 @@ only when the documents prove it:
 - **bracket tree (loser struck through)**: the loser's name is struck through on the
   bracket tree (Men -74, Men -79 qualifiers, Women -52 semi-finals).
 
-`win_method` is empty unless written in a document. The only one found is a **TKO**
-(Women -52 semi-final, Noskova over Brown). Checkmate/KO/time/points are not recorded
-anywhere else, and **no final result is recorded** (all finals have an empty `winner`).
+- **reported by Val (results form, 2026-11-24)**: final and exhibition results the
+  documents don't have, entered by Val on a form. 21 of the 29 missing results were
+  filled in this way, 20 of them with the win method. The other 8 (5 Juniors finals and the
+  Masters -85, -100 and +100 finals) are still unknown and keep an empty `winner`.
+
+`win_method` comes from Val's answers, plus one **TKO** written on a bracket (Women -52
+semi-final, Noskova over Brown). Methods for the earlier rounds are not recorded.
 
 ## Columns left for the evaluation
 
@@ -26,9 +30,9 @@ row so they can be joined to a ratings table.
 
 ## Gaps and contradictions in the sources
 
-1. **No final results.** Men -61 and Men -85 bracket medal tables list a SILVER
-   (Zhandaulet, Marcel), but the final slot is empty and the bronze cell shows `#REF!`,
-   so this looks like a spreadsheet formula artefact. Left unconfirmed.
+1. **No final results in the documents.** The Men -61 bracket medal table lists
+   Zhandaulet as SILVER, but Val reports that Zhandaulet won the final, so the medal tables
+   are not reliable (spreadsheet formula artefact; bronze shows `#REF!`).
 2. **Dates.** Bracket headers say 16 to 21/11/2026; fights are scheduled 17 to 21 Nov.
 3. **Two versions of the Day 3 morning sheet** ((4) and (5)) with different times;
    the (5) version is used.
