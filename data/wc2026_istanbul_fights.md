@@ -79,5 +79,7 @@ that video), `video_winner`, `video_method`, `video_round`, `video_stoppages`,
   Antapa. Unresolved.
 - **WC26-075 Men +100**: two silvers (Latifi Refik and Feujio) by appeals committee decision.
 - **WC26-054 Men -79 final**: ending not shown on stream.
-- **No video yet** for 25 fights: Day 1 (no captions; Whisper script pending) and the
+- **Day 1**: KABckf5Qcuo is the Chess.com copy of Day 3, not Day 1. The French recap
+  FVPGjs_3pgo covers the 4 French Day 1 fights (WC26-029, -034, -057, -064).
+- **No video yet** for 21 fights: rest of Day 1 (no captions; Whisper script pending) and the
   Masters -79 quarter-finals WC26-101/102.
