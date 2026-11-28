@@ -56,3 +56,28 @@ row so they can be joined to a ratings table.
 12. **Name and country spellings** are harmonised: club cities (Cologne, Montreal) are
     replaced by the tree's country (Germany, Canada); names keep the bracket-tree spelling,
     which is sometimes surname first (e.g. "Volkov Maxime", "Righi Sofian", "Marty Jean-Yves").
+
+## Results from the livestream commentary (added 2026-11-28)
+
+Source: YouTube auto-captions of the United Chessboxing and Chesscom Events streams
+(Days 2 to 5, gala finals, medal ceremony). Per-video detail lives in the project's
+`video_results/` CSVs. New columns: `video_id`, `video_start`, `video_end` (h:mm:ss in
+that video), `video_winner`, `video_method`, `video_round`, `video_stoppages`,
+`video_comment`, `video_check`.
+
+- **8 unknown finals filled from the medal ceremony** (result_source says so):
+  Juniors -59 Belov, -63 Mchedlishvili, -67 Nazarenko, -78 Sultangaziev, -84 Karabanov;
+  Masters -85 Fedorenko, -100 Bespalov, +100 Shayakhmetov (name cut in captions, only
+  "from Kazakhstan" heard).
+- **win_method** filled from the stream where it was empty. Where Val's reported method
+  differs from the stream, the list keeps Val's and `video_check` flags it: WC26-071 and
+  WC26-085, -100, -111, -075 (stream: time), WC26-073 (resignation), WC26-080 (checkmate,
+  not TKO).
+- **Reversed on appeal**: WC26-049 (stream: Percoskie on time) and WC26-051 (stream:
+  Perevalov mate). The ceremony gave Percoskie and Perevalov extra bronzes.
+- **WC26-076 exhibition**: stream shows Pratibha beating Antapa on time; list still says
+  Antapa. Unresolved.
+- **WC26-075 Men +100**: two silvers (Latifi Refik and Feujio) by appeals committee decision.
+- **WC26-054 Men -79 final**: ending not shown on stream.
+- **No video yet** for 25 fights: Day 1 (no captions; Whisper script pending) and the
+  Masters -79 quarter-finals WC26-101/102.
